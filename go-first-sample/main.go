@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"./structs"
 	"./utils"
 )
 
@@ -21,4 +22,9 @@ func main() {
 
 	// 複数の戻り値はそのまま引数として使うことも可能
 	fmt.Printf("%v\n", utils.JoinString(utils.GetMultiReturns()))
+
+	// 構造体の初期化
+	u := structs.User{Name: "taro", Age: 16}
+	// メソッドの呼び出し
+	u.Talk()
 }
