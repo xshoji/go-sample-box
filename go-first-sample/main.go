@@ -37,7 +37,9 @@ func main() {
 	fmt.Printf("%v\n", utils.JoinString(utils.GetMultiReturns()))
 
 	// 構造体の初期化
-	u := structs.User{Name: "taro", Age: 16}
+	taro := structs.User{Name: "taro", Age: 16}
+	jiro := structs.User{Name: "jiro", Age: 99}
 	// メソッドの呼び出し
-	u.Talk()
+	taro.Talk()
+	jiro.Talk()
 }
