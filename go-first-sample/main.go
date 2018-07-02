@@ -25,6 +25,7 @@ func main() {
 	valueStringSlice = append(valueStringSlice, "ddd")
 	fmt.Printf("%v\n", valueStringSlice)
 
+	// for
 	for _, v := range valueStringSlice {
 		fmt.Println(v)
 	}
