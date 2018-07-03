@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/xshoji/go-sample-box/basic/structs"
-	"github.com/xshoji/go-sample-box/basic/utils"
+	. "github.com/xshoji/go-sample-box/basic/structs"
+	. "github.com/xshoji/go-sample-box/basic/utils"
 )
 
 func main() {
@@ -40,14 +40,14 @@ func main() {
 	// public method
 	// Package prefix is required when calling method
 	fmt.Println("function")
-	fmt.Printf("%v\n", utils.JoinString("aaa", "bbb"))
-	fmt.Printf("%v\n", utils.JoinString(utils.GetMultiReturns()))
+	fmt.Printf("%v\n", JoinString("aaa", "bbb"))
+	fmt.Printf("%v\n", JoinString(GetMultiReturns()))
 	fmt.Println("")
 
 	// 構造体の初期化
 	fmt.Println("structs, method")
-	taro := structs.User{Name: "taro", Age: 16}
-	jiro := structs.User{Name: "jiro", Age: 99}
+	taro := NewUser("taro", 16)
+	jiro := NewUser("jiro", 99)
 	// メソッドの呼び出し
 	taro.Talk()
 	jiro.Talk()
