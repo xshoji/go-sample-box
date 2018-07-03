@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/xshoji/go-sample-box/go-basic-sample/structs"
-	"github.com/xshoji/go-sample-box/go-basic-sample/utils"
+	"github.com/xshoji/go-sample-box/basic/structs"
+	"github.com/xshoji/go-sample-box/basic/utils"
 )
 
 func main() {
