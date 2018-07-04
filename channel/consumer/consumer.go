@@ -7,6 +7,13 @@ type Consumer struct {
 	Channel <-chan string
 }
 
+// NewConsumer NewConsumer
+func NewConsumer(ch <-chan string) *Consumer {
+	c := new(Consumer)
+	c.Channel = ch
+	return c
+}
+
 // Consume Consume
 func (c Consumer) Consume() {
 

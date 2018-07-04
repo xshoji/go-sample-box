@@ -9,8 +9,8 @@ import (
 
 func main() {
 	channel := make(chan string)
-	producer := producer.Producer{Channel: channel}
-	consumer := consumer.Consumer{Channel: channel}
+	producer := producer.NewProducer(channel)
+	consumer := consumer.NewConsumer(channel)
 
 	fmt.Println("Consumer start")
 	go consumer.Consume()
