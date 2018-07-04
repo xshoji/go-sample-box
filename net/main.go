@@ -21,10 +21,11 @@ func main() {
 
 	fmt.Println("GetAsObject parsed")
 	fmt.Printf(
-		"hash: %v\ntime: %.f\nblock_index: %.f\nheight: %.f\n",
+		"hash: %v\ntime: %.f\nblock_index: %.f\nheight: %.f\ntxIndexes_count: %d\n",
 		result.(map[string]interface{})["hash"].(string),
 		result.(map[string]interface{})["time"].(float64),
 		result.(map[string]interface{})["block_index"].(float64),
 		result.(map[string]interface{})["height"].(float64),
+		len(result.(map[string]interface{})["txIndexes"].([]interface{})),
 	)
 }
