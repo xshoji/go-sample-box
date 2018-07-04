@@ -19,13 +19,18 @@ func NewClient(url string) *Client {
 	return client
 }
 
-// GetAsString GetAsString
-func (c *Client) GetAsString() string {
+// GetWithPathAsString GetWithPathAsString
+func (c *Client) getBodyBytesWithPath(path string) []byte {
 	if c.Url == "" {
 		log.Panic("Url is")
 	}
 
-	resp, err := http.Get(c.Url)
+	url := c.Url
+	if path != "" {
+		url = url + "/" + path
+	}
+
+	resp, err := http.Get(url)
 	if err != nil {
 		log.Panic("Error occured. | ", err)
 	}
@@ -35,28 +40,29 @@ func (c *Client) GetAsString() string {
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
-	bodyString := string(body)
+	return body
+}
+
+// GetWithPathAsString GetWithPathAsString
+func (c *Client) GetWithPathAsString(path string) string {
+	bodyString := string(c.getBodyBytesWithPath(path))
 	return bodyString
 }
 
+// GetAsString GetAsString
+func (c *Client) GetAsString() string {
+	return c.GetWithPathAsString("")
+}
+
+// GetWithPathAsObject GetWithPathAsObject
 // - [golang は ゆるふわに JSON を扱えまぁす! — KaoriYa](https://www.kaoriya.net/blog/2016/06/25/)
+func (c *Client) GetWithPathAsObject(path string) interface{} {
+	var result interface{}
+	json.Unmarshal(c.getBodyBytesWithPath(path), &result)
+	return result
+}
+
 // GetAsObject GetAsObject
 func (c *Client) GetAsObject() interface{} {
-	if c.Url == "" {
-		log.Panic("Url is")
-	}
-
-	resp, err := http.Get(c.Url)
-	if err != nil {
-		log.Panic("Error occured. | ", err)
-	}
-	if resp.StatusCode != http.StatusOK {
-		log.Panic("Status is not OK. | ", resp.StatusCode)
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	var result interface{}
-	json.Unmarshal(body, &result)
-	return result
+	return c.GetWithPathAsObject("")
 }
