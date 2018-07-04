@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/xshoji/go-sample-box/net/client"
+	"github.com/xshoji/go-sample-box/httpget/client"
 )
 
 // - [http - The Go Programming Language](https://golang.org/pkg/net/http/)
