@@ -22,7 +22,7 @@ func main() {
 	clientRawTx := client.NewClient("https://blockchain.info/rawtx")
 	// - [Go の channel 処理パターン集 · Hori Blog](https://hori-ryota.com/blog/golang-channel-pattern/#%E5%AE%9A%E7%BE%A9%E3%81%AE%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3)
 	txhashChannel := make(chan string, ChannelCapacity)
-	// 3並列処理で処理する
+	// ConcurrentCount数で並列処理する
 	var consumers []*consumer.Consumer
 	var c *consumer.Consumer
 	for i := 0; i < ConcurrentCount; i++ {
