@@ -10,5 +10,5 @@ import (
 // - [networking - Access HTTP response as string in Go - Stack Overflow](https://stackoverflow.com/questions/38673673/access-http-response-as-string-in-go)
 func main() {
 	apiClient := apiclient.NewApiClient("https://blockchain.info//latestblock")
-	fmt.Println(apiClient.Get())
+	fmt.Println(apiClient.GetAsString())
 }

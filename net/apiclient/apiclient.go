@@ -18,8 +18,8 @@ func NewApiClient(url string) *ApiClient {
 	return client
 }
 
-// Get Get
-func (c *ApiClient) Get() string {
+// GetAsString GetAsString
+func (c *ApiClient) GetAsString() string {
 	if c.Url == "" {
 		log.Panic("Url is empty")
 	}
