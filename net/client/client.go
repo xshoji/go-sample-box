@@ -1,4 +1,4 @@
-package apiclient
+package client
 
 import (
 	"io/ioutil"
@@ -6,22 +6,22 @@ import (
 	"net/http"
 )
 
-// ApiClient ApiClient
-type ApiClient struct {
+// Client Client
+type Client struct {
 	Url string
 }
 
-// NewApiClient NewApiClient
-func NewApiClient(url string) *ApiClient {
-	client := new(ApiClient)
+// NewClient NewClient
+func NewClient(url string) *Client {
+	client := new(Client)
 	client.Url = url
 	return client
 }
 
 // GetAsString GetAsString
-func (c *ApiClient) GetAsString() string {
+func (c *Client) GetAsString() string {
 	if c.Url == "" {
-		log.Panic("Url is empty")
+		log.Panic("Url is")
 	}
 
 	resp, err := http.Get(c.Url)
