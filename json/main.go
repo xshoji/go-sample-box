@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 
 	"github.com/xshoji/go-sample-box/json/client"
 )
@@ -16,4 +18,10 @@ func main() {
 	fmt.Printf("height: %.f\n", block.Height)
 	fmt.Printf("block_index: %.f\n", block.BlockIndex)
 	fmt.Printf("txIndexesCount: %d\n", len(block.TxIndexes))
+
+	bytes, err := json.Marshal(block)
+	if err != nil {
+		log.Panic("error")
+	}
+	fmt.Println(string(bytes))
 }
