@@ -9,23 +9,23 @@ import (
 
 // Client Client
 type Client struct {
-	Url string
+	URL string
 }
 
 // NewClient NewClient
 func NewClient(url string) *Client {
 	client := new(Client)
-	client.Url = url
+	client.URL = url
 	return client
 }
 
 // GetWithPathAsString GetWithPathAsString
 func (c *Client) getBodyBytesWithPath(path string) []byte {
-	if c.Url == "" {
+	if c.URL == "" {
 		log.Panic("Url is")
 	}
 
-	url := c.Url
+	url := c.URL
 	if path != "" {
 		url = url + "/" + path
 	}
