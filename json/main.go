@@ -17,7 +17,6 @@ func main() {
 	fmt.Printf("time: %.f\n", block.Time)
 	fmt.Printf("height: %.f\n", block.Height)
 	fmt.Printf("block_index: %.f\n", block.BlockIndex)
-	fmt.Printf("txIndexesCount: %d\n", len(block.TxIndexes))
 
 	bytes, err := json.Marshal(block)
 	if err != nil {
