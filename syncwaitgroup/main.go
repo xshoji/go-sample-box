@@ -5,7 +5,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/xshoji/go-sample-box/sync/worker"
+	"github.com/xshoji/go-sample-box/syncwaitgroup/worker"
 )
 
 func main() {
