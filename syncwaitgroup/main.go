@@ -8,6 +8,7 @@ import (
 	"github.com/xshoji/go-sample-box/syncwaitgroup/worker"
 )
 
+// channelを使わないお手軽非同期並行処理
 func main() {
 	// - [syncパッケージを利用した同期処理 - はじめてのGo言語](http://cuto.unirita.co.jp/gostudy/post/go_sync/)
 	workerGroup := new(sync.WaitGroup)
