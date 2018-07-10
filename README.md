@@ -12,3 +12,7 @@
 
   この記事にならって、`~/go/src/[username]/[repository]`配下にcloneしてきて、
   パッケージの参照を`"github.com/xshoji/go-sample-box/go-first-sample/structs"`とかにしたらうまくいった
+
+## References
+
+ - [gostor/awesome-go-storage： A curated list of awesome Go storage projects and libraries](https://github.com/gostor/awesome-go-storage)
