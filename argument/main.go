@@ -19,8 +19,8 @@ func main() {
 		flag.Usage()
 		os.Exit(0)
 	}
-	fmt.Println("count: ", *count)
 	fmt.Println("title: ", *title)
+	fmt.Println("count: ", *count)
 	fmt.Println("debug: ", *isDebug)
 
 }
