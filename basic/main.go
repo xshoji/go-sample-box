@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/xshoji/go-sample-box/basic/structs"
 	"github.com/xshoji/go-sample-box/basic/utils"
@@ -14,6 +15,10 @@ func main() {
 	valueRune := '\n'
 	valueString := "test"
 	fmt.Printf("valueInt, valueDouble, valueRune, valueString\n%v, %v, %v, %v\n", valueInt, valueDouble, valueRune, valueString)
+	fmt.Println("")
+
+	// cast
+	fmt.Printf("valueInt: %d, valueString: %s\n", valueInt, strconv.Itoa(valueInt))
 	fmt.Println("")
 
 	// array
