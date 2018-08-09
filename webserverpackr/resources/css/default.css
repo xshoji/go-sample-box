@@ -1,0 +1,9 @@
+#body {
+    font-size: 30px;
+    font-family: monospace;
+    color: blue;
+}
+
+#body:hover {
+    color: red;
+}
