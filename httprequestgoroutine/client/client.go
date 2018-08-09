@@ -9,23 +9,6 @@ import (
 	"strings"
 )
 
-// Client Client
-type Client struct {
-	url string
-}
-
-// NewClient NewClient
-func NewClient(url string) *Client {
-	client := new(Client)
-	client.url = url
-	return client
-}
-
-// GetUrl GetUrl
-func (c *Client) GetUrl() string {
-	return c.url
-}
-
 // ResponseResult ResponseResult
 type ResponseResult struct {
 	responseBody string
@@ -48,6 +31,23 @@ func (r *ResponseResult) GetBodyAsObject() interface{} {
 	var result interface{}
 	json.Unmarshal([]byte(r.responseBody), &result)
 	return result
+}
+
+// Client Client
+type Client struct {
+	url string
+}
+
+// NewClient NewClient
+func NewClient(url string) *Client {
+	client := new(Client)
+	client.url = url
+	return client
+}
+
+// GetUrl GetUrl
+func (c *Client) GetUrl() string {
+	return c.url
 }
 
 // callApi callApi
