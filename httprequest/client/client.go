@@ -45,18 +45,18 @@ func NewClient(url string) *Client {
 	return client
 }
 
-// GetUrl GetUrl
-func (c *Client) GetUrl() string {
+// GetURL GetURL
+func (c *Client) GetURL() string {
 	return c.url
 }
 
-// callApi callApi
-func (c *Client) callApi(path string, httpMethod string, postData map[string][]string) []byte {
-	if c.GetUrl() == "" {
+// callAPI callAPI
+func (c *Client) callAPI(path string, httpMethod string, postData map[string][]string) []byte {
+	if c.GetURL() == "" {
 		log.Panic("Client has not Url.")
 	}
 
-	urlFull := c.GetUrl()
+	urlFull := c.GetURL()
 	if path != "" {
 		urlFull = urlFull + "/" + path
 	}
@@ -66,6 +66,7 @@ func (c *Client) callApi(path string, httpMethod string, postData map[string][]s
 	if httpMethod == "GET" {
 		resp, err = http.Get(urlFull)
 	} else if httpMethod == "POST" {
+		// - [How to send a POST request in Go? - Stack Overflow](https://stackoverflow.com/questions/24493116/how-to-send-a-post-request-in-go)
 		form := url.Values(postData)
 		resp, err = http.Post(urlFull, "text/plain", strings.NewReader(form.Encode()))
 	} else {
@@ -84,24 +85,24 @@ func (c *Client) callApi(path string, httpMethod string, postData map[string][]s
 	return body
 }
 
-// callApiGet callApiGet
-func (c *Client) callApiGet(path string) []byte {
-	return c.callApi(path, "GET", nil)
+// callAPIGet callAPIGet
+func (c *Client) callAPIGet(path string) []byte {
+	return c.callAPI(path, "GET", nil)
 }
 
-// callApiPost callApiPost
-func (c *Client) callApiPost(path string, postData map[string][]string) []byte {
-	return c.callApi(path, "POST", postData)
+// callAPIPost callAPIPost
+func (c *Client) callAPIPost(path string, postData map[string][]string) []byte {
+	return c.callAPI(path, "POST", postData)
 }
 
 // Post Post
 func (c *Client) Post(path string, postData map[string][]string) *ResponseResult {
-	bodyString := string(c.callApiPost(path, postData))
+	bodyString := string(c.callAPIPost(path, postData))
 	return NewResponseResult(bodyString)
 }
 
 // Get Get
 func (c *Client) Get(path string) *ResponseResult {
-	bodyString := string(c.callApiGet(path))
+	bodyString := string(c.callAPIGet(path))
 	return NewResponseResult(bodyString)
 }
