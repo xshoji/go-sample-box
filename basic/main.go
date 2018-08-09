@@ -35,10 +35,20 @@ func main() {
 	fmt.Printf("%v\n", valueStringSlice)
 	fmt.Println("")
 
+	//map
+	mapValues := map[string]string{
+		"aaa": "aaa",
+		"bbb": "aaa",
+		"ccc": "aaa",
+	}
+
 	// for
 	fmt.Println("for")
 	for _, v := range valueStringSlice {
 		fmt.Println(v)
+	}
+	for k, v := range mapValues {
+		fmt.Println(k + ":" + v)
 	}
 	fmt.Println("")
 

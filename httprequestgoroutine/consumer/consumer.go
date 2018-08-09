@@ -3,7 +3,7 @@ package consumer
 import (
 	"fmt"
 
-	"github.com/xshoji/go-sample-box/httpget/client"
+	"github.com/xshoji/go-sample-box/httprequestgoroutine/client"
 )
 
 // Consumer Consumer
@@ -36,7 +36,7 @@ func (c Consumer) Consume() {
 	var result interface{}
 	for v := range c.Channel {
 		fmt.Println("Consumer is recieved: ", v)
-		result = c.ClientTx.GetWithPathAsObject(v)
+		result = c.ClientTx.Get(v).GetBodyAsObject()
 		fmt.Printf(
 			"hash: %v, time: %.f, tx_index: %.f\n",
 			result.(map[string]interface{})["hash"].(string),

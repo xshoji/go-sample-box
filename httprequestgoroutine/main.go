@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/xshoji/go-sample-box/httpget/client"
-	"github.com/xshoji/go-sample-box/httpget/consumer"
+	"github.com/xshoji/go-sample-box/httprequestgoroutine/client"
+	"github.com/xshoji/go-sample-box/httprequestgoroutine/consumer"
 )
 
 const (
@@ -32,11 +32,11 @@ func main() {
 	}
 
 	fmt.Println("GetAsString")
-	fmt.Println(clientLatestblock.GetAsString())
+	fmt.Println(clientLatestblock.Get("").GetBody())
 	fmt.Println("")
 
 	fmt.Println("GetAsObject")
-	resultLatestBlock := clientLatestblock.GetAsObject()
+	resultLatestBlock := clientLatestblock.Get("").GetBodyAsObject()
 	fmt.Printf("%#v\n", resultLatestBlock)
 	fmt.Println("")
 
@@ -59,7 +59,7 @@ func main() {
 	// blockHash = "0000000000000000002b7601d833e402abe8d6dd2a8337d00b1ad905c6d10247"
 
 	fmt.Println("Get transaction hashs")
-	resultSingleBlock := clientRawblock.GetWithPathAsObject(blockHash)
+	resultSingleBlock := clientRawblock.Get("/" + blockHash).GetBodyAsObject()
 	transactions := resultSingleBlock.(map[string]interface{})["tx"].([]interface{})
 	var transactionHashs []string
 	for _, transaction := range transactions {
