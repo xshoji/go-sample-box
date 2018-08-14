@@ -14,11 +14,6 @@ type options struct {
 	Port int `short:"p" long:"port" description:"Listen port" default:"9090"`
 }
 
-// type options struct {
-// 	PortResources int `short:"rp" long:"resourcePort" description:"Listen port for resources" default:"9090"`
-// 	PortAPI       int `short:"ap" long:"apiPort" description:"Listen port for Api" default:"9091"`
-// }
-
 // Response Response
 type Response struct {
 	Name    string `json:"name"`
