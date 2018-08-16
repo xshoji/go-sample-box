@@ -44,6 +44,7 @@ func main() {
 
 	// for
 	fmt.Println("for")
+	fmt.Printf("valueStringSlice size:%d\n", len(valueStringSlice))
 	for _, v := range valueStringSlice {
 		fmt.Println(v)
 	}
