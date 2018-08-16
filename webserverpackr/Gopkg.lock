@@ -1,0 +1,19 @@
+memo = "b1c62fda1f7b5ad8a7319b2df65109e7adce153c4d8dc3d20d075df50c04072d"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/gobuffalo/packr"
+  packages = ["."]
+  revision = "4399355520ba52518a972ac16c24f6eb8a1610c1"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/jessevdk/go-flags"
+  packages = ["."]
+  revision = "4f0ca1e2d1349e9662b633ea1b8b8d48e8a32533"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  revision = "816c9085562cd7ee03e7f8188a1cfd942858cded"
