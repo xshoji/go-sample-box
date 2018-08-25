@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math/rand"
 	"strconv"
+	"time"
 )
 
 // Consumer Consumer
@@ -38,6 +39,9 @@ func (c Consumer) Consume() {
 	}
 
 	for v := range c.Channel {
+		duration := time.Duration(rand.Intn(1000-1)+1) * time.Millisecond
+		fmt.Printf("[%v] Consumer sleep: %v\n", c.Identifir, duration)
+		time.Sleep(duration)
 		fmt.Printf("[%v] Consumer recieved: %v\n", c.Identifir, v)
 	}
 	fmt.Printf("[%v] Consumer channle closed.\n", c.Identifir)

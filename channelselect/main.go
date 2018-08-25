@@ -13,7 +13,7 @@ import (
 )
 
 type options struct {
-	WorkerCount int `short:"w" long:"workers" description:"Consuming worker count" default:"1"`
+	WorkerCount int `short:"w" long:"workers" description:"Consuming worker count" default:"3"`
 }
 
 // - [Go の channel 処理パターン集 · Hori Blog](https://hori-ryota.com/blog/golang-channel-pattern/)
@@ -26,7 +26,8 @@ func main() {
 		return
 	}
 
-	channel := make(chan string)
+	// channel capacity = 100
+	channel := make(chan string, 100)
 	producer := producer.NewProducer(channel)
 
 	fmt.Printf("Consuming workers : %v\n", opts.WorkerCount)
