@@ -24,4 +24,5 @@ func (c Consumer) Consume() {
 	for v := range c.Channel {
 		fmt.Println("Consumer recieved: " + v)
 	}
+	fmt.Println("Consumer channle closed.")
 }

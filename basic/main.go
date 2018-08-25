@@ -11,14 +11,18 @@ import (
 func main() {
 	// primitive types
 	valueInt := 100
-	valueDouble := 100.12
+	valueFloat64 := 100.12
 	valueRune := '\n'
 	valueString := "test"
-	fmt.Printf("valueInt, valueDouble, valueRune, valueString\n%v, %v, %v, %v\n", valueInt, valueDouble, valueRune, valueString)
+	valueBytes := []byte("test")
+	fmt.Printf("valueInt, valueFloat, valueRune, valueString\n%v, %v, %v, %v\n", valueInt, valueFloat64, valueRune, valueString)
 	fmt.Println("")
 
 	// cast
 	fmt.Printf("valueInt: %d, valueString: %s\n", valueInt, strconv.Itoa(valueInt))
+	fmt.Printf("valueFloat: %v, valueString: %s\n", valueFloat64, strconv.FormatFloat(valueFloat64, 'f', 4, 32))
+	fmt.Printf("valueString: %v, value[]byte: %v\n", valueString, []byte(valueString))
+	fmt.Printf("value[]byte: %v, valueString: %s\n", valueBytes, string(valueBytes))
 	fmt.Println("")
 
 	// array

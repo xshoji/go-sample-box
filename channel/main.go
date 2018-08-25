@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/xshoji/go-sample-box/channel/consumer"
 	"github.com/xshoji/go-sample-box/channel/producer"
@@ -19,4 +20,7 @@ func main() {
 	for _, message := range []string{"hello", "my", "name", "is", "taro"} {
 		producer.Produce(message)
 	}
+	close(channel)
+	// sleepしないとconsumerのclosedメッセージが表示されるまえにプロセスが終了しちゃう
+	time.Sleep(time.Duration(100) * time.Millisecond)
 }
