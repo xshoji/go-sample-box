@@ -32,7 +32,7 @@ func NewResponse(name string, message string, time time.Time) Response {
 }
 
 //-------------------
-// $ go ensure
+// $ dep ensure
 // $ go get -u github.com/gobuffalo/packr/packr
 // $ packr
 // $ GOOS=linux GOARCH=amd64 go build -o /tmp/webapp .
