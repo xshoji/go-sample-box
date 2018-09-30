@@ -72,4 +72,18 @@ func main() {
 	taro.Talk()
 	jiro.Talk()
 	fmt.Println("")
+
+	// 無名構造体
+	anonymousStruct := struct {
+		Name     string
+		Age      int
+		Language string
+	}{
+		"taro",
+		100,
+		"Japanese",
+	}
+	fmt.Println("anonymous struct")
+	fmt.Print(anonymousStruct)
+	fmt.Println("")
 }
