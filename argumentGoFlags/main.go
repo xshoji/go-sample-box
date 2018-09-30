@@ -6,9 +6,11 @@ import (
 	"github.com/jessevdk/go-flags"
 )
 
+// > Make default values clearer · Issue #145 · jessevdk/go-flags
+// > https://github.com/jessevdk/go-flags/issues/145
 type options struct {
 	Title string `short:"t" long:"title" description:"Description of title" required:"true"`
-	Count int    `short:"c" long:"count" description:"Description of count"`
+	Count int    `short:"c" long:"count" description:"Description of count" default:"3"`
 	Debug bool   `short:"d" long:"debug" description:"Description of debug"`
 }
 
