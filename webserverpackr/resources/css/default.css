@@ -1,9 +1,7 @@
-#body {
-    font-size: 30px;
-    font-family: monospace;
-    color: blue;
+body {
+    padding-top: 20px;
 }
 
-#body:hover {
+#alert-button:hover {
     color: red;
 }

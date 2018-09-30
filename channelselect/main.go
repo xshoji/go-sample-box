@@ -47,21 +47,21 @@ func main() {
 	}
 
 	// Add request
-	// curl http://localhost:9090?name=xshoji
+	// curl http://localhost:9090/channel1?name=xshoji
 	http.HandleFunc("/channel1", func(w http.ResponseWriter, r *http.Request) {
 		// Get query string as single value
 		name := r.URL.Query().Get("name")
 		producer1.Produce(name)
 	})
 	// Add request
-	// curl http://localhost:9090?name=xshoji
+	// curl http://localhost:9090/channel2?name=xshoji
 	http.HandleFunc("/channel2", func(w http.ResponseWriter, r *http.Request) {
 		// Get query string as single value
 		name := r.URL.Query().Get("name")
 		producer2.Produce(name)
 	})
 	// Add request
-	// curl http://localhost:9090?name=xshoji
+	// curl http://localhost:9090/done?name=xshoji
 	http.HandleFunc("/done", func(w http.ResponseWriter, r *http.Request) {
 		channelDone <- true
 	})

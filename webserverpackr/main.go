@@ -32,10 +32,13 @@ func NewResponse(name string, message string, time time.Time) Response {
 }
 
 //-------------------
+// << Installation >>
 // $ dep ensure
 // $ go get -u github.com/gobuffalo/packr/packr
-// $ packr
-// $ GOOS=linux GOARCH=amd64 go build -o /tmp/webapp .
+//
+// << Build >>
+// $ packr; go build -o /tmp/webapp .
+// $ packr; GOOS=linux GOARCH=amd64 go build -o /tmp/webapp .
 //-------------------
 // - [Using HTML Templates from a Folder (Complied) · GolangCode](https://golangcode.com/using-html-templates-from-a-folder-complied/)
 //var templates = template.Must(template.ParseGlob("resources/*"))
