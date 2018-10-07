@@ -5,6 +5,7 @@ import (
 	"github.com/xshoji/go-sample-box/jsonDynamic/sameKeyDifferentType"
 	"github.com/xshoji/go-sample-box/jsonDynamic/sameKeyTotallyDifferentType"
 	"github.com/xshoji/go-sample-box/jsonDynamic/sameKeyDifferentJsonStructure"
+	"github.com/xshoji/go-sample-box/jsonDynamic/undefinedType"
 )
 
 // > 動的な要素を持つJSONをいい感じにUnmarshalする - Qiita
@@ -43,4 +44,7 @@ func main() {
 
 	// 同じキー名でjsonの構造が違うjsonのunmarshalの例
 	sameKeyDifferentJsonStructure.Run()
+
+	//
+	undefinedType.Run()
 }
