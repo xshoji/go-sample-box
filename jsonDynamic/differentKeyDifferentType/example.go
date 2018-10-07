@@ -28,7 +28,7 @@ type HobbyMovie struct {
 }
 
 func Run() {
-	fmt.Println("[ differentKeyDifferentType ]")
+	fmt.Println("--[ differentKeyDifferentType ]-----------------")
 	json1 := `
 	{
 	  "name":"taro",

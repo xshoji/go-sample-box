@@ -61,7 +61,7 @@ func (u *User) UnmarshalJSON(data []byte) error {
 }
 
 func Run() {
-	fmt.Println("[ sameKeyTotallyDifferentType ]")
+	fmt.Println("--[ sameKeyTotallyDifferentType ]-----------------")
 	json1 := `
 	{
 	  "name":"taro",

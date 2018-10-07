@@ -13,7 +13,7 @@ type User struct {
 }
 
 func Run() {
-	fmt.Println("[ sameKeyTotallyDifferentType ]")
+	fmt.Println("--[ undefinedType ]-----------------")
 	json1 := `
 	{
 	  "name":"taro",

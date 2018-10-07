@@ -58,7 +58,7 @@ func (u *User) UnmarshalJSON(data []byte) error {
 }
 
 func Run() {
-	fmt.Println("[ sameKeyDifferentJsonStructure ]")
+	fmt.Println("--[ sameKeyDifferentJsonStructure ]-----------------")
 	json1 := `
 	{
 	  "name":"taro",
@@ -97,6 +97,5 @@ func Run() {
 		// value of "hobby"'s pointer
  		fmt.Println(*p)
 	}
-
 	fmt.Println("")
 }
