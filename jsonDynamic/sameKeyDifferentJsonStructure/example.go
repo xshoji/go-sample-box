@@ -1,4 +1,4 @@
-package sameKeyTotallyDifferentType
+package sameKeyDifferentJsonStructure
 
 import (
 	"encoding/json"
@@ -24,11 +24,8 @@ type HobbyGame struct {
 func (*HobbyGame) getType() {}
 
 
-type HobbyMovie struct {
-	DistributionCompany string `json:"distributionCompany"`
-	WatchingTimeAverage string `json:"watchingTimeAverage"`
-}
-func (*HobbyMovie) getType() {}
+type HobbySimple string
+func (*HobbySimple) getType() {}
 
 
 // > interface要素を持つstructへのJSON Unmarshal - すぎゃーんメモ
@@ -51,9 +48,9 @@ func (u *User) UnmarshalJSON(data []byte) error {
 		return nil
 	}
 
-	var hobbyMovie HobbyMovie
-	if err := json.Unmarshal(a.Hobby, &hobbyMovie); err == nil && len(hobbyMovie.DistributionCompany) > 0{
-		u.Hobby = &hobbyMovie
+	var hobbySimple HobbySimple
+	if err := json.Unmarshal(a.Hobby, &hobbySimple); err == nil && len(hobbySimple) > 0 {
+		u.Hobby = &hobbySimple
 		return nil
 	}
 
@@ -61,7 +58,7 @@ func (u *User) UnmarshalJSON(data []byte) error {
 }
 
 func Run() {
-	fmt.Println("[ sameKeyTotallyDifferentType ]")
+	fmt.Println("[ sameKeyDifferentJsonStructure ]")
 	json1 := `
 	{
 	  "name":"taro",
@@ -77,31 +74,29 @@ func Run() {
 	json.Unmarshal([]byte(json1), &user)
 	bytes, _ := json.MarshalIndent(user, "", "    ")
 	fmt.Println(string(bytes))
-	// > go - Golang Cast interface to struct - Stack Overflow
-	// > https://stackoverflow.com/questions/50939497/golang-cast-interface-to-struct
-	if _, ok := user.Hobby.(*HobbyMovie); ok {
-		fmt.Println("user has HobbyMovie")
-	}
-	if _, ok := user.Hobby.(*HobbyGame); ok {
-		fmt.Println("user has HobbyMovie")
-		fmt.Println(user.Hobby.(*HobbyGame).PlatForm)
-		fmt.Println(user.Hobby.(*HobbyGame).PlayTimeAverage)
-	}
 
 	json2 := `
 	{
 	  "name":"hanako",
 	  "gender":"female",
 	  "age":20,
-	  "hobby": {
-	    "distributionCompany": "20th Century Fox",
-	    "watchingTimeAverage": "2 hours"
-	  }
+	  "hobby": "Movie"
 	}
 	`
 	var user2 User
 	json.Unmarshal([]byte(json2), &user2)
 	bytes, _ = json.MarshalIndent(user2, "", "    ")
 	fmt.Println(string(bytes))
+	if _, ok := user2.Hobby.(*HobbyGame); ok {
+		fmt.Println("user has HobbyGame")
+	}
+	if _, ok := user2.Hobby.(*HobbySimple); ok {
+		fmt.Println("user has HobbySimple")
+		// "hobby"'s pointer
+		p := user2.Hobby.(*HobbySimple)
+		// value of "hobby"'s pointer
+ 		fmt.Println(*p)
+	}
+
 	fmt.Println("")
 }

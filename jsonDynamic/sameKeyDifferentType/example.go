@@ -72,8 +72,6 @@ func (u *User) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// - [http - The Go Programming Language](https://golang.org/pkg/net/http/)
-// - [networking - Access HTTP response as string in Go - Stack Overflow](https://stackoverflow.com/questions/38673673/access-http-response-as-string-in-go)
 func Run() {
 	fmt.Println("[ sameKeyDifferentType ]")
 	json1 := `

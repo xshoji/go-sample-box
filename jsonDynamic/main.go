@@ -4,6 +4,7 @@ import (
 	"github.com/xshoji/go-sample-box/jsonDynamic/differentKeyDifferentType"
 	"github.com/xshoji/go-sample-box/jsonDynamic/sameKeyDifferentType"
 	"github.com/xshoji/go-sample-box/jsonDynamic/sameKeyTotallyDifferentType"
+	"github.com/xshoji/go-sample-box/jsonDynamic/sameKeyDifferentJsonStructure"
 )
 
 // > 動的な要素を持つJSONをいい感じにUnmarshalする - Qiita
@@ -30,12 +31,16 @@ import (
 // > interface要素を持つstructへのJSON Unmarshal - すぎゃーんメモ
 // > https://memo.sugyan.com/entry/2018/06/23/232559
 func main() {
-	// ケース1: 同じキー名だけど中身の構造が違うjsonのunmarshalの例
-	sameKeyDifferentType.Run()
 
-	// ケース2: 違うキー名で中身の構造が違うjsonのunmarshalの例
+	// 違うキー名で中身の構造が違うjsonのunmarshalの例
 	differentKeyDifferentType.Run()
 
-	// ケース3: 違うキー名で中身の構造が全く違うjsonのunmarshalの例
+	// 同じキー名だけど中身の構造が違うjsonのunmarshalの例
+	sameKeyDifferentType.Run()
+
+	// 同じキー名で中身の構造が全く違うjsonのunmarshalの例
 	sameKeyTotallyDifferentType.Run()
+
+	// 同じキー名でjsonの構造が違うjsonのunmarshalの例
+	sameKeyDifferentJsonStructure.Run()
 }

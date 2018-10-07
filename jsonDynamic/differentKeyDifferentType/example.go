@@ -27,8 +27,6 @@ type HobbyMovie struct {
 	WatchingTimeAverage string `json:"watchingTimeAverage"`
 }
 
-// - [http - The Go Programming Language](https://golang.org/pkg/net/http/)
-// - [networking - Access HTTP response as string in Go - Stack Overflow](https://stackoverflow.com/questions/38673673/access-http-response-as-string-in-go)
 func Run() {
 	fmt.Println("[ differentKeyDifferentType ]")
 	json1 := `
