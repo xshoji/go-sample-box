@@ -1,4 +1,4 @@
-package sameKeyDifferentStructure
+package sameKeyDifferentType
 
 import (
 	"encoding/json"
@@ -75,7 +75,7 @@ func (u *User) UnmarshalJSON(data []byte) error {
 // - [http - The Go Programming Language](https://golang.org/pkg/net/http/)
 // - [networking - Access HTTP response as string in Go - Stack Overflow](https://stackoverflow.com/questions/38673673/access-http-response-as-string-in-go)
 func Run() {
-	fmt.Println("[ sameKeyDifferentStructure ]")
+	fmt.Println("[ sameKeyDifferentType ]")
 	json1 := `
 	{
 	  "name":"taro",

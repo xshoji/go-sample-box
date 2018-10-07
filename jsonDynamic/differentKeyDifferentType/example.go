@@ -1,4 +1,4 @@
-package differentKeyDifferentStructure
+package differentKeyDifferentType
 
 import (
 	"encoding/json"
@@ -30,7 +30,7 @@ type HobbyMovie struct {
 // - [http - The Go Programming Language](https://golang.org/pkg/net/http/)
 // - [networking - Access HTTP response as string in Go - Stack Overflow](https://stackoverflow.com/questions/38673673/access-http-response-as-string-in-go)
 func Run() {
-	fmt.Println("[ differentKeyDifferentStructure ]")
+	fmt.Println("[ differentKeyDifferentType ]")
 	json1 := `
 	{
 	  "name":"taro",
