@@ -1,4 +1,4 @@
-package caseDifferentKeyDifferentStructure
+package sameKeyTotallyDifferentStructure
 
 import (
 	"encoding/json"
@@ -9,37 +9,68 @@ type User struct {
 	Name string `json:"name"`
 	Gender string `json:"gender"`
 	Age int `json:"age"`
-	HobbyGame *HobbyGame `json:"hobbyGame,omitempty"`
-	HobbyMovie *HobbyMovie `json:"hobbyMovie,omitempty"`
+	Hobby Hobby `json:"hobby,omitempty"`
+}
+
+type Hobby interface {
+	// 何でも良い
+	getType()
 }
 
 type HobbyGame struct {
-	Type string `json:"type"`
-	Length string `json:"length"`
 	PlatForm string `json:"platform"`
 	PlayTimeAverage string `json:"playTimeAverage"`
 }
+func (*HobbyGame) getType() {}
+
 
 type HobbyMovie struct {
-	Type string `json:"type"`
-	Length string `json:"length"`
 	DistributionCompany string `json:"distributionCompany"`
 	WatchingTimeAverage string `json:"watchingTimeAverage"`
+}
+func (*HobbyMovie) getType() {}
+
+
+// > interface要素を持つstructへのJSON Unmarshal - すぎゃーんメモ
+// > https://memo.sugyan.com/entry/2018/06/23/232559
+func (u *User) UnmarshalJSON(data []byte) error {
+	type alias User
+	a := struct {
+		Hobby json.RawMessage `json:"hobby"`
+		*alias
+	}{
+		alias: (*alias)(u),
+	}
+	if err := json.Unmarshal(data, &a); err != nil {
+		return err
+	}
+
+	var hobbyGame HobbyGame
+	if err := json.Unmarshal(a.Hobby, &hobbyGame); err == nil && len(hobbyGame.PlatForm) > 0 {
+		u.Hobby = &hobbyGame
+		return nil
+	}
+
+	var hobbyMovie HobbyMovie
+	if err := json.Unmarshal(a.Hobby, &hobbyMovie); err == nil && len(hobbyMovie.DistributionCompany) > 0{
+		u.Hobby = &hobbyMovie
+		return nil
+	}
+
+	return nil
 }
 
 // - [http - The Go Programming Language](https://golang.org/pkg/net/http/)
 // - [networking - Access HTTP response as string in Go - Stack Overflow](https://stackoverflow.com/questions/38673673/access-http-response-as-string-in-go)
 func Run() {
-	fmt.Println("[ caseDifferentKeyDifferentStructure ]")
+	fmt.Println("[ sameKeyTotallyDifferentStructure ]")
 	json1 := `
 	{
 	  "name":"taro",
 	  "gender":"male",
 	  "age":16,
-	  "hobbyGame": {
-	    "type": "Game",
+	  "hobby": {
 	    "platform": "PS4",
-	    "length": "5 years",
 	    "playTimeAverage": "2 hours"
 	  }
 	}
@@ -54,10 +85,8 @@ func Run() {
 	  "name":"hanako",
 	  "gender":"female",
 	  "age":20,
-	  "hobbyMovie": {
-	    "type": "Movie",
+	  "hobby": {
 	    "distributionCompany": "20th Century Fox",
-	    "length": "10 years",
 	    "watchingTimeAverage": "2 hours"
 	  }
 	}
