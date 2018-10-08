@@ -15,10 +15,12 @@ func main() {
 	valueRune := '\n'
 	valueString := "test"
 	valueBytes := []byte("test")
+	fmt.Println("<< primitive >>")
 	fmt.Printf("valueInt, valueFloat, valueRune, valueString\n%v, %v, %v, %v\n", valueInt, valueFloat64, valueRune, valueString)
 	fmt.Println("")
 
 	// cast
+	fmt.Println("<< cast >>")
 	fmt.Printf("valueInt: %d, valueString: %s\n", valueInt, strconv.Itoa(valueInt))
 	fmt.Printf("valueFloat: %v, valueString: %s\n", valueFloat64, strconv.FormatFloat(valueFloat64, 'f', 4, 32))
 	fmt.Printf("valueFloat: %v, valueInt: %v\n", valueFloat64, int(valueFloat64))
@@ -29,6 +31,7 @@ func main() {
 
 	// pointer
 	_valueInt := &valueInt
+	fmt.Println("<< pointer >>")
 	fmt.Printf("valueInt pointer: %v\n", _valueInt)
 	fmt.Printf("valueInt pointers value: %v\n", *_valueInt)
 	fmt.Println("")
@@ -55,7 +58,7 @@ func main() {
 	}
 
 	// for
-	fmt.Println("for")
+	fmt.Println("<< for >>")
 	fmt.Printf("valueStringSlice size:%d\n", len(valueStringSlice))
 	for _, v := range valueStringSlice {
 		fmt.Println(v)
@@ -67,13 +70,13 @@ func main() {
 
 	// public method
 	// Package prefix is required when calling method
-	fmt.Println("function")
+	fmt.Println("<< function >>")
 	fmt.Printf("%v\n", utils.JoinString("aaa", "bbb"))
 	fmt.Printf("%v\n", utils.JoinString(utils.GetMultiReturns()))
 	fmt.Println("")
 
 	// 構造体の初期化
-	fmt.Println("structs, method")
+	fmt.Println("<< structs, method >>")
 	taro := structs.NewUser("taro", 16)
 	jiro := structs.NewUser("jiro", 99)
 	// メソッドの呼び出し
@@ -91,7 +94,19 @@ func main() {
 		100,
 		"Japanese",
 	}
-	fmt.Println("anonymous struct")
+	fmt.Println("<< anonymous struct >>")
 	fmt.Print(anonymousStruct)
 	fmt.Println("")
+
+	// 文字シーケンス
+	valueString2 := `
+	{
+	  "aaa", "bbb",
+	  "ccc": 111
+	}
+	`
+	fmt.Println("<< string sequence >>")
+	fmt.Println(valueString2)
+	fmt.Println("")
+
 }
