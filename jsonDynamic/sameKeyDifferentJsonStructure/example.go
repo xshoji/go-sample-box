@@ -9,23 +9,24 @@ type User struct {
 	Name string `json:"name"`
 	Gender string `json:"gender"`
 	Age int `json:"age"`
-	Hobby Hobby `json:"hobby,omitempty"`
+	Sports Sports `json:"sports,omitempty"`
 }
 
-type Hobby interface {
+type Sports interface {
 	// 何でも良い
 	getType()
 }
 
-type HobbyGame struct {
-	PlatForm string `json:"platform"`
-	PlayTimeAverage string `json:"playTimeAverage"`
+type SportsBaseball struct {
+	Position string `json:"position"`
+	InningsPitched int `json:"inningsPitched"`
+	Strikeouts int `json:"strikeouts"`
 }
-func (*HobbyGame) getType() {}
+func (*SportsBaseball) getType() {}
 
 
-type HobbySimple string
-func (*HobbySimple) getType() {}
+type SportsSimple string
+func (*SportsSimple) getType() {}
 
 
 // > interface要素を持つstructへのJSON Unmarshal - すぎゃーんメモ
@@ -33,7 +34,7 @@ func (*HobbySimple) getType() {}
 func (u *User) UnmarshalJSON(data []byte) error {
 	type alias User
 	a := struct {
-		Hobby json.RawMessage `json:"hobby"`
+		Sports json.RawMessage `json:"sports"`
 		*alias
 	}{
 		alias: (*alias)(u),
@@ -42,15 +43,15 @@ func (u *User) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	var hobbyGame HobbyGame
-	if err := json.Unmarshal(a.Hobby, &hobbyGame); err == nil && len(hobbyGame.PlatForm) > 0 {
-		u.Hobby = &hobbyGame
+	var sportsBaseball SportsBaseball
+	if err := json.Unmarshal(a.Sports, &sportsBaseball); err == nil && len(sportsBaseball.Position) > 0 {
+		u.Sports = &sportsBaseball
 		return nil
 	}
 
-	var hobbySimple HobbySimple
-	if err := json.Unmarshal(a.Hobby, &hobbySimple); err == nil && len(hobbySimple) > 0 {
-		u.Hobby = &hobbySimple
+	var sportsSimple SportsSimple
+	if err := json.Unmarshal(a.Sports, &sportsSimple); err == nil && len(sportsSimple) > 0 {
+		u.Sports = &sportsSimple
 		return nil
 	}
 
@@ -64,9 +65,10 @@ func Run() {
 	  "name":"taro",
 	  "gender":"male",
 	  "age":16,
-	  "hobby": {
-	    "platform": "PS4",
-	    "playTimeAverage": "2 hours"
+	  "sports": {
+	    "position":"Pitcher",
+	    "inningsPitched":215,
+	    "strikeouts":222
 	  }
 	}
 	`
@@ -80,21 +82,21 @@ func Run() {
 	  "name":"hanako",
 	  "gender":"female",
 	  "age":20,
-	  "hobby": "Movie"
+	  "sports": "Karate"
 	}
 	`
 	var user2 User
 	json.Unmarshal([]byte(json2), &user2)
 	bytes, _ = json.MarshalIndent(user2, "", "    ")
 	fmt.Println(string(bytes))
-	if _, ok := user2.Hobby.(*HobbyGame); ok {
-		fmt.Println("user has HobbyGame")
+	if _, ok := user2.Sports.(*SportsBaseball); ok {
+		fmt.Println("user has SportsBaseball")
 	}
-	if _, ok := user2.Hobby.(*HobbySimple); ok {
-		fmt.Println("user has HobbySimple")
-		// "hobby"'s pointer
-		p := user2.Hobby.(*HobbySimple)
-		// value of "hobby"'s pointer
+	if _, ok := user2.Sports.(*SportsSimple); ok {
+		fmt.Println("user has SportsSimple")
+		// "sports"'s pointer
+		p := user2.Sports.(*SportsSimple)
+		// value of "sports"'s pointer
  		fmt.Println(*p)
 	}
 	fmt.Println("")

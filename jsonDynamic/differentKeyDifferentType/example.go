@@ -9,21 +9,26 @@ type User struct {
 	Name string `json:"name"`
 	Gender string `json:"gender"`
 	Age int `json:"age"`
-	HobbyGame *HobbyGame `json:"hobbyGame,omitempty"`
-	HobbyMovie *HobbyMovie `json:"hobbyMovie,omitempty"`
+	SportsBaseball *SportsBaseball `json:"sportsBaseball,omitempty"`
+	SportsSwimming *SportsSwimming `json:"sportsSwimming,omitempty"`
 }
 
-type HobbyGame struct {
-	Type string `json:"type"`
-	PlatForm string `json:"platform"`
-	PlayTimeAverage string `json:"playTimeAverage"`
+type SportsBaseball struct {
+	Name string `json:"name"`
+	Experience string `json:"experience"`
+	Position string `json:"position"`
+	InningsPitched int `json:"inningsPitched"`
+	Strikeouts int `json:"strikeouts"`
 }
 
-type HobbyMovie struct {
-	Type string `json:"type"`
-	DistributionCompany string `json:"distributionCompany"`
-	WatchingTimeAverage string `json:"watchingTimeAverage"`
+type SportsSwimming struct {
+	Name string `json:"name"`
+	Experience string `json:"experience"`
+	Style string `json:"style"`
+	Length string `json:"length"`
+	Time float64 `json:"time"`
 }
+
 
 func Run() {
 	fmt.Println("--[ differentKeyDifferentType ]-----------------")
@@ -32,10 +37,12 @@ func Run() {
 	  "name":"taro",
 	  "gender":"male",
 	  "age":16,
-	  "hobbyGame": {
-	    "type": "Game",
-	    "platform": "PS4",
-	    "playTimeAverage": "2 hours"
+	  "sportsBaseball": {
+	    "name": "Baseball",
+	    "experience":"3 years",
+	    "position":"Pitcher",
+	    "inningsPitched":215,
+	    "strikeouts":222
 	  }
 	}
 	`
@@ -49,10 +56,12 @@ func Run() {
 	  "name":"hanako",
 	  "gender":"female",
 	  "age":20,
-	  "hobbyMovie": {
-	    "type": "Movie",
-	    "distributionCompany": "20th Century Fox",
-	    "watchingTimeAverage": "2 hours"
+	  "sportsSwimming": {
+	    "name": "Swimming",
+	    "experience": "5 years",
+	    "style": "Freestyle",
+	    "length": "100m",
+	    "time": 46.91
 	  }
 	}
 	`
