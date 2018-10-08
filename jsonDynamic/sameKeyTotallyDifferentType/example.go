@@ -9,26 +9,28 @@ type User struct {
 	Name string `json:"name"`
 	Gender string `json:"gender"`
 	Age int `json:"age"`
-	Hobby Hobby `json:"hobby,omitempty"`
+	Sports Sports `json:"sports,omitempty"`
 }
 
-type Hobby interface {
+type Sports interface {
 	// 何でも良い
 	getType()
 }
 
-type HobbyGame struct {
-	PlatForm string `json:"platform"`
-	PlayTimeAverage string `json:"playTimeAverage"`
+type SportsBaseball struct {
+	Position string `json:"position"`
+	InningsPitched int `json:"inningsPitched"`
+	Strikeouts int `json:"strikeouts"`
 }
-func (*HobbyGame) getType() {}
+func (*SportsBaseball) getType() {}
 
 
-type HobbyMovie struct {
-	DistributionCompany string `json:"distributionCompany"`
-	WatchingTimeAverage string `json:"watchingTimeAverage"`
+type SportsSwimming struct {
+	Style string `json:"style"`
+	Length string `json:"length"`
+	Time float64 `json:"time"`
 }
-func (*HobbyMovie) getType() {}
+func (*SportsSwimming) getType() {}
 
 
 // > interface要素を持つstructへのJSON Unmarshal - すぎゃーんメモ
@@ -36,7 +38,7 @@ func (*HobbyMovie) getType() {}
 func (u *User) UnmarshalJSON(data []byte) error {
 	type alias User
 	a := struct {
-		Hobby json.RawMessage `json:"hobby"`
+		Sports json.RawMessage `json:"sports"`
 		*alias
 	}{
 		alias: (*alias)(u),
@@ -45,15 +47,15 @@ func (u *User) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	var hobbyGame HobbyGame
-	if err := json.Unmarshal(a.Hobby, &hobbyGame); err == nil && len(hobbyGame.PlatForm) > 0 {
-		u.Hobby = &hobbyGame
+	var sportsBaseball SportsBaseball
+	if err := json.Unmarshal(a.Sports, &sportsBaseball); err == nil && len(sportsBaseball.Position) > 0 {
+		u.Sports = &sportsBaseball
 		return nil
 	}
 
-	var hobbyMovie HobbyMovie
-	if err := json.Unmarshal(a.Hobby, &hobbyMovie); err == nil && len(hobbyMovie.DistributionCompany) > 0{
-		u.Hobby = &hobbyMovie
+	var sportsSwimming SportsSwimming
+	if err := json.Unmarshal(a.Sports, &sportsSwimming); err == nil && len(sportsSwimming.Style) > 0{
+		u.Sports = &sportsSwimming
 		return nil
 	}
 
@@ -67,9 +69,10 @@ func Run() {
 	  "name":"taro",
 	  "gender":"male",
 	  "age":16,
-	  "hobby": {
-	    "platform": "PS4",
-	    "playTimeAverage": "2 hours"
+	  "sports": {
+	    "position":"Pitcher",
+	    "inningsPitched":215,
+	    "strikeouts":222
 	  }
 	}
 	`
@@ -79,13 +82,14 @@ func Run() {
 	fmt.Println(string(bytes))
 	// > go - Golang Cast interface to struct - Stack Overflow
 	// > https://stackoverflow.com/questions/50939497/golang-cast-interface-to-struct
-	if _, ok := user.Hobby.(*HobbyMovie); ok {
-		fmt.Println("user has HobbyMovie")
+	if _, ok := user.Sports.(*SportsSwimming); ok {
+		fmt.Println("user has SportsSwimming")
 	}
-	if _, ok := user.Hobby.(*HobbyGame); ok {
-		fmt.Println("user has HobbyMovie")
-		fmt.Println(user.Hobby.(*HobbyGame).PlatForm)
-		fmt.Println(user.Hobby.(*HobbyGame).PlayTimeAverage)
+	if _, ok := user.Sports.(*SportsBaseball); ok {
+		fmt.Println("user has SportsBaseball")
+		fmt.Println(user.Sports.(*SportsBaseball).Position)
+		fmt.Println(user.Sports.(*SportsBaseball).InningsPitched)
+		fmt.Println(user.Sports.(*SportsBaseball).Strikeouts)
 	}
 
 	json2 := `
@@ -93,9 +97,10 @@ func Run() {
 	  "name":"hanako",
 	  "gender":"female",
 	  "age":20,
-	  "hobby": {
-	    "distributionCompany": "20th Century Fox",
-	    "watchingTimeAverage": "2 hours"
+	  "sports": {
+	    "style": "Freestyle",
+	    "length": "100m",
+	    "time": 46.91
 	  }
 	}
 	`

@@ -9,28 +9,32 @@ type User struct {
 	Name string `json:"name"`
 	Gender string `json:"gender"`
 	Age int `json:"age"`
-	Hobby Hobby `json:"hobby,omitempty"`
+	Sports Sports `json:"sports,omitempty"`
 }
 
-type Hobby interface {
+type Sports interface {
 	// 何でも良い
 	getType()
 }
 
-type HobbyGame struct {
-	Type string `json:"type"`
-	PlatForm string `json:"platform"`
-	PlayTimeAverage string `json:"playTimeAverage"`
+type SportsBaseball struct {
+	Name string `json:"name"`
+	Experience string `json:"experience"`
+	Position string `json:"position"`
+	InningsPitched int `json:"inningsPitched"`
+	Strikeouts int `json:"strikeouts"`
 }
-func (*HobbyGame) getType() {}
+func (*SportsBaseball) getType() {}
 
 
-type HobbyMovie struct {
-	Type string `json:"type"`
-	DistributionCompany string `json:"distributionCompany"`
-	WatchingTimeAverage string `json:"watchingTimeAverage"`
+type SportsSwimming struct {
+	Name string `json:"name"`
+	Experience string `json:"experience"`
+	Style string `json:"style"`
+	Length string `json:"length"`
+	Time float64 `json:"time"`
 }
-func (*HobbyMovie) getType() {}
+func (*SportsSwimming) getType() {}
 
 
 // > interface要素を持つstructへのJSON Unmarshal - すぎゃーんメモ
@@ -38,7 +42,7 @@ func (*HobbyMovie) getType() {}
 func (u *User) UnmarshalJSON(data []byte) error {
 	type alias User
 	a := struct {
-		Hobby json.RawMessage `json:"hobby"`
+		Sports json.RawMessage `json:"sports"`
 		*alias
 	}{
 		alias: (*alias)(u),
@@ -47,23 +51,22 @@ func (u *User) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-
-	var template struct { Type string `json:"type"` }
-	if err := json.Unmarshal(a.Hobby, &template); err != nil || len(template.Type) == 0 {
-		panic("Unkown hobby type.")
+	var template struct { Name string `json:"name"` }
+	if err := json.Unmarshal(a.Sports, &template); err != nil || len(template.Name) == 0 {
+		panic("Unkown sports.")
 	}
 
-	if template.Type == "Game" {
-		var hobby HobbyGame
-		if err := json.Unmarshal(a.Hobby, &hobby); err == nil {
-			u.Hobby = &hobby
+	if template.Name == "Baseball" {
+		var sportsBaseball SportsBaseball
+		if err := json.Unmarshal(a.Sports, &sportsBaseball); err == nil {
+			u.Sports = &sportsBaseball
 			return nil
 		}
 	}
-	if template.Type == "Movie" {
-		var hobby HobbyMovie
-		if err := json.Unmarshal(a.Hobby, &hobby); err == nil {
-			u.Hobby = &hobby
+	if template.Name == "Swimming" {
+		var sportsSwimming SportsSwimming
+		if err := json.Unmarshal(a.Sports, &sportsSwimming); err == nil {
+			u.Sports = &sportsSwimming
 			return nil
 		}
 	}
@@ -77,10 +80,12 @@ func Run() {
 	  "name":"taro",
 	  "gender":"male",
 	  "age":16,
-	  "hobby": {
-	    "type": "Game",
-	    "platform": "PS4",
-	    "playTimeAverage": "2 hours"
+	  "sports": {
+	    "name": "Baseball",
+	    "experience":"3 years",
+	    "position":"Pitcher",
+	    "inningsPitched":215,
+	    "strikeouts":222
 	  }
 	}
 	`
@@ -94,10 +99,12 @@ func Run() {
 	  "name":"hanako",
 	  "gender":"female",
 	  "age":20,
-	  "hobby": {
-	    "type": "Movie",
-	    "distributionCompany": "20th Century Fox",
-	    "watchingTimeAverage": "2 hours"
+	  "sports": {
+	    "name": "Swimming",
+	    "experience": "5 years",
+	    "style": "Freestyle",
+	    "length": "100m",
+	    "time": 46.91
 	  }
 	}
 	`
