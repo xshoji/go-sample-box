@@ -21,8 +21,16 @@ func main() {
 	// cast
 	fmt.Printf("valueInt: %d, valueString: %s\n", valueInt, strconv.Itoa(valueInt))
 	fmt.Printf("valueFloat: %v, valueString: %s\n", valueFloat64, strconv.FormatFloat(valueFloat64, 'f', 4, 32))
+	fmt.Printf("valueFloat: %v, valueInt: %v\n", valueFloat64, int(valueFloat64))
+	fmt.Printf("valueInt: %v, valueFloat: %v\n", valueInt, float64(valueInt))
 	fmt.Printf("valueString: %v, value[]byte: %v\n", valueString, []byte(valueString))
 	fmt.Printf("value[]byte: %v, valueString: %s\n", valueBytes, string(valueBytes))
+	fmt.Println("")
+
+	// pointer
+	_valueInt := &valueInt
+	fmt.Printf("valueInt pointer: %p\n", _valueInt)
+	fmt.Printf("valueInt pointers value: %v\n", *_valueInt)
 	fmt.Println("")
 
 	// array
