@@ -32,12 +32,12 @@ func (*SportsSimple) getType() {}
 // > interface要素を持つstructへのJSON Unmarshal - すぎゃーんメモ
 // > https://memo.sugyan.com/entry/2018/06/23/232559
 func (u *User) UnmarshalJSON(data []byte) error {
-	type alias User
+	type Alias User
 	a := struct {
 		Sports json.RawMessage `json:"sports"`
-		*alias
+		*Alias
 	}{
-		alias: (*alias)(u),
+		Alias: (*Alias)(u),
 	}
 	if err := json.Unmarshal(data, &a); err != nil {
 		return err
@@ -74,7 +74,7 @@ func Run() {
 	`
 	var user User
 	json.Unmarshal([]byte(json1), &user)
-	bytes, _ := json.MarshalIndent(user, "", "    ")
+	bytes, _ := json.MarshalIndent(user, "", "  ")
 	fmt.Println(string(bytes))
 
 	json2 := `
@@ -87,7 +87,7 @@ func Run() {
 	`
 	var user2 User
 	json.Unmarshal([]byte(json2), &user2)
-	bytes, _ = json.MarshalIndent(user2, "", "    ")
+	bytes, _ = json.MarshalIndent(user2, "", "  ")
 	fmt.Println(string(bytes))
 	if _, ok := user2.Sports.(*SportsBaseball); ok {
 		fmt.Println("user has SportsBaseball")

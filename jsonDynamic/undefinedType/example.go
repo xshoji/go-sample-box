@@ -30,7 +30,7 @@ func Run() {
 	`
 	var user User
 	json.Unmarshal([]byte(json1), &user)
-	bytes, _ := json.MarshalIndent(user, "", "    ")
+	bytes, _ := json.MarshalIndent(user, "", "  ")
 	fmt.Println(string(bytes))
 	if sportsName, ok := user.Sports.(map[string]interface{})["name"]; ok {
 		fmt.Println(sportsName.(string))
@@ -55,7 +55,7 @@ func Run() {
 	`
 	var user2 User
 	json.Unmarshal([]byte(json2), &user2)
-	bytes, _ = json.MarshalIndent(user2, "", "    ")
+	bytes, _ = json.MarshalIndent(user2, "", "  ")
 	fmt.Println(string(bytes))
 	if sportsName, ok := user2.Sports.(map[string]interface{})["name"]; ok {
 		fmt.Println(sportsName.(string))
