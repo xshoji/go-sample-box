@@ -19,6 +19,15 @@ func main() {
 	fmt.Printf("valueInt, valueFloat, valueRune, valueString\n%v, %v, %v, %v\n", valueInt, valueFloat64, valueRune, valueString)
 	fmt.Println("")
 
+	// 文字シーケンス
+	valueString2 := `{
+  "aaa", "bbb",
+  "ccc": 111
+}`
+	fmt.Println("<< string sequence >>")
+	fmt.Println(valueString2)
+	fmt.Println("")
+
 	// cast
 	fmt.Println("<< cast >>")
 	fmt.Printf("valueInt: %d, valueString: %s\n", valueInt, strconv.Itoa(valueInt))
@@ -98,15 +107,12 @@ func main() {
 	fmt.Print(anonymousStruct)
 	fmt.Println("")
 
-	// 文字シーケンス
-	valueString2 := `
-	{
-	  "aaa", "bbb",
-	  "ccc": 111
-	}
-	`
-	fmt.Println("<< string sequence >>")
-	fmt.Println(valueString2)
-	fmt.Println("")
 
+	// 無名関数
+	anonymousFunction := func() {
+		fmt.Println("This is anonymousFunction.")
+	}
+	fmt.Println("<< anonymous function >>")
+	anonymousFunction()
+	fmt.Println("")
 }
