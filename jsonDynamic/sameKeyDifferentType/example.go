@@ -19,7 +19,6 @@ type Hobby interface {
 
 type HobbyGame struct {
 	Type string `json:"type"`
-	Length string `json:"length"`
 	PlatForm string `json:"platform"`
 	PlayTimeAverage string `json:"playTimeAverage"`
 }
@@ -28,7 +27,6 @@ func (*HobbyGame) getType() {}
 
 type HobbyMovie struct {
 	Type string `json:"type"`
-	Length string `json:"length"`
 	DistributionCompany string `json:"distributionCompany"`
 	WatchingTimeAverage string `json:"watchingTimeAverage"`
 }
@@ -82,7 +80,6 @@ func Run() {
 	  "hobby": {
 	    "type": "Game",
 	    "platform": "PS4",
-	    "length": "5 years",
 	    "playTimeAverage": "2 hours"
 	  }
 	}
@@ -100,7 +97,6 @@ func Run() {
 	  "hobby": {
 	    "type": "Movie",
 	    "distributionCompany": "20th Century Fox",
-	    "length": "10 years",
 	    "watchingTimeAverage": "2 hours"
 	  }
 	}

@@ -9,7 +9,7 @@ type User struct {
 	Name string `json:"name"`
 	Gender string `json:"gender"`
 	Age int `json:"age"`
-	Hobby interface{} `json:"hobby,omitempty"`
+	Sports interface{} `json:"sports,omitempty"`
 }
 
 func Run() {
@@ -19,9 +19,12 @@ func Run() {
 	  "name":"taro",
 	  "gender":"male",
 	  "age":16,
-	  "hobby": {
-	    "platform": "PS4",
-	    "playTimeAverage": "2 hours"
+	  "sports": {
+	    "name": "Baseball",
+	    "experience":"3 years",
+	    "position":"Pitcher",
+	    "inningsPitched":215,
+	    "strikeouts":222
 	  }
 	}
 	`
@@ -29,11 +32,11 @@ func Run() {
 	json.Unmarshal([]byte(json1), &user)
 	bytes, _ := json.MarshalIndent(user, "", "    ")
 	fmt.Println(string(bytes))
-	if platform, ok := user.Hobby.(map[string]interface{})["platform"]; ok {
-		fmt.Println(platform.(string))
+	if sportsName, ok := user.Sports.(map[string]interface{})["name"]; ok {
+		fmt.Println(sportsName.(string))
 	}
-	if playTimeAverage, ok := user.Hobby.(map[string]interface{})["playTimeAverage"]; ok {
-		fmt.Println(playTimeAverage.(string))
+	if inningsPitched, ok := user.Sports.(map[string]interface{})["inningsPitched"]; ok {
+		fmt.Println(int(inningsPitched.(float64)))
 	}
 
 	json2 := `
@@ -41,9 +44,12 @@ func Run() {
 	  "name":"hanako",
 	  "gender":"female",
 	  "age":20,
-	  "hobby": {
-	    "distributionCompany": "20th Century Fox",
-	    "watchingTimeAverage": "2 hours"
+	  "sports": {
+	    "name": "Swimming",
+	    "experience": "5 years",
+	    "style": "Freestyle",
+	    "length": "100m",
+	    "time": 46.91
 	  }
 	}
 	`
@@ -51,11 +57,11 @@ func Run() {
 	json.Unmarshal([]byte(json2), &user2)
 	bytes, _ = json.MarshalIndent(user2, "", "    ")
 	fmt.Println(string(bytes))
-	if distributionCompany, ok := user2.Hobby.(map[string]interface{})["distributionCompany"]; ok {
-		fmt.Println(distributionCompany.(string))
+	if sportsName, ok := user2.Sports.(map[string]interface{})["name"]; ok {
+		fmt.Println(sportsName.(string))
 	}
-	if watchingTimeAverage, ok := user2.Hobby.(map[string]interface{})["watchingTimeAverage"]; ok {
-		fmt.Println(watchingTimeAverage.(string))
+	if time, ok := user2.Sports.(map[string]interface{})["time"]; ok {
+		fmt.Println(time.(float64))
 	}
 	fmt.Println("")
 }
