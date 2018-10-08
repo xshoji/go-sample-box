@@ -29,7 +29,7 @@ func main() {
 
 	// pointer
 	_valueInt := &valueInt
-	fmt.Printf("valueInt pointer: %p\n", _valueInt)
+	fmt.Printf("valueInt pointer: %v\n", _valueInt)
 	fmt.Printf("valueInt pointers value: %v\n", *_valueInt)
 	fmt.Println("")
 
