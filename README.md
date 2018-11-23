@@ -4,6 +4,9 @@
 
 まず、gvmを導入してgoを複数バージョン管理できるようにします。
 
+> .00_Golangメモ.md  
+> https://gist.github.com/xshoji/ea284689bda36fbdaa67e83ba713517f#file-01_memo-md
+
 次に、このリポジトリを自分の好きなディレクトリにcloneしてます。
 
 ```
@@ -21,8 +24,6 @@ Intellijで開発します。
 
 > .00_Intellij_IDEAメモ.md  
 > https://gist.github.com/xshoji/7c16af201ab283d1c2dcfee65a5aea7d#file-02_golang-md
-
-を参照。
 
 実行は、各ディレクトリで`go run main.go`で実行します。
 
