@@ -1,5 +1,31 @@
 ## go-sample-box
 
+## 開発の準備
+
+まず、gvmを導入してgoを複数バージョン管理できるようにします。
+
+次に、このリポジトリを自分の好きなディレクトリにcloneしてます。
+
+```
+cd Develop/go
+git clone https://github.com/xshoji/go-sample-box
+```
+
+gvmのsrcディレクトリにシンボリックリンクを貼ります。
+
+```
+ln -s ~/Develop/go/go-sample-box ~/.gvm/pkgsets/go1.9.7/global/src/github.com/xshoji/go-sample-box
+```
+
+Intellijで開発します。
+
+> .00_Intellij_IDEAメモ.md  
+> https://gist.github.com/xshoji/7c16af201ab283d1c2dcfee65a5aea7d#file-02_golang-md
+
+を参照。
+
+実行は、各ディレクトリで`go run main.go`で実行します。
+
 ### Development environment
 
  - [Downloads - The Go Programming Language](https://golang.org/dl/)
