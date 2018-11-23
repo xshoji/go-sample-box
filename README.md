@@ -25,7 +25,13 @@ Intellijで開発します。
 > .00_Intellij_IDEAメモ.md  
 > https://gist.github.com/xshoji/7c16af201ab283d1c2dcfee65a5aea7d#file-02_golang-md
 
-実行は、各ディレクトリで`go run main.go`で実行します。
+実行は、
+
+```
+cd ~/.gvm/pkgsets/go1.9.7/global/src/github.com/xshoji/go-sample-box/argumentGoFlags
+```
+
+等の各ディレクトリで`go run main.go`で実行します。
 
 ### Development environment
 
