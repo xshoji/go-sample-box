@@ -1,4 +1,4 @@
-## go-sample-box
+# go-sample-box
 
 ## 開発の準備
 
@@ -32,6 +32,12 @@ cd ~/.gvm/pkgsets/go1.9.7/global/src/github.com/xshoji/go-sample-box/argumentGoF
 ```
 
 等の各ディレクトリで`go run main.go`で実行します。
+
+Intellijでは、
+
+`File -> Projeect Structure -> SDKs -> go1.9.7 -> Classpath -> + ~/.gvm/pkgsets/go1.9.7/global/src`
+
+で追加する。
 
 ### Development environment
 
