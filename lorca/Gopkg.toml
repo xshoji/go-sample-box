@@ -32,7 +32,3 @@
 [[constraint]]
   branch = "master"
   name = "github.com/zserge/lorca"
-
-[[constraint]]
-  name = "github.com/gobuffalo/packr"
-  version = "1.13.7"
