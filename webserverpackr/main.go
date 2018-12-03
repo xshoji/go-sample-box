@@ -1,34 +1,15 @@
 package main
 
 import (
+	"github.com/gobuffalo/packr"
+	"github.com/jessevdk/go-flags"
 	"log"
 	"net/http"
 	"strconv"
-	"time"
-
-	"github.com/gobuffalo/packr"
-	"github.com/jessevdk/go-flags"
 )
 
 type options struct {
 	Port int `short:"p" long:"port" description:"Listen port" default:"9090"`
-}
-
-// Response Response
-type Response struct {
-	Name    string `json:"name"`
-	Message string `json:"message"`
-	// - [データをJSONに変換するときに任意のフォーマットを設定する - Qiita](https://qiita.com/taizo/items/2c3a338f1aeea86ce9e2)
-	Time time.Time `json:"time"`
-}
-
-// NewResponse NewResponse
-func NewResponse(name string, message string, time time.Time) Response {
-	response := new(Response)
-	response.Name = name
-	response.Message = message
-	response.Time = time
-	return *response
 }
 
 //-------------------
