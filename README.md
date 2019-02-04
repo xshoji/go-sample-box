@@ -22,8 +22,8 @@ ln -s ~/Develop/go/go-sample-box ~/.gvm/pkgsets/go1.9.7/global/src/github.com/xs
 
 Intellijで開発します。
 
-> .00_Intellij_IDEAメモ.md  
-> https://gist.github.com/xshoji/7c16af201ab283d1c2dcfee65a5aea7d#file-02_golang-md
+> Intellij · Issue #15 · xshoji/documents  
+> https://github.com/xshoji/documents/issues/15#issuecomment-452327501
 
 実行は、
 
@@ -32,6 +32,8 @@ cd ~/.gvm/pkgsets/go1.9.7/global/src/github.com/xshoji/go-sample-box/argumentGoF
 ```
 
 等の各ディレクトリで`go run main.go`で実行します。
+
+depで依存を管理している場合は`dep ensure`で依存をインストールします。
 
 Intellijでは、
 
