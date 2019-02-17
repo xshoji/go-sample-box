@@ -63,6 +63,8 @@ func main() {
 	fmt.Printf("%v\n", valueStringSlice)
 	valueStringSlice = valueStringSlice[0:2]
 	fmt.Printf("%v\n", valueStringSlice)
+	valueStringSlice = make([]string, 5)
+	fmt.Println(valueStringSlice)
 	fmt.Println("")
 
 	//map
@@ -113,7 +115,6 @@ func main() {
 	fmt.Print(anonymousStruct)
 	fmt.Println("")
 
-
 	// 無名関数
 	anonymousFunction := func() {
 		fmt.Println("This is anonymousFunction.")
@@ -137,5 +138,13 @@ func main() {
 	var randomString = hex.EncodeToString(shaBytes[:])
 	fmt.Println(randomString)
 	fmt.Println("")
+
+	fmt.Println("<< size >>")
+	sizeString := "aaa"
+	sizeArray := [10]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+	sizeSlice := make([]string, 15)
+	fmt.Printf("Size of string : %v\n", len(sizeString))
+	fmt.Printf("Size of array : %v\n", len(sizeArray))
+	fmt.Printf("Size of slice : %v\n", len(sizeSlice))
 
 }
