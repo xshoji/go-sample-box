@@ -84,10 +84,10 @@ func (*UserService) Delete(context context.Context, in *proto.SimpleRequest) (*p
 	foundUser, ok := UserRepositoryMap[in.Id]
 	if ok {
 		delete(UserRepositoryMap, in.Id)
-	}
-	if ok != true {
+	} else {
 		return createNotFoundResponse(), nil
 	}
+
 	response := createOkResponse()
 	response.Users = []*proto.User{foundUser}
 	return response, nil
