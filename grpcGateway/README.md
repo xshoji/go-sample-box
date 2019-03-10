@@ -17,7 +17,7 @@ go get -u github.com/golang/protobuf/protoc-gen-go
 
 ```
 // generage code
-protoeasy --go --grpc --grpc --grpc-gateway .
+protoeasy --go --grpc --grpc-gateway .
 
 // run grpc and gateway server
 go run main.go
