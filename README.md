@@ -7,17 +7,10 @@
 > .00_Golangメモ.md  
 > https://gist.github.com/xshoji/ea284689bda36fbdaa67e83ba713517f#file-01_memo-md
 
-次に、このリポジトリを自分の好きなディレクトリにcloneしてます。
+次に、このリポジトリをGOPATH配下の以下のディレクトリにcloneしてます。
 
 ```
-cd Develop/go
-git clone https://github.com/xshoji/go-sample-box
-```
-
-gvmのsrcディレクトリにシンボリックリンクを貼ります。
-
-```
-ln -s ~/Develop/go/go-sample-box ~/.gvm/pkgsets/go1.9.7/global/src/github.com/xshoji/go-sample-box
+git clone https://github.com/xshoji/go-sample-box ${GOPATH}/src/github.com/xshoji/go-sample-box
 ```
 
 Intellijで開発します。
