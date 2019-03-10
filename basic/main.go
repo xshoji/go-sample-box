@@ -34,6 +34,8 @@ func main() {
 	fmt.Println("")
 
 	// cast
+	// > Golangでの文字列・数値変換 - 小野マトペの納豆ペペロンチーノ日記
+	// > http://matope.hatenablog.com/entry/2014/04/22/101127
 	fmt.Println("<< cast >>")
 	fmt.Printf("valueInt: %d, valueString: %s\n", valueInt, strconv.Itoa(valueInt))
 	fmt.Printf("valueInt64: %d, valueString: %s\n", valueInt64, strconv.FormatInt(valueInt64, 10))
@@ -41,6 +43,10 @@ func main() {
 	fmt.Printf("valueFloat: %v, valueInt: %v\n", valueFloat64, int(valueFloat64))
 	fmt.Printf("valueInt: %v, valueFloat: %v\n", valueInt, float64(valueInt))
 	fmt.Printf("valueString: %v, value[]byte: %v\n", valueString, []byte(valueString))
+	valueInt, _ = strconv.Atoi(valueString)
+	fmt.Printf("valueString: %v, valueInt: %v\n", valueString, valueInt)
+	valueInt64, _ = strconv.ParseInt(valueString, 10, 64)
+	fmt.Printf("valueString: %v, valueInt64: %v\n", valueString, valueInt64)
 	fmt.Printf("value[]byte: %v, valueString: %s\n", valueBytes, string(valueBytes))
 	fmt.Println("")
 
