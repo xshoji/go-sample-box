@@ -3,41 +3,56 @@ package proto;
 
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+
+message UserResponse {
+  int64 status = 1;
+  string message = 2;
+  int64 count = 3;
+  repeated User users = 4;
+}
 
 message User {
-  int64  id  = 1;
+  int64 id  = 1;
   string name = 2;
-  int64  age  = 3;
+  oneof age_optional {
+    int64 age = 3; // 扱い値をoneofでラップする
+  }
 }
 
 message SimpleRequest {
   int64  id  = 1;
 }
 
-
 service UserService {
 
-   rpc Create(User) returns (User) {
+   rpc Create(User) returns (UserResponse) {
      option (google.api.http) = {
        post: "/v1/users"
        body: "*"
      };
    }
 
-   rpc Read(SimpleRequest) returns (User) {
+   rpc Read(SimpleRequest) returns (UserResponse) {
      option (google.api.http) = {
        get: "/v1/users/{id}"
      };
    }
 
-   rpc Update(User) returns (User) {
+   rpc ReadAll(google.protobuf.Empty) returns (UserResponse) {
+     option (google.api.http) = {
+       get: "/v1/users"
+     };
+   }
+
+   rpc Update(User) returns (UserResponse) {
      option (google.api.http) = {
        post: "/v1/users/{id}"
        body: "*"
      };
    }
 
-   rpc Delete(SimpleRequest) returns (User) {
+   rpc Delete(SimpleRequest) returns (UserResponse) {
      option (google.api.http) = {
        delete: "/v1/users/{id}"
      };
