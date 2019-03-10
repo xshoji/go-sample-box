@@ -16,7 +16,7 @@ message User {
   int64 id  = 1;
   string name = 2;
   oneof age_optional {
-    int64 age = 3; // 扱い値をoneofでラップする
+    int64 age = 3; // 0とnilを区別するOptional値の表現
   }
 }
 
