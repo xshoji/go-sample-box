@@ -1,4 +1,4 @@
-package sameKeyDifferentJsonStructure
+package samekeydifferentjsonstructure
 
 import (
 	"encoding/json"
@@ -6,9 +6,9 @@ import (
 )
 
 type User struct {
-	Name string `json:"name"`
+	Name   string `json:"name"`
 	Gender string `json:"gender"`
-	Age int `json:"age"`
+	Age    int    `json:"age"`
 	Sports Sports `json:"sports,omitempty"`
 }
 
@@ -18,16 +18,16 @@ type Sports interface {
 }
 
 type SportsBaseball struct {
-	Position string `json:"position"`
-	InningsPitched int `json:"inningsPitched"`
-	Strikeouts int `json:"strikeouts"`
+	Position       string `json:"position"`
+	InningsPitched int    `json:"inningsPitched"`
+	Strikeouts     int    `json:"strikeouts"`
 }
+
 func (*SportsBaseball) getType() {}
 
-
 type SportsSimple string
-func (*SportsSimple) getType() {}
 
+func (*SportsSimple) getType() {}
 
 // > interface要素を持つstructへのJSON Unmarshal - すぎゃーんメモ
 // > https://memo.sugyan.com/entry/2018/06/23/232559
@@ -97,7 +97,7 @@ func Run() {
 		// "sports"'s pointer
 		p := user2.Sports.(*SportsSimple)
 		// value of "sports"'s pointer
- 		fmt.Println(*p)
+		fmt.Println(*p)
 	}
 	fmt.Println("")
 }

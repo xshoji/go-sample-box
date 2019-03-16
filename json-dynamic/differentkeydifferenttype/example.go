@@ -1,4 +1,4 @@
-package differentKeyDifferentType
+package differentkeydifferenttype
 
 import (
 	"encoding/json"
@@ -6,29 +6,28 @@ import (
 )
 
 type User struct {
-	Name string `json:"name"`
-	Gender string `json:"gender"`
-	Age int `json:"age"`
+	Name           string          `json:"name"`
+	Gender         string          `json:"gender"`
+	Age            int             `json:"age"`
 	SportsBaseball *SportsBaseball `json:"sportsBaseball,omitempty"`
 	SportsSwimming *SportsSwimming `json:"sportsSwimming,omitempty"`
 }
 
 type SportsBaseball struct {
-	Name string `json:"name"`
-	Experience string `json:"experience"`
-	Position string `json:"position"`
-	InningsPitched int `json:"inningsPitched"`
-	Strikeouts int `json:"strikeouts"`
+	Name           string `json:"name"`
+	Experience     string `json:"experience"`
+	Position       string `json:"position"`
+	InningsPitched int    `json:"inningsPitched"`
+	Strikeouts     int    `json:"strikeouts"`
 }
 
 type SportsSwimming struct {
-	Name string `json:"name"`
-	Experience string `json:"experience"`
-	Style string `json:"style"`
-	Length string `json:"length"`
-	Time float64 `json:"time"`
+	Name       string  `json:"name"`
+	Experience string  `json:"experience"`
+	Style      string  `json:"style"`
+	Length     string  `json:"length"`
+	Time       float64 `json:"time"`
 }
-
 
 func Run() {
 	fmt.Println("--[ differentKeyDifferentType ]-----------------")

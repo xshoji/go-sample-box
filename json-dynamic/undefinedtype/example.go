@@ -1,4 +1,4 @@
-package undefinedType
+package undefinedtype
 
 import (
 	"encoding/json"
@@ -6,9 +6,9 @@ import (
 )
 
 type User struct {
-	Name string `json:"name"`
-	Gender string `json:"gender"`
-	Age int `json:"age"`
+	Name   string      `json:"name"`
+	Gender string      `json:"gender"`
+	Age    int         `json:"age"`
 	Sports interface{} `json:"sports,omitempty"`
 }
 

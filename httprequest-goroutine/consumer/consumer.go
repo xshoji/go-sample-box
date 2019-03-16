@@ -3,7 +3,7 @@ package consumer
 import (
 	"fmt"
 
-	"github.com/xshoji/go-sample-box/httprequestgoroutine/client"
+	"github.com/xshoji/go-sample-box/httprequest-goroutine/client"
 )
 
 // Consumer Consumer

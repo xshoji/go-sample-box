@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/xshoji/go-sample-box/grpcGateway/proto"
+	"github.com/xshoji/go-sample-box/grpc-gateway/proto"
 	"sync"
 )
 

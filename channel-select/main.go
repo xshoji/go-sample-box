@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/jessevdk/go-flags"
-	"github.com/xshoji/go-sample-box/channelselect/consumer"
-	"github.com/xshoji/go-sample-box/channelselect/producer"
+	"github.com/xshoji/go-sample-box/channel-select/consumer"
+	"github.com/xshoji/go-sample-box/channel-select/producer"
 )
 
 type options struct {

@@ -6,9 +6,9 @@ import (
 )
 
 type User struct {
-	Name string `json:"name"`
+	Name   string `json:"name"`
 	Gender string `json:"gender"`
-	Age int `json:"age"`
+	Age    int    `json:"age"`
 	Sports Sports `json:"sports,omitempty"`
 }
 
@@ -18,20 +18,20 @@ type Sports interface {
 }
 
 type SportsBaseball struct {
-	Position string `json:"position"`
-	InningsPitched int `json:"inningsPitched"`
-	Strikeouts int `json:"strikeouts"`
+	Position       string `json:"position"`
+	InningsPitched int    `json:"inningsPitched"`
+	Strikeouts     int    `json:"strikeouts"`
 }
+
 func (*SportsBaseball) getType() {}
 
-
 type SportsSwimming struct {
-	Style string `json:"style"`
-	Length string `json:"length"`
-	Time float64 `json:"time"`
+	Style  string  `json:"style"`
+	Length string  `json:"length"`
+	Time   float64 `json:"time"`
 }
-func (*SportsSwimming) getType() {}
 
+func (*SportsSwimming) getType() {}
 
 // > interface要素を持つstructへのJSON Unmarshal - すぎゃーんメモ
 // > https://memo.sugyan.com/entry/2018/06/23/232559
@@ -54,7 +54,7 @@ func (u *User) UnmarshalJSON(data []byte) error {
 	}
 
 	var sportsSwimming SportsSwimming
-	if err := json.Unmarshal(a.Sports, &sportsSwimming); err == nil && len(sportsSwimming.Style) > 0{
+	if err := json.Unmarshal(a.Sports, &sportsSwimming); err == nil && len(sportsSwimming.Style) > 0 {
 		u.Sports = &sportsSwimming
 		return nil
 	}

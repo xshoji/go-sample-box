@@ -63,11 +63,11 @@ func (c *Client) callAPI(path string, httpMethod string, headers map[string]stri
 	// Build headers
 	requestHeader := map[string]string{
 		"Content-Type": "text/xml",
-		"charset": "UTF-8",
+		"charset":      "UTF-8",
 	}
 	// Override headers
 	for k, v := range headers {
-		requestHeader[k] = v;
+		requestHeader[k] = v
 	}
 
 	request, _ := http.NewRequest("POST", urlFull, strings.NewReader(postData))
