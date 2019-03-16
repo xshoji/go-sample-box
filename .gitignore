@@ -30,3 +30,5 @@ target/
 
 vendor/
 .gvm_local/
+output/
+!.gitkeep
