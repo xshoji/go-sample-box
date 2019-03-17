@@ -12,7 +12,8 @@ import (
 )
 
 type options struct {
-	Words string `short:"w" long:"words" description:"Search words" required:"true"`
+	Words   string `short:"w" long:"words" description:"Search words" required:"true"`
+	Service string `short:"s" long:"service" description:"Service type [ yahoo | tabelog ]" default:"yahoo"`
 }
 
 // [ Usage ]
@@ -57,7 +58,14 @@ func main() {
 
 	// run task list
 	var res string
-	err = c.Run(ctxt, text(opts.Words, &res))
+	var tasks chromedp.Tasks
+	if opts.Service == "tabelog" {
+		tasks = searchTasksTabelog(opts.Words, &res)
+	} else {
+		tasks = searchTasksYahoo(opts.Words, &res)
+	}
+
+	err = c.Run(ctxt, tasks)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -74,14 +82,26 @@ func main() {
 	log.Printf("\n\nresult: \n%s\n\n\n", gohtml.Format(res))
 }
 
-func text(word string, res *string) chromedp.Tasks {
+func searchTasksYahoo(word string, res *string) chromedp.Tasks {
 	return chromedp.Tasks{
 		chromedp.Navigate(`https://www.yahoo.co.jp/`),
 		chromedp.WaitVisible(`#srchtxtBg`, chromedp.ByQuery),
-		chromedp.WaitVisible(`#srchbtn`, chromedp.ByQuery),
 		chromedp.SendKeys(`#srchtxtBg > input`, word, chromedp.ByQuery),
+		chromedp.WaitVisible(`#srchbtn`, chromedp.ByQuery),
 		chromedp.Click(`#srchbtn`, chromedp.ByQuery),
 		chromedp.WaitVisible(`#mIn`, chromedp.ByQuery),
 		chromedp.InnerHTML(`#mIn`, res, chromedp.NodeVisible, chromedp.ByQuery),
+	}
+}
+
+func searchTasksTabelog(word string, res *string) chromedp.Tasks {
+	return chromedp.Tasks{
+		chromedp.Navigate(`https://tabelog.com/`),
+		chromedp.WaitVisible(`#sk`, chromedp.ByQuery),
+		chromedp.SendKeys(`#sk`, word, chromedp.ByQuery),
+		chromedp.WaitVisible(`#js-global-search-btn`, chromedp.ByQuery),
+		chromedp.Click(`#js-global-search-btn`, chromedp.ByQuery),
+		chromedp.WaitVisible(`#column-main`, chromedp.ByQuery),
+		chromedp.InnerHTML(`#column-main`, res, chromedp.NodeVisible, chromedp.ByQuery),
 	}
 }
