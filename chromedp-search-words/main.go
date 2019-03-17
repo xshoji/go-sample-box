@@ -9,6 +9,7 @@ import (
 	"github.com/yosssi/gohtml"
 	"log"
 	"os"
+	"time"
 )
 
 type options struct {
@@ -17,8 +18,8 @@ type options struct {
 }
 
 // [ Usage ]
-// go run main.go -u="https://news.yahoo.co.jp/" -q="#liveStream"
-// go run main.go -u="https://news.yahoo.co.jp/" -q="section.toptopics"
+// go run main.go -w="yahoo japan" -s="yahoo"
+// go run main.go -w="オムライス" -s="tabelog"
 func main() {
 
 	opts := *new(options)
@@ -101,6 +102,7 @@ func searchTasksTabelog(word string, res *string) chromedp.Tasks {
 		chromedp.SendKeys(`#sk`, word, chromedp.ByQuery),
 		chromedp.WaitVisible(`#js-global-search-btn`, chromedp.ByQuery),
 		chromedp.Click(`#js-global-search-btn`, chromedp.ByQuery),
+		chromedp.Sleep(2 * time.Second),
 		chromedp.WaitVisible(`#column-main`, chromedp.ByQuery),
 		chromedp.InnerHTML(`#column-main`, res, chromedp.NodeVisible, chromedp.ByQuery),
 	}
