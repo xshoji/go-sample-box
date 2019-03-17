@@ -6,13 +6,13 @@ import (
 	"github.com/chromedp/chromedp"
 	"github.com/chromedp/chromedp/runner"
 	"github.com/jessevdk/go-flags"
+	"github.com/yosssi/gohtml"
 	"log"
 	"os"
 )
 
 type options struct {
-	Url           string `short:"u" long:"url" description:"URL" required:"true"`
-	QuerySelector string `short:"q" long:"queryselector" description:"Queryselector used to output as string" required:"true"`
+	Words string `short:"w" long:"words" description:"Search words" required:"true"`
 }
 
 // [ Usage ]
@@ -23,7 +23,7 @@ func main() {
 	opts := *new(options)
 	parser := flags.NewParser(&opts, flags.Default)
 	// set name
-	parser.Name = "chromedp-get-html"
+	parser.Name = "chromedp-search-words"
 	if _, err := parser.Parse(); err != nil {
 		flagsError, _ := err.(*flags.Error)
 		// help時は何もしない
@@ -50,13 +50,14 @@ func main() {
 		runner.Flag("no-default-browser-check", true),
 		runner.RemoteDebuggingPort(9222),
 	))
+	//	c, err := chromedp.New(ctxt, chromedp.WithLog(log.Printf))
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// run task list
 	var res string
-	err = c.Run(ctxt, text(opts.Url, opts.QuerySelector, &res))
+	err = c.Run(ctxt, text(opts.Words, &res))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -68,20 +69,19 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-
-		// wait for chrome to finish
-		err = c.Wait()
-		if err != nil {
-			log.Fatal(err)
-		}
 	}()
 
-	log.Printf("\n\nresult: \n%s\n\n\n", res)
+	log.Printf("\n\nresult: \n%s\n\n\n", gohtml.Format(res))
 }
 
-func text(url string, selector string, res *string) chromedp.Tasks {
+func text(word string, res *string) chromedp.Tasks {
 	return chromedp.Tasks{
-		chromedp.Navigate(url),
-		chromedp.InnerHTML(selector, res, chromedp.NodeVisible, chromedp.ByQuery),
+		chromedp.Navigate(`https://www.yahoo.co.jp/`),
+		chromedp.WaitVisible(`#srchtxtBg`, chromedp.ByQuery),
+		chromedp.WaitVisible(`#srchbtn`, chromedp.ByQuery),
+		chromedp.SendKeys(`#srchtxtBg > input`, word, chromedp.ByQuery),
+		chromedp.Click(`#srchbtn`, chromedp.ByQuery),
+		chromedp.WaitVisible(`#mIn`, chromedp.ByQuery),
+		chromedp.InnerHTML(`#mIn`, res, chromedp.NodeVisible, chromedp.ByQuery),
 	}
 }
