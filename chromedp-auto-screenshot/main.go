@@ -21,8 +21,8 @@ type options struct {
 }
 
 // [ Usage ]
-// go run main.go -u="https://news.yahoo.co.jp/" -i="#liveStream" -o="/tmp/yahoo_news_livestream.png"
-// go run main.go -u="https://news.yahoo.co.jp/" -i="section.toptopics" -o="/tmp/yahoo_news_toptopics.png"
+// go run main.go -u="https://news.yahoo.co.jp/" -q="#liveStream" -o="/tmp/yahoo_news_livestream.png"
+// go run main.go -u="https://news.yahoo.co.jp/" -q="section.toptopics" -o="/tmp/yahoo_news_toptopics.png"
 //
 // [ References ]
 // > querySelector()を使うとjQueryみたいにセレクターで要素を取得できるよ。（DOMおれおれAdvent Calendar 2015 – 02日目） ｜ Ginpen.com
