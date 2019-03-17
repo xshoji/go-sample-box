@@ -15,9 +15,9 @@ import (
 )
 
 type options struct {
-	Url    string `short:"u" long:"url" description:"url" required:"true"`
-	Id     string `short:"i" long:"id" description:"id" required:"true"`
-	Output string `short:"o" long:"output" description:"Output file path" default:"/tmp/img.png"`
+	Url           string `short:"u" long:"url" description:"URL" required:"true"`
+	QuerySelector string `short:"q" long:"queryselector" description:"Queryselector used to capture a element" required:"true"`
+	Output        string `short:"o" long:"output" description:"Output file path" default:"/tmp/img.png"`
 }
 
 // [ Usage ]
@@ -45,7 +45,7 @@ func main() {
 	}
 
 	fmt.Printf("url: %v\n", opts.Url)
-	fmt.Printf("id: %v\n", opts.Id)
+	fmt.Printf("query: %v\n", opts.QuerySelector)
 	fmt.Printf("output: %v\n", opts.Output)
 
 	var err error
@@ -76,7 +76,7 @@ func main() {
 	}
 
 	// run task list
-	err = c.Run(ctxt, screenshot(opts.Url, opts.Id, opts.Output))
+	err = c.Run(ctxt, screenshot(opts.Url, opts.QuerySelector, opts.Output))
 	if err != nil {
 		log.Fatal(err)
 	}
