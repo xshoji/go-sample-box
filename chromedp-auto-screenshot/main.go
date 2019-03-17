@@ -67,11 +67,12 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// headlessモードの時は不要
 	// wait for chrome to finish
-	err = c.Wait()
-	if err != nil {
-		log.Fatal(err)
-	}
+	//err = c.Wait()
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
 }
 
 func screenshot(urlstr, sel string, filePath string) chromedp.Tasks {
