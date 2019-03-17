@@ -20,7 +20,13 @@ type options struct {
 	Output string `short:"o" long:"output" description:"Output file path" default:"/tmp/img.png"`
 }
 
-// go run main.go --url="https://www.amazon.co.jp/" --id="navFooter" --output="/tmp/test.png"
+// [ Usage ]
+// go run main.go -u="https://news.yahoo.co.jp/" -i="#liveStream" -o="/tmp/yahoo_news_livestream.png"
+// go run main.go -u="https://news.yahoo.co.jp/" -i="section.toptopics" -o="/tmp/yahoo_news_toptopics.png"
+//
+// [ References ]
+// > querySelector()を使うとjQueryみたいにセレクターで要素を取得できるよ。（DOMおれおれAdvent Calendar 2015 – 02日目） ｜ Ginpen.com
+// > https://ginpen.com/2015/12/02/queryselector-api-like-jquery/
 func main() {
 	opts := *new(options)
 	parser := flags.NewParser(&opts, flags.Default)
@@ -60,6 +66,8 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// > screenshot from a wrong page · Issue #205 · chromedp/chromedp
+	// > https://github.com/chromedp/chromedp/issues/205
 	param := emulation.SetDeviceMetricsOverride(1920, 1080, 1, false)
 	// set param
 	err = c.Run(ctxt, param)
@@ -74,10 +82,12 @@ func main() {
 	}
 
 	// shutdown chrome
-	err = c.Shutdown(ctxt)
-	if err != nil {
-		log.Fatal(err)
-	}
+	defer func() {
+		err = c.Shutdown(ctxt)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
 
 	// headlessモードの時は不要
 	// wait for chrome to finish
@@ -92,8 +102,8 @@ func screenshot(urlstr, sel string, filePath string) chromedp.Tasks {
 	return chromedp.Tasks{
 		chromedp.Navigate(urlstr),
 		chromedp.Sleep(2 * time.Second),
-		chromedp.WaitVisible(sel, chromedp.ByID),
-		chromedp.Screenshot(sel, &buf, chromedp.ByID),
+		chromedp.WaitVisible(sel, chromedp.ByQuery),
+		chromedp.Screenshot(sel, &buf, chromedp.ByQuery),
 		chromedp.ActionFunc(func(context.Context, cdp.Executor) error {
 			return ioutil.WriteFile(filePath, buf, 0644)
 		}),

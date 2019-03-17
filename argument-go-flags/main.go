@@ -16,6 +16,8 @@ type options struct {
 
 // - [Goでコマンドラインオプションを処理する](https://blog.web-apps.tech/go-cmdline-option-jessevdk-go-flags/)
 // - [jessevdk/go-flags： go command line option parser](https://github.com/jessevdk/go-flags)
+// > Calling a program with -h/--help sets error in Parse(opts) ? · Issue #45 · jessevdk/go-flags
+// > https://github.com/jessevdk/go-flags/issues/45
 func main() {
 
 	// [ simple ]
