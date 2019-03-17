@@ -10,6 +10,7 @@ import (
 	"github.com/jessevdk/go-flags"
 	"io/ioutil"
 	"log"
+	"os"
 	"time"
 )
 
@@ -21,11 +22,22 @@ type options struct {
 
 // go run main.go --url="https://www.amazon.co.jp/" --id="navFooter" --output="/tmp/test.png"
 func main() {
-	var opts options
-	if _, err := flags.Parse(&opts); err != nil {
-		// some error handling
+	opts := *new(options)
+	parser := flags.NewParser(&opts, flags.Default)
+	// set name
+	parser.Name = "chromedp-auto-screenshot"
+	if _, err := parser.Parse(); err != nil {
+		flagsError, _ := err.(*flags.Error)
+		// help時は何もしない
+		if flagsError.Type == flags.ErrHelp {
+			return
+		}
+		fmt.Println()
+		parser.WriteHelp(os.Stdout)
+		fmt.Println()
 		return
 	}
+
 	fmt.Printf("url: %v\n", opts.Url)
 	fmt.Printf("id: %v\n", opts.Id)
 	fmt.Printf("output: %v\n", opts.Output)

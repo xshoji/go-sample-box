@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-
 	"github.com/jessevdk/go-flags"
+	"os"
 )
 
 // > Make default values clearer · Issue #145 · jessevdk/go-flags
@@ -17,11 +17,41 @@ type options struct {
 // - [Goでコマンドラインオプションを処理する](https://blog.web-apps.tech/go-cmdline-option-jessevdk-go-flags/)
 // - [jessevdk/go-flags： go command line option parser](https://github.com/jessevdk/go-flags)
 func main() {
-	var opts options
-	if _, err := flags.Parse(&opts); err != nil {
-		// some error handling
+
+	// [ simple ]
+	//var opts options
+	//if _, err := flags.Parse(&opts); err != nil {
+	//	// some error handling
+	//	return
+	//}
+
+	// [ custom name ]
+	//opts := *new(options)
+	//parser := flags.NewParser(&opts, flags.Default)
+	//// set name
+	//parser.Name = "argument-go-flags"
+	//if _, err := parser.Parse(); err != nil {
+	//	// some error handling
+	//	return
+	//}
+
+	// [ --help and error help ]
+	opts := *new(options)
+	parser := flags.NewParser(&opts, flags.Default)
+	// set name
+	parser.Name = "argument-go-flags"
+	if _, err := parser.Parse(); err != nil {
+		flagsError, _ := err.(*flags.Error)
+		// help時は何もしない
+		if flagsError.Type == flags.ErrHelp {
+			return
+		}
+		fmt.Println()
+		parser.WriteHelp(os.Stdout)
+		fmt.Println()
 		return
 	}
+
 	fmt.Printf("title: %s\n", opts.Title)
 	fmt.Printf("count: %d\n", opts.Count)
 	fmt.Printf("debug: %t\n", opts.Debug)
