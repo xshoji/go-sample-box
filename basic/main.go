@@ -14,6 +14,8 @@ import (
 
 func main() {
 	// primitive types
+	var valueInt8 int8
+	valueInt8 = 1
 	valueInt := 100
 	valueInt64 := time.Now().UnixNano()
 	valueFloat64 := 100.12
@@ -37,6 +39,7 @@ func main() {
 	// > Golangでの文字列・数値変換 - 小野マトペの納豆ペペロンチーノ日記
 	// > http://matope.hatenablog.com/entry/2014/04/22/101127
 	fmt.Println("<< cast >>")
+	fmt.Printf("valueInt8: %d, valueString: %s\n", valueInt, strconv.Itoa(int(valueInt8)))
 	fmt.Printf("valueInt: %d, valueString: %s\n", valueInt, strconv.Itoa(valueInt))
 	fmt.Printf("valueInt64: %d, valueString: %s\n", valueInt64, strconv.FormatInt(valueInt64, 10))
 	fmt.Printf("valueFloat: %v, valueString: %s\n", valueFloat64, strconv.FormatFloat(valueFloat64, 'f', 4, 32))
@@ -153,4 +156,28 @@ func main() {
 	fmt.Printf("Size of array : %v\n", len(sizeArray))
 	fmt.Printf("Size of slice : %v\n", len(sizeSlice))
 
+	// Nullable variables
+	// > go - How to make a nullable field in Golang struct? - Stack Overflow
+	// > https://stackoverflow.com/questions/51998165/how-to-make-a-nullable-field-in-golang-struct
+	fmt.Println("<< Nullable values handling >>")
+	fmt.Println("")
+	fmt.Println("[ pointer ]")
+	user := struct {
+		Name *string
+		Age  *int
+	}{}
+	user.Name = &valueString
+	user.Age = &valueInt
+	fmt.Println("Refer values")
+	fmt.Println(*user.Name)
+	fmt.Println(*user.Age)
+	fmt.Println(user.Name == nil)
+	fmt.Println(user.Age == nil)
+
+	fmt.Println("")
+	fmt.Println("Refer nil values")
+	user.Name = nil
+	user.Age = nil
+	fmt.Println(user.Name == nil)
+	fmt.Println(user.Age == nil)
 }
