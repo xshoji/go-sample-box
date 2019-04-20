@@ -134,18 +134,21 @@ func main() {
 
 	// Create random integer
 	fmt.Println("<< random integer >>")
-	rand.Seed(time.Now().UnixNano())
-	millsec := rand.Intn(1000-1) + 1
-	fmt.Println(millsec)
+	createRandomNumber := func() int {
+		rand.Seed(time.Now().UnixNano())
+		return rand.Intn(1000000-1) + 1
+	}
+	fmt.Println(createRandomNumber())
 	fmt.Println("")
 
 	// Create random string
 	fmt.Println("<< random string >>")
-	var seed = strconv.FormatInt(time.Now().UnixNano(), 10)
-	fmt.Println(seed)
-	var shaBytes = sha256.Sum256([]byte(seed))
-	var randomString = hex.EncodeToString(shaBytes[:])
-	fmt.Println(randomString)
+	createRandomString := func() string {
+		seed := strconv.FormatInt(time.Now().UnixNano(), 10)
+		shaBytes := sha256.Sum256([]byte(seed))
+		return hex.EncodeToString(shaBytes[:])
+	}
+	fmt.Println(createRandomString())
 	fmt.Println("")
 
 	fmt.Println("<< size >>")
