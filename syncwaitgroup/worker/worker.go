@@ -31,8 +31,9 @@ func (w Worker) Start() {
 	rand.Seed(time.Now().UnixNano())
 	for i := 0; i < 20; i++ {
 		// - [Golang Cookbook： generate random number in a given range](http://golangcookbook.blogspot.com/2012/11/generate-random-number-in-given-range.html)
-		millsec := rand.Intn(1000-1) + 1
-		time.Sleep(time.Duration(millsec) * time.Millisecond)
-		fmt.Printf("name: %s, i: %d, millsec: %d\n", w.Name, i, millsec)
+		randomMilliSec := rand.Intn(1000-1) + 1
+		time.Sleep(time.Duration(randomMilliSec) * time.Millisecond)
+		fmt.Printf("name: %s, i: %d, waitMilliSec: %d\n", w.Name, i, randomMilliSec)
 	}
+	fmt.Println("Finish!" + w.Name)
 }
