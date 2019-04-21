@@ -13,6 +13,8 @@ import (
 )
 
 func main() {
+	//
+	//
 	// primitive types
 	var valueInt8 int8
 	valueInt8 = 1
@@ -26,6 +28,8 @@ func main() {
 	fmt.Printf("valueInt, valueInt64, valueFloat, valueRune, valueString\n%v, %v, %v, %v, %v\n", valueInt, valueInt64, valueFloat64, valueRune, valueString)
 	fmt.Println("")
 
+	//
+	//
 	// 文字シーケンス
 	valueString2 := `{
   "aaa", "bbb",
@@ -35,6 +39,8 @@ func main() {
 	fmt.Println(valueString2)
 	fmt.Println("")
 
+	//
+	//
 	// cast
 	// > Golangでの文字列・数値変換 - 小野マトペの納豆ペペロンチーノ日記
 	// > http://matope.hatenablog.com/entry/2014/04/22/101127
@@ -53,6 +59,8 @@ func main() {
 	fmt.Printf("value[]byte: %v, valueString: %s\n", valueBytes, string(valueBytes))
 	fmt.Println("")
 
+	//
+	//
 	// pointer
 	_valueInt := &valueInt
 	fmt.Println("<< pointer >>")
@@ -60,11 +68,15 @@ func main() {
 	fmt.Printf("valueInt pointers value: %v\n", *_valueInt)
 	fmt.Println("")
 
+	//
+	//
 	// array
 	valueIntArray := [...]int{1, 2, 3}
 	fmt.Printf("valueIntArray\n%v\n", valueIntArray)
 	fmt.Println("")
 
+	//
+	//
 	// slice
 	valueStringSlice := []string{"aaa", "bbb", "ccc"}
 	fmt.Printf("valueStringSlice\n%v\n", valueStringSlice)
@@ -76,6 +88,8 @@ func main() {
 	fmt.Println(valueStringSlice)
 	fmt.Println("")
 
+	//
+	//
 	//map
 	mapValues := map[string]string{
 		"aaa": "aaa",
@@ -94,6 +108,8 @@ func main() {
 	}
 	fmt.Println("")
 
+	//
+	//
 	// public method
 	// Package prefix is required when calling method
 	fmt.Println("<< function >>")
@@ -101,7 +117,9 @@ func main() {
 	fmt.Printf("%v\n", utils.JoinString(utils.GetMultiReturns()))
 	fmt.Println("")
 
-	// 構造体の初期化
+	//
+	//
+	// initialize struct
 	fmt.Println("<< structs, method >>")
 	taro := structs.NewUser("taro", 16)
 	jiro := structs.NewUser("jiro", 99)
@@ -110,7 +128,9 @@ func main() {
 	jiro.Talk()
 	fmt.Println("")
 
-	// 無名構造体
+	//
+	//
+	// anonymous struct
 	anonymousStruct := struct {
 		Name     string
 		Age      int
@@ -124,7 +144,9 @@ func main() {
 	fmt.Print(anonymousStruct)
 	fmt.Println("")
 
-	// 無名関数
+	//
+	//
+	// anonymous function
 	anonymousFunction := func() {
 		fmt.Println("This is anonymousFunction.")
 	}
@@ -132,6 +154,8 @@ func main() {
 	anonymousFunction()
 	fmt.Println("")
 
+	//
+	//
 	// Create random integer
 	fmt.Println("<< random integer >>")
 	createRandomNumber := func() int {
@@ -141,6 +165,8 @@ func main() {
 	fmt.Println(createRandomNumber())
 	fmt.Println("")
 
+	//
+	//
 	// Create random string
 	fmt.Println("<< random string >>")
 	createRandomString := func() string {
@@ -159,6 +185,8 @@ func main() {
 	fmt.Printf("Size of array : %v\n", len(sizeArray))
 	fmt.Printf("Size of slice : %v\n", len(sizeSlice))
 
+	//
+	//
 	// Nullable variables
 	// > go - How to make a nullable field in Golang struct? - Stack Overflow
 	// > https://stackoverflow.com/questions/51998165/how-to-make-a-nullable-field-in-golang-struct
@@ -185,6 +213,8 @@ func main() {
 	fmt.Println(user.Age == nil)
 	fmt.Println("")
 
+	//
+	//
 	// DateTime format
 	// > Golangでの日付のフォーマット指定の方法について - Qiita
 	// > https://qiita.com/unbabel/items/c8782420391c108e3cac
