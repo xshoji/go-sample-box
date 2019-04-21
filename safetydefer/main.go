@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -23,6 +24,7 @@ func main() {
 
 	go func() {
 		<-signals
+		fmt.Println("")
 		log.Println("Catch signals")
 		deferfunc()
 		log.Println("Execute os.Exit()")
