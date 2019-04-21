@@ -183,4 +183,16 @@ func main() {
 	user.Age = nil
 	fmt.Println(user.Name == nil)
 	fmt.Println(user.Age == nil)
+	fmt.Println("")
+
+	// DateTime format
+	// > Golangでの日付のフォーマット指定の方法について - Qiita
+	// > https://qiita.com/unbabel/items/c8782420391c108e3cac
+	fmt.Println("<< now >>")
+	now := time.Now()
+	fmt.Println("plane:")
+	fmt.Println(now)
+	fmt.Println("formatted:")
+	fmt.Println(now.Format("2006 / 01 [January(Jan)] / 02 [Monday(Mon)] 15:04:05 [MST]"))
+	fmt.Println("")
 }
