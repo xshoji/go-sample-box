@@ -45,8 +45,9 @@ func main() {
 	// > Golangでの文字列・数値変換 - 小野マトペの納豆ペペロンチーノ日記
 	// > http://matope.hatenablog.com/entry/2014/04/22/101127
 	fmt.Println("<< cast >>")
-	fmt.Printf("valueInt8: %d, valueString: %s\n", valueInt, strconv.Itoa(int(valueInt8)))
-	fmt.Printf("valueInt: %d, valueString: %s\n", valueInt, strconv.Itoa(valueInt))
+	// FormatIntの第2引数は基数。2なら2進数、16なら16進数になる
+	fmt.Printf("valueInt: %d, valueString: %s\n", valueInt, strconv.FormatInt(int64(valueInt), 10))
+	fmt.Printf("valueInt8: %d, valueString: %s\n", valueInt, strconv.FormatInt(int64(valueInt8), 10))
 	fmt.Printf("valueInt64: %d, valueString: %s\n", valueInt64, strconv.FormatInt(valueInt64, 10))
 	fmt.Printf("valueFloat: %v, valueString: %s\n", valueFloat64, strconv.FormatFloat(valueFloat64, 'f', 4, 32))
 	fmt.Printf("valueFloat: %v, valueInt: %v\n", valueFloat64, int(valueFloat64))
