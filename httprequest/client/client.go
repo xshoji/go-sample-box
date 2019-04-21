@@ -29,7 +29,10 @@ func (r *ResponseResult) GetBody() string {
 // GetBodyAsObject GetBodyAsObject
 func (r *ResponseResult) GetBodyAsObject() interface{} {
 	var result interface{}
-	json.Unmarshal([]byte(r.responseBody), &result)
+	err := json.Unmarshal([]byte(r.responseBody), &result)
+	if err != nil {
+		log.Panic("error")
+	}
 	return result
 }
 
@@ -70,16 +73,21 @@ func (c *Client) callAPI(path string, httpMethod string, postData map[string][]s
 		form := url.Values(postData)
 		resp, err = http.Post(urlFull, "text/plain", strings.NewReader(form.Encode()))
 	} else {
-		log.Panic("httpMethod:" + httpMethod + " is unkown.")
+		log.Panic("httpMethod:" + httpMethod + " is unknown.")
 	}
 
 	if err != nil {
-		log.Panic("Error occured. | ", err)
+		log.Panic("Error occurred. | ", err)
 	}
 	if resp.StatusCode != http.StatusOK {
 		log.Panic("Status is not OK. | ", resp.StatusCode)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		err := resp.Body.Close()
+		if err != nil {
+			log.Panic("error")
+		}
+	}()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	return body
