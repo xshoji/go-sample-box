@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"os/signal"
 	"time"
 )
 
@@ -52,8 +53,6 @@ func main() {
 
 	// create context
 	ctxt, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
 	// create chrome instance
 	c, err := chromedp.New(ctxt, chromedp.WithLog(log.Printf), chromedp.WithRunnerOptions(
 		runner.Flag("headless", true),
@@ -65,6 +64,24 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// defer handling
+	defer cancel()
+	shutdownFunc := func() {
+		err = c.Shutdown(ctxt)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	defer shutdownFunc()
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, os.Kill, os.Interrupt)
+	go func() {
+		<-signals
+		cancel()
+		shutdownFunc()
+		os.Exit(0)
+	}()
 
 	// > screenshot from a wrong page · Issue #205 · chromedp/chromedp
 	// > https://github.com/chromedp/chromedp/issues/205
@@ -80,14 +97,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	// shutdown chrome
-	defer func() {
-		err = c.Shutdown(ctxt)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}()
 
 	// headlessモードの時は不要
 	// wait for chrome to finish

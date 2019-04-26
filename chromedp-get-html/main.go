@@ -8,6 +8,7 @@ import (
 	"github.com/jessevdk/go-flags"
 	"log"
 	"os"
+	"os/signal"
 )
 
 type options struct {
@@ -40,7 +41,6 @@ func main() {
 
 	// create context
 	ctxt, cancel := context.WithCancel(context.Background())
-	defer cancel()
 
 	// create chrome instance
 	c, err := chromedp.New(ctxt, chromedp.WithLog(log.Printf), chromedp.WithRunnerOptions(
@@ -54,27 +54,30 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// defer handling
+	defer cancel()
+	shutdownFunc := func() {
+		err = c.Shutdown(ctxt)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	defer shutdownFunc()
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, os.Kill, os.Interrupt)
+	go func() {
+		<-signals
+		cancel()
+		shutdownFunc()
+		os.Exit(0)
+	}()
+
 	// run task list
 	var res string
 	err = c.Run(ctxt, text(opts.Url, opts.QuerySelector, &res))
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	// shutdown chrome
-	defer func() {
-		// shutdown chrome
-		err = c.Shutdown(ctxt)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		// wait for chrome to finish
-		err = c.Wait()
-		if err != nil {
-			log.Fatal(err)
-		}
-	}()
 
 	log.Printf("\n\nresult: \n%s\n\n\n", res)
 }

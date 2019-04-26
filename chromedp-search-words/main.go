@@ -9,6 +9,7 @@ import (
 	"github.com/yosssi/gohtml"
 	"log"
 	"os"
+	"os/signal"
 	"time"
 )
 
@@ -42,7 +43,6 @@ func main() {
 
 	// create context
 	ctxt, cancel := context.WithCancel(context.Background())
-	defer cancel()
 
 	// create chrome instance
 	c, err := chromedp.New(ctxt, chromedp.WithLog(log.Printf), chromedp.WithRunnerOptions(
@@ -57,6 +57,24 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// defer handling
+	defer cancel()
+	shutdownFunc := func() {
+		err = c.Shutdown(ctxt)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	defer shutdownFunc()
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, os.Kill, os.Interrupt)
+	go func() {
+		<-signals
+		cancel()
+		shutdownFunc()
+		os.Exit(0)
+	}()
+
 	// run task list
 	var res string
 	var tasks chromedp.Tasks
@@ -70,15 +88,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	// shutdown chrome
-	defer func() {
-		// shutdown chrome
-		err = c.Shutdown(ctxt)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}()
 
 	log.Printf("\n\nresult: \n%s\n\n\n", gohtml.Format(res))
 }
