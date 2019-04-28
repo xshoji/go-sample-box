@@ -12,7 +12,7 @@ func main() {
 	fmt.Println(sports.Swimming)
 	fmt.Println(sports.Soccer)
 	fmt.Println(sports.Karate)
-	fmt.Println("")
+	fmt.Println()
 
 	// Set to struct
 	object := new(struct {
@@ -28,4 +28,21 @@ func main() {
 	object.Sports = sportsList
 	fmt.Println("<< Print object values >>")
 	fmt.Println(object)
+	fmt.Println()
+
+	// Check None
+	object2 := new(struct {
+		Name   string
+		Sports sports.Sports
+	})
+	object.Name = "SportList"
+	fmt.Println("<< Check enum values >>")
+	object2.Name = "CheckSports"
+	fmt.Println(object2)
+	fmt.Println("Does object2.Sports have sports?")
+	fmt.Println(object2.Sports != sports.Null)
+	object2.Sports = sports.Baseball
+	fmt.Println("Does object2.Sports have sports?")
+	fmt.Println(object2.Sports != sports.Null)
+	fmt.Println()
 }

@@ -4,7 +4,7 @@ package sports
 type Sports int
 
 const (
-	_ Sports = iota
+	Null Sports = iota
 	Baseball
 	Swimming
 	Soccer

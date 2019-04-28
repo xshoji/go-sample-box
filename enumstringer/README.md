@@ -19,3 +19,7 @@ go run main.go
 
 > 実行例と stringer から学ぶ go generate 入門 - Qiita  
 > https://qiita.com/nirasan/items/d9399394b57a72e6a90f
+
+> ★ Ultimate Visual Guide to Go Enums ★  
+> https://blog.learngoprogramming.com/golang-const-type-enums-iota-bc4befd096d3
+
