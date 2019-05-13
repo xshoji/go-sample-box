@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"strconv"
@@ -26,7 +27,7 @@ func main() {
 	valueBytes := []byte("test")
 	fmt.Println("<< primitive >>")
 	fmt.Printf("valueInt, valueInt64, valueFloat, valueRune, valueString\n%v, %v, %v, %v, %v\n", valueInt, valueInt64, valueFloat64, valueRune, valueString)
-	fmt.Println("")
+	fmt.Println()
 
 	//
 	//
@@ -37,7 +38,7 @@ func main() {
 }`
 	fmt.Println("<< string sequence >>")
 	fmt.Println(valueString2)
-	fmt.Println("")
+	fmt.Println()
 
 	//
 	//
@@ -58,7 +59,7 @@ func main() {
 	valueInt64, _ = strconv.ParseInt(valueString, 10, 64)
 	fmt.Printf("valueString: %v, valueInt64: %v\n", valueString, valueInt64)
 	fmt.Printf("value[]byte: %v, valueString: %s\n", valueBytes, string(valueBytes))
-	fmt.Println("")
+	fmt.Println()
 
 	//
 	//
@@ -67,14 +68,14 @@ func main() {
 	fmt.Println("<< pointer >>")
 	fmt.Printf("valueInt pointer: %v\n", _valueInt)
 	fmt.Printf("valueInt pointers value: %v\n", *_valueInt)
-	fmt.Println("")
+	fmt.Println()
 
 	//
 	//
 	// array
 	valueIntArray := [...]int{1, 2, 3}
 	fmt.Printf("valueIntArray\n%v\n", valueIntArray)
-	fmt.Println("")
+	fmt.Println()
 
 	//
 	//
@@ -87,7 +88,7 @@ func main() {
 	fmt.Printf("%v\n", valueStringSlice)
 	valueStringSlice = make([]string, 5)
 	fmt.Println(valueStringSlice)
-	fmt.Println("")
+	fmt.Println()
 
 	//
 	//
@@ -107,7 +108,7 @@ func main() {
 	for k, v := range mapValues {
 		fmt.Println(k + ":" + v)
 	}
-	fmt.Println("")
+	fmt.Println()
 
 	//
 	//
@@ -116,7 +117,7 @@ func main() {
 	fmt.Println("<< function >>")
 	fmt.Printf("%v\n", utils.JoinString("aaa", "bbb"))
 	fmt.Printf("%v\n", utils.JoinString(utils.GetMultiReturns()))
-	fmt.Println("")
+	fmt.Println()
 
 	//
 	//
@@ -127,7 +128,17 @@ func main() {
 	// メソッドの呼び出し
 	taro.Talk()
 	jiro.Talk()
-	fmt.Println("")
+	fmt.Println()
+
+	//
+	//
+	// anonymous function
+	anonymousFunction := func() {
+		fmt.Println("This is anonymousFunction.")
+	}
+	fmt.Println("<< anonymous function >>")
+	anonymousFunction()
+	fmt.Println()
 
 	//
 	//
@@ -143,17 +154,31 @@ func main() {
 	}
 	fmt.Println("<< anonymous struct >>")
 	fmt.Print(anonymousStruct)
-	fmt.Println("")
+	fmt.Println()
 
-	//
-	//
-	// anonymous function
-	anonymousFunction := func() {
-		fmt.Println("This is anonymousFunction.")
+	toJson := func(v interface{}) string {
+		bytes, _ := json.Marshal(v)
+		return string(bytes)
 	}
-	fmt.Println("<< anonymous function >>")
-	anonymousFunction()
-	fmt.Println("")
+	anonymousStruct2Name := "taro"
+	anonymousStruct2Age := 100
+	anonymousStruct2Lang := "Japanese"
+	anonymousStruct2 := struct {
+		Name     *string
+		Age      *int
+		Language *string
+	}{}
+	fmt.Println("<< anonymous struct with pointer>>")
+	fmt.Println(anonymousStruct2)
+	fmt.Println(toJson(anonymousStruct2))
+	anonymousStruct2.Name = &anonymousStruct2Name
+	fmt.Println(anonymousStruct2)
+	fmt.Println(toJson(anonymousStruct2))
+	anonymousStruct2.Age = &anonymousStruct2Age
+	anonymousStruct2.Language = &anonymousStruct2Lang
+	fmt.Println(anonymousStruct2)
+	fmt.Println(toJson(anonymousStruct2))
+	fmt.Println()
 
 	//
 	//
@@ -164,7 +189,7 @@ func main() {
 		return rand.Intn(1000000-1) + 1
 	}
 	fmt.Println(createRandomNumber())
-	fmt.Println("")
+	fmt.Println()
 
 	//
 	//
@@ -176,7 +201,7 @@ func main() {
 		return hex.EncodeToString(shaBytes[:])
 	}
 	fmt.Println(createRandomString())
-	fmt.Println("")
+	fmt.Println()
 
 	fmt.Println("<< size >>")
 	sizeString := "aaa"
@@ -185,6 +210,7 @@ func main() {
 	fmt.Printf("Size of string : %v\n", len(sizeString))
 	fmt.Printf("Size of array : %v\n", len(sizeArray))
 	fmt.Printf("Size of slice : %v\n", len(sizeSlice))
+	fmt.Println()
 
 	//
 	//
@@ -192,7 +218,6 @@ func main() {
 	// > go - How to make a nullable field in Golang struct? - Stack Overflow
 	// > https://stackoverflow.com/questions/51998165/how-to-make-a-nullable-field-in-golang-struct
 	fmt.Println("<< Nullable values handling >>")
-	fmt.Println("")
 	fmt.Println("[ pointer ]")
 	user := struct {
 		Name *string
@@ -206,13 +231,13 @@ func main() {
 	fmt.Println(user.Name == nil)
 	fmt.Println(user.Age == nil)
 
-	fmt.Println("")
+	fmt.Println()
 	fmt.Println("Refer nil values")
 	user.Name = nil
 	user.Age = nil
 	fmt.Println(user.Name == nil)
 	fmt.Println(user.Age == nil)
-	fmt.Println("")
+	fmt.Println()
 
 	//
 	//
@@ -225,5 +250,5 @@ func main() {
 	fmt.Println(now)
 	fmt.Println("formatted:")
 	fmt.Println(now.Format("2006 / 01 [January(Jan)] / 02 [Monday(Mon)] 15:04:05 [MST]"))
-	fmt.Println("")
+	fmt.Println()
 }
