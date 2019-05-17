@@ -128,6 +128,17 @@ func main() {
 	// メソッドの呼び出し
 	taro.Talk()
 	jiro.Talk()
+	//
+	// 本体を引数にする引数名付きの生成パターン
+	hanako := structs.NewUserDefault(structs.User{
+		Name: "hanako",
+	})
+	yasuyo := structs.NewUserDefault(structs.User{
+		Name: "yasuyo",
+		Age:  100,
+	})
+	hanako.Talk()
+	yasuyo.Talk()
 	fmt.Println()
 
 	//
