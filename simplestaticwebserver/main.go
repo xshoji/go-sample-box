@@ -30,11 +30,11 @@ func main() {
 		flag.Usage()
 		os.Exit(0)
 	}
-	fmt.Println("documentRootDirectory: ", *documentRootDirectoryFlag)
+	fmt.Println("DocumentRootDirectory: ", *documentRootDirectoryFlag)
 
 	http.Handle("/", http.FileServer(http.Dir(*documentRootDirectoryFlag)))
 
-	fmt.Println("publish: http://localhost:" + *portFlag)
+	fmt.Println("Published! : http://localhost:" + *portFlag)
 
 	if err := http.ListenAndServe(":"+*portFlag, nil); err != nil {
 		log.Fatal("ListenAndServe: ", err)
