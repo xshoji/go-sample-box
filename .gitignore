@@ -32,3 +32,4 @@ vendor/
 .gvm_local/
 output/
 !.gitkeep
+dist
