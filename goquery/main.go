@@ -22,7 +22,7 @@ func init() {
 func main() {
 
 	flag.Parse()
-	if *helpFlag == true || *urlFlag == "" {
+	if *helpFlag || *urlFlag == "" {
 		flag.Usage()
 		os.Exit(0)
 	}

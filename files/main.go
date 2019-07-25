@@ -20,7 +20,7 @@ func init() {
 func main() {
 
 	flag.Parse()
-	if *helpFlag == true || *directoryPathFlag == "" {
+	if *helpFlag || *directoryPathFlag == "" {
 		flag.Usage()
 		os.Exit(0)
 	}
