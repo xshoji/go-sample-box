@@ -6,7 +6,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
+	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/xshoji/go-sample-box/basic/structs"
@@ -261,5 +263,35 @@ func main() {
 	fmt.Println(now)
 	fmt.Println("formatted:")
 	fmt.Println(now.Format("2006 / 01 [January(Jan)] / 02 [Monday(Mon)] 15:04:05 [MST]"))
+	fmt.Println()
+
+	//
+	//
+	// Replace
+	fmt.Println("<< strings.Replace >>")
+	mozi := "aaabbbaaaccc"
+	fmt.Println(strings.Replace(mozi, "aaa", "!!!", -1))
+	fmt.Println()
+
+	//
+	//
+	// regexp.MatchString
+	fmt.Println("<< regexp.MatchString >>")
+	fmt.Println(regexp.MatchString(`^aaa`, mozi))
+	fmt.Println(regexp.MatchString(`ccc$`, mozi))
+	fmt.Println(regexp.MatchString(`ddd`, mozi))
+	fmt.Println()
+
+	//
+	//
+	// ReplaceAllString
+	fmt.Println("<< ReplaceAllString >>")
+	mozi = "[111-222-333] [skdflskdjflsd] xxxx yyyy pppp 500 200 100"
+	re := regexp.MustCompile(`(\[.*\])`)
+	fmt.Println(re.ReplaceAllString(mozi, "test"))
+	//> 正規表現：文字列を「含まない」否定の表現まとめ ｜ WWWクリエイターズ
+	//> http://www-creators.com/archives/1827
+	re = regexp.MustCompile(`(\[[^\]]*\])`)
+	fmt.Println(re.ReplaceAllString(mozi, "test"))
 	fmt.Println()
 }

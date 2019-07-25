@@ -10,9 +10,9 @@ import (
 //> https://stackoverflow.com/questions/19761963/flag-command-line-parsing-in-golang
 
 var helpFlag = flag.Bool("help", false, "help")
-var titleFlag = flag.String("title", "", "[require] title")
-var countFlag = flag.Int("count", 1, "[option] count")
-var isDebugFlag = flag.Bool("debug", false, "[option] debug")
+var titleFlag = flag.String("title", "", "[required] title")
+var countFlag = flag.Int("count", 1, "[optional] count")
+var isDebugFlag = flag.Bool("debug", false, "[optional] debug")
 
 func init() {
 	flag.BoolVar(helpFlag, "h", false, "= -help")
