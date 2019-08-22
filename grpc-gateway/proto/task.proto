@@ -1,0 +1,31 @@
+syntax = "proto3";
+package proto;
+
+import "google/api/annotations.proto";
+// import "google/protobuf/empty.proto";
+// import "google/protobuf/wrappers.proto";
+
+message Task {
+  int64 id  = 1;
+  string title = 2;
+  Level level = 3;
+  Status status = 4;
+  string description = 5;
+  oneof memo_optional {
+    string memo = 6; // 0とnilを区別するOptional値の表現
+  }
+}
+
+enum Level {
+  LEVEL_UNKNOWN = 0;
+  LOW = 1;
+  MID = 2;
+  HIGH = 3;
+}
+
+enum Status {
+  STATUS_UNKNOWN = 0;
+  TODO = 1;
+  IN_PROGRESS = 2;
+  DONE = 3;
+}
