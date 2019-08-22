@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/xshoji/go-sample-box/grpc-gateway-rest/gateway"
-	"github.com/xshoji/go-sample-box/grpc-gateway-rest/proto"
-	"github.com/xshoji/go-sample-box/grpc-gateway-rest/proto/impl"
+	"github.com/xshoji/go-sample-box/grpc-gateway/gateway"
+	"github.com/xshoji/go-sample-box/grpc-gateway/proto"
+	"github.com/xshoji/go-sample-box/grpc-gateway/proto/impl"
 	"google.golang.org/grpc"
 	"log"
 	"net"
