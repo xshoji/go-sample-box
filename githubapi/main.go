@@ -12,6 +12,7 @@ import (
 
 var helpFlag = flag.Bool("help", false, "help")
 var commandFlag = flag.String("command", "", "[required] command")
+var paramsFlag = flag.String("params", "", "[optional] params ( json format )")
 var user string
 var repository string
 var accessToken string
@@ -20,6 +21,7 @@ var apiClient *client.Client
 func init() {
 	flag.BoolVar(helpFlag, "h", false, "= -help")
 	flag.StringVar(commandFlag, "c", "", "= -command")
+	flag.StringVar(paramsFlag, "p", "", "= -params")
 	user = os.Getenv("GITHUB_USER")
 	repository = os.Getenv("GITHUB_REPOSITORY")
 	accessToken = os.Getenv("GITHUB_ACCESS_TOKEN")
@@ -39,13 +41,45 @@ func main() {
 
 	if *commandFlag == "issues" {
 		issues()
+	} else if *commandFlag == "issueComments" {
+		issueComments()
 	} else {
 		log.Fatal("Unknown command.")
 	}
 }
 
 func issues() {
-	res := apiClient.Get("/repos/" + user + "/" + repository + "/issues?access_token=" + accessToken)
+
+	var paramMap map[string]interface{}
+	json.Unmarshal([]byte(*paramsFlag), &paramMap)
+	value, ok := paramMap["issueNumber"]
+	if !ok {
+		log.Fatal("-p {\"issueNumber\":\"1234\"} is required. (\"issueNumber\":null is allowed.)")
+	}
+	var issueNumber string
+	if value != nil {
+		issueNumber = "/" + value.(string)
+	}
+
+	res := apiClient.Get("/repos/" + user + "/" + repository + "/issues" + issueNumber + "?access_token=" + accessToken)
+	var buf bytes.Buffer
+	err := json.Indent(&buf, []byte(res.GetBody()), "", "  ")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(buf.String())
+}
+
+func issueComments() {
+
+	var paramMap map[string]interface{}
+	json.Unmarshal([]byte(*paramsFlag), &paramMap)
+	issueNumber, ok := paramMap["issueNumber"]
+	if !ok {
+		log.Fatal("-p {\"issueNumber\":\"1234\"} is required.")
+	}
+
+	res := apiClient.Get("/repos/" + user + "/" + repository + "/issues/" + issueNumber.(string) + "/comments?access_token=" + accessToken)
 	var buf bytes.Buffer
 	err := json.Indent(&buf, []byte(res.GetBody()), "", "  ")
 	if err != nil {
