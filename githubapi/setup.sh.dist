@@ -1,0 +1,3 @@
+export GITHUB_USER=xxx
+export GITHUB_REPOSITORY=xxx
+export GITHUB_ACCESS_TOKEN=xxx
