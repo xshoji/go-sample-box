@@ -17,9 +17,7 @@ go run main.go
 > stringer - GoDoc  
 > https://godoc.org/golang.org/x/tools/cmd/stringer
 
-> 実行例と stringer から学ぶ go generate 入門 - Qiita  
-> https://qiita.com/nirasan/items/d9399394b57a72e6a90f
+> go - How to check whether the value is of type iota constant in Golang? - Stack Overflow  
+> https://stackoverflow.com/questions/37496098/how-to-check-whether-the-value-is-of-type-iota-constant-in-golang
 
-> ★ Ultimate Visual Guide to Go Enums ★  
-> https://blog.learngoprogramming.com/golang-const-type-enums-iota-bc4befd096d3
 
