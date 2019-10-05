@@ -23,3 +23,5 @@ go run main.go
 > ★ Ultimate Visual Guide to Go Enums ★  
 > https://blog.learngoprogramming.com/golang-const-type-enums-iota-bc4befd096d3
 
+> GOLANG“名前空間”列挙型？ - コードログ  
+> https://codeday.me/jp/qa/20190409/589174.html
