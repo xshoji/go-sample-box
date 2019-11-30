@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/golang/glog"
 	"gopkg.in/yaml.v2"
+	"strconv"
 	"strings"
 )
 
@@ -13,9 +14,265 @@ func main() {
 
 	flag.Parse()
 
-	stupidHonestMethod()
-	//	littleSmartMethod()
+	//stupidHonestMethod()
+	//littleSmartMethod()
+	smartMethod()
 }
+
+func smartMethod() {
+	var yamlString = getSimpleYaml()
+
+	node := &yaml.MapSlice{}
+	yaml.Unmarshal([]byte(yamlString), node)
+	orderedMapSlice := NewOrderedMapSlice(*node)
+	dumpNode("result - orderedMapSlice", orderedMapSlice.Current())
+	fmt.Printf("\n\n\n")
+	developmentTeams := orderedMapSlice.Get(`development-teams`)
+	dumpNode("result - developmentTeams", developmentTeams.Current())
+	fmt.Printf("\n\n\n")
+	teamA := developmentTeams.Get(`team-a`)
+	dumpNode("result - teamA", teamA.Current())
+	fmt.Printf("\n\n\n")
+	id := teamA.Get(`pc-app-name1`).Get(`id`)
+	dumpNode("result - id", id.Current())
+	fmt.Printf("\n\n\n")
+	ranks := teamA.Get(`ranks`)
+	dumpNode("result - ranks", ranks.Current())
+	fmt.Printf("\n\n\n")
+	ranksFirst := ranks.Get("0")
+	dumpNode("result - ranksFirst", ranksFirst.Current())
+	fmt.Printf("\n\n\n")
+	ranksSecond := ranks.Get("1")
+	dumpNode("result - ranksSecond", ranksSecond.Current())
+	fmt.Printf("\n\n\n")
+	ranksUndefined := ranks.Get("2")
+	dumpNode("result - ranksUndefined", ranksUndefined.Current())
+	fmt.Printf("\n\n\n")
+
+	undefinedValue := orderedMapSlice.Get(`hogehoge`)
+	dumpNode("undefinedValue", undefinedValue.Current())
+
+}
+
+type OrderedMapSlice struct {
+	parent  *OrderedMapSlice
+	current interface{}
+	isRoot  bool
+}
+
+func NewOrderedMapSlice(yamlData interface{}) OrderedMapSlice {
+	rootMapSlice := yaml.MapSlice{yaml.MapItem{Key: 0, Value: yamlData}}
+	orderedMapSlice := OrderedMapSlice{
+		parent: &OrderedMapSlice{
+			parent:  nil,
+			current: rootMapSlice,
+			isRoot:  true,
+		},
+		current: yamlData,
+		isRoot:  false,
+	}
+	return orderedMapSlice
+}
+
+func createOrderedMapSlice(parent *OrderedMapSlice, yamlData interface{}) *OrderedMapSlice {
+	orderedMapSlice := OrderedMapSlice{
+		parent:  parent,
+		current: yamlData,
+		isRoot:  false,
+	}
+	return &orderedMapSlice
+}
+
+func (o *OrderedMapSlice) Current() interface{} {
+	if o.current == nil {
+		return nil
+	}
+	v, ok := o.current.(yaml.MapSlice)
+	if ok {
+		return v
+	}
+	return o.current.(interface{})
+}
+
+func (o *OrderedMapSlice) Get(key string) *OrderedMapSlice {
+	dumpNode("o.Current", o.Current())
+	fmt.Printf(">> o.current : %T, %v\n", o.current, o.current)
+	if o.current == nil {
+		return createOrderedMapSlice(o, nil)
+	}
+	mapSlice, ok := o.current.(yaml.MapSlice)
+	fmt.Printf("-- o.current.(yaml.MapSlice)\n")
+	fmt.Printf("---- mapSlice	: %T, %v\n", mapSlice, mapSlice)
+	fmt.Printf("---- ok : %v\n", ok)
+	if ok {
+		for _, item := range mapSlice {
+			fmt.Printf("---- item: %T\n", item.Value)
+			if item.Key == key {
+				v, ok := item.Value.(yaml.MapSlice)
+				if ok {
+					return createOrderedMapSlice(o, v)
+				}
+				v2 := item.Value.(interface{})
+				return createOrderedMapSlice(o, v2)
+			}
+		}
+	}
+	slice, ok := o.current.([]interface{})
+	fmt.Printf("--o.current.([]interface{})\n")
+	fmt.Printf("---- slice : %T, %v\n", slice, slice)
+	fmt.Printf("---- ok : %v\n", ok)
+	if ok {
+		for i, item := range slice {
+			index := strconv.FormatInt(int64(i), 10)
+			fmt.Printf("---- index : %v, key : %v\n", index, key)
+			fmt.Printf("---- index == key : %v\n", index == key)
+			if index == key {
+				fmt.Printf("---- item: %T\n", item)
+				v, ok := item.(yaml.MapSlice)
+				if ok {
+					return createOrderedMapSlice(o, &v)
+				}
+				v2 := item.(interface{})
+				return createOrderedMapSlice(o, &v2)
+			}
+		}
+	}
+	return createOrderedMapSlice(o, nil)
+}
+
+func dumpNode(name string, node interface{}) {
+	bytes, _ := yaml.Marshal(node)
+	fmt.Printf("=======\n%v:\n%v=======\n", name, string(bytes))
+}
+
+func printPointer(name string, v interface{}, p interface{}) {
+	fmt.Printf("-- %v => v %T: &v=%p v=&i=%p p=%p\n", name, v, &v, v, p)
+}
+
+type mapSliceUtil struct{}
+
+var MapSliceUtil = mapSliceUtil{}
+
+func (p *mapSliceUtil) Get(mapSlice *yaml.MapSlice, key string) *yaml.MapSlice {
+	if mapSlice == nil {
+		return nil
+	}
+	for _, item := range *mapSlice {
+		if item.Key == key {
+			v := item.Value.(yaml.MapSlice)
+			return &v
+		}
+	}
+	return nil
+}
+
+func (p *mapSliceUtil) Set(mapSlicePointer *yaml.MapSlice, key string, value interface{}) {
+	success := false
+	mapSlice := *mapSlicePointer
+	// overwrite value
+	//	printPointer("for mapSlicePointer before", *mapSlicePointer, mapSlicePointer)
+	printPointer("for mapSlice before       ", mapSlice, &mapSlice)
+	for i, item := range mapSlice {
+		if item.Key == key {
+			mapSlice[i].Value = value
+			success = true
+		}
+	}
+	//	printPointer("for mapSlicePointer after ", *mapSlicePointer, mapSlicePointer)
+	printPointer("for mapSlice after        ", mapSlice, &mapSlice)
+	// add new value
+	if !success {
+		//a := append(mapSlice, yaml.MapItem{Key: key, Value:value})
+		//		printPointer("add mapSlicePointer before", *mapSlicePointer, mapSlicePointer)
+		printPointer("add mapSlice before       ", mapSlice, &mapSlice)
+		//		&mapSlice = &a
+		//		printPointer("add mapSlicePointer after ", *mapSlicePointer, mapSlicePointer)
+		printPointer("add mapSlice after        ", mapSlice, &mapSlice)
+	}
+}
+
+func (p *mapSliceUtil) Delete(mapSlice yaml.MapSlice, key string) yaml.MapSlice {
+	newMapSlice := yaml.MapSlice{}
+	for _, item := range mapSlice {
+		if item.Key != key {
+			newMapSlice = append(newMapSlice, item)
+		}
+	}
+	return newMapSlice
+}
+
+func (p *mapSliceUtil) MapFunc(mapSlice yaml.MapSlice, mapFunc func(item yaml.MapItem)) {
+	for _, item := range mapSlice {
+		mapFunc(item)
+	}
+}
+
+//func (p *mapSliceUtil) MapFuncByKey(mapSlice *yaml.MapSlice, key string, mapFunc func (mapSlice yaml.MapSlice) yaml.MapSlice) {
+//	internalMapSlice := MapSliceUtil.Get(*mapSlice, key)
+//	mapFunc(internalMapSlice)
+//	for _, item := range mapSlice {
+//		mapFunc(item)
+//	}
+//}
+
+//func (p *mapSliceUtil) Delete(mapSlice yaml.MapSlice, isTarget func (item yaml.MapItem) bool) yaml.MapSlice {
+//	for i, item := range mapSlice {
+//		if isTarget(item) {
+//
+//		}
+//		copy(mapSlice[i:], mapSlice[i+1:])
+//		mapSlice[len(mapSlice)-1] = yaml.MapItem{}
+//		mapSlice = mapSlice[:len(mapSlice)-1]
+//	}
+//}
+
+//func littleSmartMethod() {
+//	var yamlString = getYaml()
+//
+//	node := &yaml.MapSlice{}
+//	yaml.Unmarshal([]byte(yamlString), node)
+//	// get value
+//	developmentTeamsNode := MapSliceUtil.Get(node, `development-teams`)
+//	fmt.Printf("%v\n", ">>> get value")
+//	dumpNode("developmentTeamsNode", *developmentTeamsNode)
+//	teamNode := MapSliceUtil.Get(developmentTeamsNode, `team-c`)
+//	dumpNode("teamNode", *teamNode)
+//
+//	// set value (overwrite)
+//	fmt.Printf("%v\n", ">>> set value (overwrite)")
+//	printPointer("teamNode", *teamNode, teamNode)
+//	MapSliceUtil.Set(teamNode, `members`, []string{"a", "b", "c"})
+//	printPointer("teamNode", *teamNode, teamNode)
+//	dumpNode("teamNode", *teamNode)
+//
+//	// set value (append)
+//	fmt.Printf("%v\n", ">>> set value (append)")
+//	MapSliceUtil.Set(teamNode, `location`, "tokyo")
+//	MapSliceUtil.Set(teamNode, `skills`, []string{"java","php","golang"})
+//	printPointer("teamNode", *teamNode, teamNode)
+//	dumpNode("teamNode", *teamNode)
+//
+//	// delete value
+//	products := MapSliceUtil.Get(teamNode, `products`)
+//	MapSliceUtil.Set(teamNode, `products`, MapSliceUtil.Delete(*products, `ios-app-name10`))
+//
+//	// delete value
+//	//MapSliceUtil.Set(developmentTeamsNode, `team-a`, nil)
+//	//MapSliceUtil.Set(developmentTeamsNode, `team-d`, "new value")
+//	//MapSliceUtil.Set(developmentTeamsNode, `team-e`, []string{"a", "b", "c"})
+//	//MapSliceUtil.Set(&node, `development-teams`, MapSliceUtil.Delete(*developmentTeamsNode, `team-b`))
+//	//teamNode = MapSliceUtil.Get(*developmentTeamsNode, `team-c`)
+//	//products = MapSliceUtil.Get(*teamNode, `products`)
+//	//MapSliceUtil.Set(teamNode, `products`, MapSliceUtil.Delete(*products, `ios-app-name10`))
+//	//bytes, _ := yaml.Marshal(products)
+//	//fmt.Printf("\n\n\n--- result:\n%v\n\n", string(bytes))
+//
+//	//	*developmentTeamsNode = yaml.MapSlice{}
+//
+//
+////	dumpNode("teamNode", node)
+//
+//}
 
 func stupidHonestMethod() {
 	var yamlString = getYaml()
@@ -85,87 +342,19 @@ func stupidHonestMethod() {
 	fmt.Printf("\n\n\n--- result:\n%v\n\n", string(bytes))
 }
 
-type mapSliceUtil struct{}
-
-var MapSliceUtil = mapSliceUtil{}
-
-func (p *mapSliceUtil) Get(mapSlice yaml.MapSlice, key string) *yaml.MapSlice {
-	for _, item := range mapSlice {
-		if item.Key == key {
-			v := item.Value.(yaml.MapSlice)
-			return &v
-		}
-	}
-	return nil
-}
-
-func (p *mapSliceUtil) Set(mapSlice yaml.MapSlice, key string, value yaml.MapItem) {
-	for i, item := range mapSlice {
-		if item.Key == key {
-			mapSlice[i].Value = value
-		}
-	}
-}
-
-func (p *mapSliceUtil) Delete(mapSlice *yaml.MapSlice, key string) {
-	newMapSlice := yaml.MapSlice{}
-	for _, item := range *mapSlice {
-		fmt.Printf("%v\n", item.Key)
-		if item.Key != key {
-			newMapSlice = append(newMapSlice, item)
-		}
-	}
-	fmt.Printf("%v\n", newMapSlice)
-	*mapSlice = newMapSlice
-}
-
-func (p *mapSliceUtil) MapFunc(mapSlice yaml.MapSlice, mapFunc func(item yaml.MapItem)) {
-	for _, item := range mapSlice {
-		mapFunc(item)
-	}
-}
-
-//func (p *mapSliceUtil) MapFuncByKey(mapSlice *yaml.MapSlice, key string, mapFunc func (mapSlice yaml.MapSlice) yaml.MapSlice) {
-//	internalMapSlice := MapSliceUtil.Get(*mapSlice, key)
-//	mapFunc(internalMapSlice)
-//	for _, item := range mapSlice {
-//		mapFunc(item)
-//	}
-//}
-
-//func (p *mapSliceUtil) Delete(mapSlice yaml.MapSlice, isTarget func (item yaml.MapItem) bool) yaml.MapSlice {
-//	for i, item := range mapSlice {
-//		if isTarget(item) {
-//
-//		}
-//		copy(mapSlice[i:], mapSlice[i+1:])
-//		mapSlice[len(mapSlice)-1] = yaml.MapItem{}
-//		mapSlice = mapSlice[:len(mapSlice)-1]
-//	}
-//}
-
-func littleSmartMethod() {
-	var yamlString = getYaml()
-
-	node := yaml.MapSlice{}
-	yaml.Unmarshal([]byte(yamlString), &node)
-	//developmentTeams := MapSliceUtil.Get(node, `development-teams`)
-	//MapSliceUtil.MapFunc(developmentTeams, func(developmentTeam yaml.MapItem){
-	//	products := MapSliceUtil.Get(developmentTeam.Value.(yaml.MapSlice), `products`)
-	//	MapSliceUtil.MapFunc(products, func(product yaml.MapItem){
-	//		if strings.Contains(product.Key.(string), `ios`) {
-	//			fmt.Printf("--- product:\n%v\n\n", product)
-	//		}
-	//	})
-	//})
-	devteamsNode := MapSliceUtil.Get(node, `development-teams`)
-	MapSliceUtil.Set(*devteamsNode, `team-a`, yaml.MapItem{})
-	MapSliceUtil.Delete(devteamsNode, `team-b`)
-	//	*devteamsNode = yaml.MapSlice{}
-
-	bytes, _ := yaml.Marshal(node)
-	fmt.Printf("\n\n\n--- result:\n%v\n\n", string(bytes))
-
+func getSimpleYaml() string {
+	return `
+# Development teams records
+development-teams:
+  team-a:
+    pc-app-name1:
+      id: 1001
+    pc-app-name2:
+      id: 1002
+    ranks:
+    - 100
+    - 1000
+`
 }
 
 func getYaml() string {
@@ -238,5 +427,6 @@ development-teams:
       - john
       - nick
       - bob
+  team-d: null
 `
 }
