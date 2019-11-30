@@ -9,10 +9,15 @@ import (
 )
 
 // option details: https://github.com/golang/glog/blob/master/glog.go#L38-L70
-func main(){
+func main() {
 
 	flag.Parse()
 
+	stupidHonestMethod()
+	//	littleSmartMethod()
+}
+
+func stupidHonestMethod() {
 	var yamlString = getYaml()
 
 	// new node
@@ -26,22 +31,21 @@ func main(){
 		glog.Infof("topLevelNode.Key : %v\n", topLevelNode.Key)
 		if topLevelNode.Key != `development-teams` {
 			// next
-			glog.Infof("topLevelNode.Key added\n")
+			glog.Infof("    -> added, next\n")
 			newNode = append(newNode, topLevelNode)
 			continue
 		}
 
 		newTeams := make(yaml.MapSlice, 0)
 		// cast
-		glog.Infof("topLevelNode.Value : %v\n", topLevelNode.Value)
+		glog.Infof("    topLevelNode.Value : %v\n", topLevelNode.Value)
 		teams := topLevelNode.Value.(yaml.MapSlice)
-		glog.Infof("teams : %v\n", teams)
+		glog.Infof("    teams : %v\n", teams)
 		for _, team := range teams {
 
 			newTeamDetails := make(yaml.MapSlice, 0)
 			teamDetails := team.Value.(yaml.MapSlice)
-			glog.Infof("teams : %v\n", teams)
-			glog.Infof("team.Value : %v\n", team.Value)
+			glog.Infof("        team.Value : %v\n", team.Value)
 			for _, teamDetail := range teamDetails {
 				if teamDetail.Key != `products` {
 					newTeamDetails = append(newTeamDetails, teamDetail)
@@ -51,7 +55,8 @@ func main(){
 				newProducts := make(yaml.MapSlice, 0)
 				// cast
 				products := teamDetail.Value.(yaml.MapSlice)
-				glog.Infof("products : %v\n", products)
+				glog.Infof("            teamDetail.Value : %v\n", teamDetail.Value)
+				glog.Infof("            products : %v\n", products)
 				for _, product := range products {
 					// if ios app ...
 					if strings.Contains(product.Key.(string), `ios`) {
@@ -74,9 +79,93 @@ func main(){
 		topLevelNode.Value = newTeams
 		newNode = append(newNode, topLevelNode)
 	}
+	glog.Infof("<<< END <<<\n")
 
 	bytes, _ := yaml.Marshal(newNode)
-	fmt.Printf("--- result:\n%v\n\n", string(bytes))
+	fmt.Printf("\n\n\n--- result:\n%v\n\n", string(bytes))
+}
+
+type mapSliceUtil struct{}
+
+var MapSliceUtil = mapSliceUtil{}
+
+func (p *mapSliceUtil) Get(mapSlice yaml.MapSlice, key string) *yaml.MapSlice {
+	for _, item := range mapSlice {
+		if item.Key == key {
+			v := item.Value.(yaml.MapSlice)
+			return &v
+		}
+	}
+	return nil
+}
+
+func (p *mapSliceUtil) Set(mapSlice yaml.MapSlice, key string, value yaml.MapItem) {
+	for i, item := range mapSlice {
+		if item.Key == key {
+			mapSlice[i].Value = value
+		}
+	}
+}
+
+func (p *mapSliceUtil) Delete(mapSlice *yaml.MapSlice, key string) {
+	newMapSlice := yaml.MapSlice{}
+	for _, item := range *mapSlice {
+		fmt.Printf("%v\n", item.Key)
+		if item.Key != key {
+			newMapSlice = append(newMapSlice, item)
+		}
+	}
+	fmt.Printf("%v\n", newMapSlice)
+	*mapSlice = newMapSlice
+}
+
+func (p *mapSliceUtil) MapFunc(mapSlice yaml.MapSlice, mapFunc func(item yaml.MapItem)) {
+	for _, item := range mapSlice {
+		mapFunc(item)
+	}
+}
+
+//func (p *mapSliceUtil) MapFuncByKey(mapSlice *yaml.MapSlice, key string, mapFunc func (mapSlice yaml.MapSlice) yaml.MapSlice) {
+//	internalMapSlice := MapSliceUtil.Get(*mapSlice, key)
+//	mapFunc(internalMapSlice)
+//	for _, item := range mapSlice {
+//		mapFunc(item)
+//	}
+//}
+
+//func (p *mapSliceUtil) Delete(mapSlice yaml.MapSlice, isTarget func (item yaml.MapItem) bool) yaml.MapSlice {
+//	for i, item := range mapSlice {
+//		if isTarget(item) {
+//
+//		}
+//		copy(mapSlice[i:], mapSlice[i+1:])
+//		mapSlice[len(mapSlice)-1] = yaml.MapItem{}
+//		mapSlice = mapSlice[:len(mapSlice)-1]
+//	}
+//}
+
+func littleSmartMethod() {
+	var yamlString = getYaml()
+
+	node := yaml.MapSlice{}
+	yaml.Unmarshal([]byte(yamlString), &node)
+	//developmentTeams := MapSliceUtil.Get(node, `development-teams`)
+	//MapSliceUtil.MapFunc(developmentTeams, func(developmentTeam yaml.MapItem){
+	//	products := MapSliceUtil.Get(developmentTeam.Value.(yaml.MapSlice), `products`)
+	//	MapSliceUtil.MapFunc(products, func(product yaml.MapItem){
+	//		if strings.Contains(product.Key.(string), `ios`) {
+	//			fmt.Printf("--- product:\n%v\n\n", product)
+	//		}
+	//	})
+	//})
+	devteamsNode := MapSliceUtil.Get(node, `development-teams`)
+	MapSliceUtil.Set(*devteamsNode, `team-a`, yaml.MapItem{})
+	MapSliceUtil.Delete(devteamsNode, `team-b`)
+	//	*devteamsNode = yaml.MapSlice{}
+
+	bytes, _ := yaml.Marshal(node)
+	fmt.Printf("\n\n\n--- result:\n%v\n\n", string(bytes))
+
 }
 
 func getYaml() string {
