@@ -33,3 +33,4 @@ vendor/
 output/
 !.gitkeep
 dist
+workspace/
