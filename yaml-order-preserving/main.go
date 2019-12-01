@@ -107,6 +107,20 @@ func (o *OrderedMapSlice) GetContents() interface{} {
 	return o.contents.(interface{})
 }
 
+func (o *OrderedMapSlice) Key() interface{} {
+	if o.currentItem != nil {
+		return o.currentItem.Key
+	}
+	return nil
+}
+
+func (o *OrderedMapSlice) Value() interface{} {
+	if o.currentItem != nil {
+		return o.currentItem.Value
+	}
+	return nil
+}
+
 func (o *OrderedMapSlice) Parent() *OrderedMapSlice {
 	if o.parent == nil {
 		panic("Parent is nul.")
@@ -133,7 +147,7 @@ func (o *OrderedMapSlice) Get(key string) *OrderedMapSlice {
 				if ok {
 					return createOrderedMapSlice(o, referencedItem, &v)
 				}
-				return createOrderedMapSlice(o, nil, &item.Value)
+				return createOrderedMapSlice(o, referencedItem, &item.Value)
 			}
 		}
 	}
