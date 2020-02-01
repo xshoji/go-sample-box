@@ -58,6 +58,13 @@ func main() {
 	fmt.Println(GetValueInInterface(jsonObject, "school.established"))
 	fmt.Print("school.hoge: ")
 	fmt.Println(GetValueInInterface(jsonObject, "school.hoge"))
+
+	fmt.Printf(`{"schoolName":%v}`, GetAsJsonValue(GetValueInInterface(jsonObject, "school.name")))
+	fmt.Println()
+	fmt.Printf(`{"schoolName":%v}`, GetAsJsonValue(GetValueInInterface(jsonObject, "friends.0.age")))
+	fmt.Println()
+	fmt.Printf(`{"schoolName":%v}`, GetAsJsonValue(GetValueInInterface(jsonObject, "school.hogehoge")))
+	fmt.Println()
 }
 
 func GetValueInInterface(object interface{}, keyChain string) interface{} {
@@ -91,4 +98,9 @@ func GetValueInInterface(object interface{}, keyChain string) interface{} {
 		return result
 	}
 	return nil
+}
+
+func GetAsJsonValue(v interface{}) string {
+	result, _ := json.Marshal(v)
+	return string(result)
 }
