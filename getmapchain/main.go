@@ -87,7 +87,7 @@ func GetValueInInterface(object interface{}, keyChain string) interface{} {
 			}
 		}
 	}
-	if exists && result != nil {
+	if exists {
 		return result
 	}
 	return nil
