@@ -49,18 +49,18 @@ func main() {
 	// > http://matope.hatenablog.com/entry/2014/04/22/101127
 	fmt.Println("<< cast >>")
 	// FormatIntの第2引数は基数。2なら2進数、16なら16進数になる
-	fmt.Printf("valueInt: %d, valueString: %s\n", valueInt, strconv.FormatInt(int64(valueInt), 10))
-	fmt.Printf("valueInt8: %d, valueString: %s\n", valueInt, strconv.FormatInt(int64(valueInt8), 10))
-	fmt.Printf("valueInt64: %d, valueString: %s\n", valueInt64, strconv.FormatInt(valueInt64, 10))
-	fmt.Printf("valueFloat: %v, valueString: %s\n", valueFloat64, strconv.FormatFloat(valueFloat64, 'f', 4, 32))
-	fmt.Printf("valueFloat: %v, valueInt: %v\n", valueFloat64, int(valueFloat64))
-	fmt.Printf("valueInt: %v, valueFloat: %v\n", valueInt, float64(valueInt))
-	fmt.Printf("valueString: %v, value[]byte: %v\n", valueString, []byte(valueString))
+	fmt.Printf("valueInt: %d    -> valueString: %s\n", valueInt, strconv.Itoa(valueInt))
+	fmt.Printf("valueInt8: %d   -> valueString: %s\n", valueInt, strconv.FormatInt(int64(valueInt8), 10))
+	fmt.Printf("valueInt64: %d  -> valueString: %s\n", valueInt64, strconv.FormatInt(valueInt64, 10))
+	fmt.Printf("valueFloat: %v  -> valueString: %s\n", valueFloat64, strconv.FormatFloat(valueFloat64, 'f', 4, 32))
+	fmt.Printf("valueFloat: %v  -> valueInt: %v\n", valueFloat64, int(valueFloat64))
+	fmt.Printf("valueInt: %v    -> valueFloat: %v\n", valueInt, float64(valueInt))
+	fmt.Printf("valueString: %v -> value[]byte: %v\n", valueString, []byte(valueString))
 	valueInt, _ = strconv.Atoi(valueString)
-	fmt.Printf("valueString: %v, valueInt: %v\n", valueString, valueInt)
+	fmt.Printf("valueString: %v -> valueInt: %v\n", valueString, valueInt)
 	valueInt64, _ = strconv.ParseInt(valueString, 10, 64)
-	fmt.Printf("valueString: %v, valueInt64: %v\n", valueString, valueInt64)
-	fmt.Printf("value[]byte: %v, valueString: %s\n", valueBytes, string(valueBytes))
+	fmt.Printf("valueString: %v -> valueInt64: %v\n", valueString, valueInt64)
+	fmt.Printf("value[]byte: %v -> valueString: %s\n", valueBytes, string(valueBytes))
 	fmt.Println()
 
 	//
@@ -110,6 +110,32 @@ func main() {
 	for k, v := range mapValues {
 		fmt.Println(k + ":" + v)
 	}
+	fmt.Println()
+
+	//
+	//
+	//Nested maps
+	//> Goで多次元マップ（複数のキーからなるマップ）を実現したいときにはどうするか - Qiita
+	//> https://qiita.com/ruiu/items/476f65e7cec07fd3d4d7
+	nestedMap := make(map[string]map[string]string)
+	if _, ok := nestedMap["key1"]; !ok {
+		nestedMap["key1"] = make(map[string]string)
+	}
+	nestedMap["key1"]["key2"] = "value"
+	fmt.Println(nestedMap)
+	fmt.Println()
+
+	//
+	//
+	//Nested maps (key object)
+	//> Go maps in action - The Go Blog
+	//> https://blog.golang.org/go-maps-in-action#TOC_5.
+	type Key struct {
+		key1, key2 string
+	}
+	nestedMap2 := make(map[Key]string)
+	nestedMap2[Key{"key1", "key2"}] = "value"
+	fmt.Println(nestedMap2)
 	fmt.Println()
 
 	//
