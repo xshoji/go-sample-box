@@ -82,7 +82,8 @@ func main() {
 	//
 	//
 	// slice
-	valueStringSlice := []string{"aaa", "bbb", "ccc"}
+	var valueStringSlice []string
+	valueStringSlice = []string{"aaa", "bbb", "ccc"}
 	fmt.Printf("valueStringSlice\n%v\n", valueStringSlice)
 	valueStringSlice = append(valueStringSlice, "ddd")
 	fmt.Printf("%v\n", valueStringSlice)

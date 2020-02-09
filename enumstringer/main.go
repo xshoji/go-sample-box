@@ -19,7 +19,7 @@ func main() {
 		Name   string
 		Sports []sports.Sports
 	})
-	sportsList := make([]sports.Sports, 5)
+	var sportsList []sports.Sports
 	sportsList = append(sportsList, sports.Baseball)
 	sportsList = append(sportsList, sports.Swimming)
 	sportsList = append(sportsList, sports.Soccer)
