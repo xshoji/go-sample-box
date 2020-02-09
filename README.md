@@ -58,3 +58,6 @@ GOOS=linux GOARCH=amd64 go build -o /tmp/webapp main.go
 ## References
 
  - [gostor/awesome-go-storage： A curated list of awesome Go storage projects and libraries](https://github.com/gostor/awesome-go-storage)
+ 
+> uber-style-guide-ja/guide.md at master · knsh14/uber-style-guide-ja  
+> https://github.com/knsh14/uber-style-guide-ja/blob/master/guide.md#%e5%b0%8e%e5%85%a5
