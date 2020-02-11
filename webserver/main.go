@@ -75,9 +75,14 @@ func main() {
 	})
 
 	var err error
+	var port string
 	if opts.Tsl {
-		err = http.ListenAndServeTLS(":"+strconv.Itoa(opts.PortTls), certFile, keyFile, nil)
+		port = ":" + strconv.Itoa(opts.PortTls)
+		fmt.Printf("server(https) %s\n", port)
+		err = http.ListenAndServeTLS(port, certFile, keyFile, nil)
 	} else {
+		port = ":" + strconv.Itoa(opts.Port)
+		fmt.Printf("server(http) %s\n", port)
 		err = http.ListenAndServe(":"+strconv.Itoa(opts.Port), nil)
 	}
 	if err != nil {

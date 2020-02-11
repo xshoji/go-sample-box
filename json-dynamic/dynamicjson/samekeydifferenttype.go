@@ -1,23 +1,23 @@
-package samekeydifferenttype
+package dynamicjson
 
 import (
 	"encoding/json"
 	"fmt"
 )
 
-type User struct {
-	Name   string `json:"name"`
-	Gender string `json:"gender"`
-	Age    int    `json:"age"`
-	Sports Sports `json:"sports,omitempty"`
+type UserC struct {
+	Name   string  `json:"name"`
+	Gender string  `json:"gender"`
+	Age    int     `json:"age"`
+	Sports SportsC `json:"sports,omitempty"`
 }
 
-type Sports interface {
+type SportsC interface {
 	// 何でも良い
 	getType()
 }
 
-type SportsBaseball struct {
+type SportsBaseballC struct {
 	Name           string `json:"name"`
 	Experience     string `json:"experience"`
 	Position       string `json:"position"`
@@ -25,9 +25,9 @@ type SportsBaseball struct {
 	Strikeouts     int    `json:"strikeouts"`
 }
 
-func (*SportsBaseball) getType() {}
+func (*SportsBaseballC) getType() {}
 
-type SportsSwimming struct {
+type SportsSwimmingC struct {
 	Name       string  `json:"name"`
 	Experience string  `json:"experience"`
 	Style      string  `json:"style"`
@@ -35,12 +35,12 @@ type SportsSwimming struct {
 	Time       float64 `json:"time"`
 }
 
-func (*SportsSwimming) getType() {}
+func (*SportsSwimmingC) getType() {}
 
 // > interface要素を持つstructへのJSON Unmarshal - すぎゃーんメモ
 // > https://memo.sugyan.com/entry/2018/06/23/232559
-func (u *User) UnmarshalJSON(data []byte) error {
-	type Alias User
+func (u *UserC) UnmarshalJSON(data []byte) error {
+	type Alias UserC
 	a := struct {
 		Sports json.RawMessage `json:"sports"`
 		*Alias
@@ -59,14 +59,14 @@ func (u *User) UnmarshalJSON(data []byte) error {
 	}
 
 	if template.Name == "Baseball" {
-		var sportsBaseball SportsBaseball
+		var sportsBaseball SportsBaseballC
 		if err := json.Unmarshal(a.Sports, &sportsBaseball); err == nil {
 			u.Sports = &sportsBaseball
 			return nil
 		}
 	}
 	if template.Name == "Swimming" {
-		var sportsSwimming SportsSwimming
+		var sportsSwimming SportsSwimmingC
 		if err := json.Unmarshal(a.Sports, &sportsSwimming); err == nil {
 			u.Sports = &sportsSwimming
 			return nil
@@ -75,7 +75,7 @@ func (u *User) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func Run() {
+func RunSameKeyDifferentType() {
 	fmt.Println("--[ sameKeyDifferentType ]-----------------")
 	json1 := `
 	{
@@ -91,7 +91,7 @@ func Run() {
 	  }
 	}
 	`
-	var user User
+	var user UserC
 	json.Unmarshal([]byte(json1), &user)
 	bytes, _ := json.MarshalIndent(user, "", "  ")
 	fmt.Println(string(bytes))
@@ -110,7 +110,7 @@ func Run() {
 	  }
 	}
 	`
-	var user2 User
+	var user2 UserC
 	json.Unmarshal([]byte(json2), &user2)
 	bytes, _ = json.MarshalIndent(user2, "", "  ")
 	fmt.Println(string(bytes))

@@ -315,4 +315,41 @@ func TestGetSuccess(t *testing.T) {
 		}
 	})
 }
+
+
+
+//
+//
+//
+// Safety defer pattern
+//-------------------------------
+// Define defer function
+deferFunc := func() {
+    log.Println("Call defer function")
+}
+defer deferFunc() // set defer
+
+// Make kill signal channel
+signals := make(chan os.Signal, 1)
+signal.Notify(signals, os.Kill, os.Interrupt)
+
+go func() {
+    <-signals
+    fmt.Println("")
+    log.Println("Catch signals")
+    deferFunc()
+    log.Println("Execute os.Exit()")
+    os.Exit(0)
+}()
+
+//-------------------------------
+// Define main logic
+for i := 0; i < 5; i++ {
+    log.Printf("Loop count is %v\n", i)
+    duration := time.Duration(1000 * time.Millisecond)
+    time.Sleep(duration)
+}
+
+log.Println("Finish loop")
+
 ```

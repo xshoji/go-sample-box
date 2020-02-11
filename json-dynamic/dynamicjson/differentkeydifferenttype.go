@@ -1,19 +1,19 @@
-package differentkeydifferenttype
+package dynamicjson
 
 import (
 	"encoding/json"
 	"fmt"
 )
 
-type User struct {
-	Name           string          `json:"name"`
-	Gender         string          `json:"gender"`
-	Age            int             `json:"age"`
-	SportsBaseball *SportsBaseball `json:"sportsBaseball,omitempty"`
-	SportsSwimming *SportsSwimming `json:"sportsSwimming,omitempty"`
+type UserA struct {
+	Name           string           `json:"name"`
+	Gender         string           `json:"gender"`
+	Age            int              `json:"age"`
+	SportsBaseball *SportsBaseballA `json:"sportsBaseball,omitempty"`
+	SportsSwimming *SportsSwimmingA `json:"sportsSwimming,omitempty"`
 }
 
-type SportsBaseball struct {
+type SportsBaseballA struct {
 	Name           string `json:"name"`
 	Experience     string `json:"experience"`
 	Position       string `json:"position"`
@@ -21,7 +21,7 @@ type SportsBaseball struct {
 	Strikeouts     int    `json:"strikeouts"`
 }
 
-type SportsSwimming struct {
+type SportsSwimmingA struct {
 	Name       string  `json:"name"`
 	Experience string  `json:"experience"`
 	Style      string  `json:"style"`
@@ -29,7 +29,7 @@ type SportsSwimming struct {
 	Time       float64 `json:"time"`
 }
 
-func Run() {
+func RunDifferentKeyDifferentType() {
 	fmt.Println("--[ differentKeyDifferentType ]-----------------")
 	json1 := `
 	{
@@ -45,7 +45,7 @@ func Run() {
 	  }
 	}
 	`
-	var user User
+	var user UserA
 	json.Unmarshal([]byte(json1), &user)
 	bytes, _ := json.MarshalIndent(user, "", "  ")
 	fmt.Println(string(bytes))
@@ -64,7 +64,7 @@ func Run() {
 	  }
 	}
 	`
-	var user2 User
+	var user2 UserA
 	json.Unmarshal([]byte(json2), &user2)
 	bytes, _ = json.MarshalIndent(user2, "", "  ")
 	fmt.Println(string(bytes))

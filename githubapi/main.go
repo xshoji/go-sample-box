@@ -5,18 +5,19 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/xshoji/go-sample-box/githubapi/client"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 )
 
 var helpFlag = flag.Bool("help", false, "help")
-var commandFlag = flag.String("command", "", "[required] command")
+var commandFlag = flag.String("command", "", "[required] command ( issues | issueComments )")
 var paramsFlag = flag.String("params", "", "[optional] params ( json format )")
 var user string
 var repository string
 var accessToken string
-var apiClient *client.Client
+var githubApiUrlBase string
 
 func init() {
 	flag.BoolVar(helpFlag, "h", false, "= -help")
@@ -25,9 +26,13 @@ func init() {
 	user = os.Getenv("GITHUB_USER")
 	repository = os.Getenv("GITHUB_REPOSITORY")
 	accessToken = os.Getenv("GITHUB_ACCESS_TOKEN")
-	apiClient = client.NewClient("https://api.github.com")
+	githubApiUrlBase = "https://api.github.com"
 }
 
+// cp setup.sh.dist setup.sh
+// source setup.sh
+// go run main.go -c=issues -p='{"issueNumber":null}'
+// go run main.go -c=issueComments -p='{"issueNumber":"23"}'
 func main() {
 
 	flag.Parse()
@@ -61,29 +66,44 @@ func issues() {
 		issueNumber = "/" + value.(string)
 	}
 
-	res := apiClient.Get("/repos/" + user + "/" + repository + "/issues" + issueNumber + "?access_token=" + accessToken)
-	var buf bytes.Buffer
-	err := json.Indent(&buf, []byte(res.GetBody()), "", "  ")
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(buf.String())
+	fullUrl := fmt.Sprintf("%s/repos/%s/%s/issues%s?access_token=%s", githubApiUrlBase, user, repository, issueNumber, accessToken)
+	fmt.Println(getJsonResponse(fullUrl))
 }
 
 func issueComments() {
 
 	var paramMap map[string]interface{}
 	json.Unmarshal([]byte(*paramsFlag), &paramMap)
-	issueNumber, ok := paramMap["issueNumber"]
+	value, ok := paramMap["issueNumber"]
 	if !ok {
 		log.Fatal("-p {\"issueNumber\":\"1234\"} is required.")
 	}
+	var issueNumber string
+	if value != nil {
+		issueNumber = "/" + value.(string)
+	}
 
-	res := apiClient.Get("/repos/" + user + "/" + repository + "/issues/" + issueNumber.(string) + "/comments?access_token=" + accessToken)
+	fullUrl := fmt.Sprintf("%s/repos/%s/%s/issues%s/comments?access_token=%s", githubApiUrlBase, user, repository, issueNumber, accessToken)
+	fmt.Println(getJsonResponse(fullUrl))
+}
+
+func getJsonResponse(url string) string {
+	resp, err := http.Get(url)
+
+	// Response handling
+	body, err := ioutil.ReadAll(resp.Body)
+	var result interface{}
+	json.Unmarshal(body, &result)
+	defer func() {
+		err := resp.Body.Close()
+		if err != nil {
+			log.Panic("resp.Body.Close() failed.")
+		}
+	}()
 	var buf bytes.Buffer
-	err := json.Indent(&buf, []byte(res.GetBody()), "", "  ")
+	err = json.Indent(&buf, body, "", "  ")
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(buf.String())
+	return buf.String()
 }

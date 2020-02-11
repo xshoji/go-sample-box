@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -64,11 +65,15 @@ func main() {
 	})
 
 	go func() {
-		http.ListenAndServe(":"+strconv.Itoa(opts.Port1), server1) //監視するポートを設定します。
+		port := ":" + strconv.Itoa(opts.Port1)
+		fmt.Printf("server1 %s\n", port)
+		http.ListenAndServe(port, server1) //監視するポートを設定します。
 	}()
 
 	go func() {
-		http.ListenAndServe(":"+strconv.Itoa(opts.Port2), server2)
+		port := ":" + strconv.Itoa(opts.Port2)
+		fmt.Printf("server2 %s\n", port)
+		http.ListenAndServe(port, server2)
 	}()
 
 	// - [Go の並行処理 - Block Rockin’ Codes](http://jxck.hatenablog.com/entry/20130414/1365960707)

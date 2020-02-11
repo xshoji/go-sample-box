@@ -14,10 +14,10 @@ func main() {
 
 	//-------------------------------
 	// Define defer process
-	deferfunc := func() {
+	deferFunc := func() {
 		log.Println("Call defer function")
 	}
-	defer deferfunc()
+	defer deferFunc()
 
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, os.Kill, os.Interrupt)
@@ -26,7 +26,7 @@ func main() {
 		<-signals
 		fmt.Println("")
 		log.Println("Catch signals")
-		deferfunc()
+		deferFunc()
 		log.Println("Execute os.Exit()")
 		os.Exit(0)
 	}()

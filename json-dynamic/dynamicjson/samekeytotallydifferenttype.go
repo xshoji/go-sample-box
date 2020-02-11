@@ -1,42 +1,42 @@
-package sameKeyTotallyDifferentType
+package dynamicjson
 
 import (
 	"encoding/json"
 	"fmt"
 )
 
-type User struct {
-	Name   string `json:"name"`
-	Gender string `json:"gender"`
-	Age    int    `json:"age"`
-	Sports Sports `json:"sports,omitempty"`
+type UserD struct {
+	Name   string  `json:"name"`
+	Gender string  `json:"gender"`
+	Age    int     `json:"age"`
+	Sports SportsD `json:"sports,omitempty"`
 }
 
-type Sports interface {
+type SportsD interface {
 	// 何でも良い
 	getType()
 }
 
-type SportsBaseball struct {
+type SportsBaseballD struct {
 	Position       string `json:"position"`
 	InningsPitched int    `json:"inningsPitched"`
 	Strikeouts     int    `json:"strikeouts"`
 }
 
-func (*SportsBaseball) getType() {}
+func (*SportsBaseballD) getType() {}
 
-type SportsSwimming struct {
+type SportsSwimmingD struct {
 	Style  string  `json:"style"`
 	Length string  `json:"length"`
 	Time   float64 `json:"time"`
 }
 
-func (*SportsSwimming) getType() {}
+func (*SportsSwimmingD) getType() {}
 
 // > interface要素を持つstructへのJSON Unmarshal - すぎゃーんメモ
 // > https://memo.sugyan.com/entry/2018/06/23/232559
-func (u *User) UnmarshalJSON(data []byte) error {
-	type Alias User
+func (u *UserD) UnmarshalJSON(data []byte) error {
+	type Alias UserD
 	a := struct {
 		Sports json.RawMessage `json:"sports"`
 		*Alias
@@ -47,13 +47,13 @@ func (u *User) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	var sportsBaseball SportsBaseball
+	var sportsBaseball SportsBaseballD
 	if err := json.Unmarshal(a.Sports, &sportsBaseball); err == nil && len(sportsBaseball.Position) > 0 {
 		u.Sports = &sportsBaseball
 		return nil
 	}
 
-	var sportsSwimming SportsSwimming
+	var sportsSwimming SportsSwimmingD
 	if err := json.Unmarshal(a.Sports, &sportsSwimming); err == nil && len(sportsSwimming.Style) > 0 {
 		u.Sports = &sportsSwimming
 		return nil
@@ -62,7 +62,7 @@ func (u *User) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func Run() {
+func RunSameKeyTotallyDifferentType() {
 	fmt.Println("--[ sameKeyTotallyDifferentType ]-----------------")
 	json1 := `
 	{
@@ -76,20 +76,20 @@ func Run() {
 	  }
 	}
 	`
-	var user User
+	var user UserD
 	json.Unmarshal([]byte(json1), &user)
 	bytes, _ := json.MarshalIndent(user, "", "  ")
 	fmt.Println(string(bytes))
 	// > go - Golang Cast interface to struct - Stack Overflow
 	// > https://stackoverflow.com/questions/50939497/golang-cast-interface-to-struct
-	if _, ok := user.Sports.(*SportsSwimming); ok {
+	if _, ok := user.Sports.(*SportsSwimmingD); ok {
 		fmt.Println("user has SportsSwimming")
 	}
-	if _, ok := user.Sports.(*SportsBaseball); ok {
+	if _, ok := user.Sports.(*SportsBaseballD); ok {
 		fmt.Println("user has SportsBaseball")
-		fmt.Println(user.Sports.(*SportsBaseball).Position)
-		fmt.Println(user.Sports.(*SportsBaseball).InningsPitched)
-		fmt.Println(user.Sports.(*SportsBaseball).Strikeouts)
+		fmt.Println(user.Sports.(*SportsBaseballD).Position)
+		fmt.Println(user.Sports.(*SportsBaseballD).InningsPitched)
+		fmt.Println(user.Sports.(*SportsBaseballD).Strikeouts)
 	}
 
 	json2 := `
@@ -104,7 +104,7 @@ func Run() {
 	  }
 	}
 	`
-	var user2 User
+	var user2 UserD
 	json.Unmarshal([]byte(json2), &user2)
 	bytes, _ = json.MarshalIndent(user2, "", "  ")
 	fmt.Println(string(bytes))

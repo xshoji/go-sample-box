@@ -1,18 +1,18 @@
-package undefinedtype
+package dynamicjson
 
 import (
 	"encoding/json"
 	"fmt"
 )
 
-type User struct {
+type UserE struct {
 	Name   string      `json:"name"`
 	Gender string      `json:"gender"`
 	Age    int         `json:"age"`
 	Sports interface{} `json:"sports,omitempty"`
 }
 
-func Run() {
+func RunUndefinedType() {
 	fmt.Println("--[ undefinedType ]-----------------")
 	json1 := `
 	{
@@ -28,7 +28,7 @@ func Run() {
 	  }
 	}
 	`
-	var user User
+	var user UserE
 	json.Unmarshal([]byte(json1), &user)
 	bytes, _ := json.MarshalIndent(user, "", "  ")
 	fmt.Println(string(bytes))
@@ -53,7 +53,7 @@ func Run() {
 	  }
 	}
 	`
-	var user2 User
+	var user2 UserE
 	json.Unmarshal([]byte(json2), &user2)
 	bytes, _ = json.MarshalIndent(user2, "", "  ")
 	fmt.Println(string(bytes))

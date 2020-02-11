@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gobuffalo/packr"
 	"github.com/jessevdk/go-flags"
 	"log"
@@ -14,12 +15,12 @@ type options struct {
 
 //-------------------
 // << Installation >>
-// $ dep ensure
 // $ go get -u github.com/gobuffalo/packr/packr
 //
 // << Build >>
 // $ packr; go build -o /tmp/webapp .
 // $ packr; GOOS=linux GOARCH=amd64 go build -o /tmp/webapp .
+// $ /tmp/./webapp
 //-------------------
 // - [Using HTML Templates from a Folder (Complied) · GolangCode](https://golangcode.com/using-html-templates-from-a-folder-complied/)
 //var templates = template.Must(template.ParseGlob("resources/*"))
@@ -38,7 +39,9 @@ func main() {
 
 	// - [web applications - How do I serve CSS and JS in Go Lang - Stack Overflow](https://stackoverflow.com/questions/43601359/how-do-i-serve-css-and-js-in-go-lang)
 	http.Handle("/", http.FileServer(box))
-	err := http.ListenAndServe(":"+strconv.Itoa(opts.Port), nil) //監視するポートを設定します。
+	port := ":" + strconv.Itoa(opts.Port)
+	fmt.Printf("server %s\n", port)
+	err := http.ListenAndServe(port, nil) //監視するポートを設定します。
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}

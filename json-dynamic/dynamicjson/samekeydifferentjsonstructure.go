@@ -1,38 +1,38 @@
-package samekeydifferentjsonstructure
+package dynamicjson
 
 import (
 	"encoding/json"
 	"fmt"
 )
 
-type User struct {
-	Name   string `json:"name"`
-	Gender string `json:"gender"`
-	Age    int    `json:"age"`
-	Sports Sports `json:"sports,omitempty"`
+type UserB struct {
+	Name   string  `json:"name"`
+	Gender string  `json:"gender"`
+	Age    int     `json:"age"`
+	Sports SportsB `json:"sports,omitempty"`
 }
 
-type Sports interface {
+type SportsB interface {
 	// 何でも良い
 	getType()
 }
 
-type SportsBaseball struct {
+type SportsBaseballB struct {
 	Position       string `json:"position"`
 	InningsPitched int    `json:"inningsPitched"`
 	Strikeouts     int    `json:"strikeouts"`
 }
 
-func (*SportsBaseball) getType() {}
+func (*SportsBaseballB) getType() {}
 
-type SportsSimple string
+type SportsSimpleB string
 
-func (*SportsSimple) getType() {}
+func (*SportsSimpleB) getType() {}
 
 // > interface要素を持つstructへのJSON Unmarshal - すぎゃーんメモ
 // > https://memo.sugyan.com/entry/2018/06/23/232559
-func (u *User) UnmarshalJSON(data []byte) error {
-	type Alias User
+func (u *UserB) UnmarshalJSON(data []byte) error {
+	type Alias UserB
 	a := struct {
 		Sports json.RawMessage `json:"sports"`
 		*Alias
@@ -43,13 +43,13 @@ func (u *User) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	var sportsBaseball SportsBaseball
+	var sportsBaseball SportsBaseballB
 	if err := json.Unmarshal(a.Sports, &sportsBaseball); err == nil && len(sportsBaseball.Position) > 0 {
 		u.Sports = &sportsBaseball
 		return nil
 	}
 
-	var sportsSimple SportsSimple
+	var sportsSimple SportsSimpleB
 	if err := json.Unmarshal(a.Sports, &sportsSimple); err == nil && len(sportsSimple) > 0 {
 		u.Sports = &sportsSimple
 		return nil
@@ -58,7 +58,7 @@ func (u *User) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func Run() {
+func RunSameKeyDifferentJsonStructure() {
 	fmt.Println("--[ sameKeyDifferentJsonStructure ]-----------------")
 	json1 := `
 	{
@@ -72,7 +72,7 @@ func Run() {
 	  }
 	}
 	`
-	var user User
+	var user UserB
 	json.Unmarshal([]byte(json1), &user)
 	bytes, _ := json.MarshalIndent(user, "", "  ")
 	fmt.Println(string(bytes))
@@ -85,17 +85,17 @@ func Run() {
 	  "sports": "Karate"
 	}
 	`
-	var user2 User
+	var user2 UserB
 	json.Unmarshal([]byte(json2), &user2)
 	bytes, _ = json.MarshalIndent(user2, "", "  ")
 	fmt.Println(string(bytes))
-	if _, ok := user2.Sports.(*SportsBaseball); ok {
+	if _, ok := user2.Sports.(*SportsBaseballB); ok {
 		fmt.Println("user has SportsBaseball")
 	}
-	if _, ok := user2.Sports.(*SportsSimple); ok {
+	if _, ok := user2.Sports.(*SportsSimpleB); ok {
 		fmt.Println("user has SportsSimple")
 		// "sports"'s pointer
-		p := user2.Sports.(*SportsSimple)
+		p := user2.Sports.(*SportsSimpleB)
 		// value of "sports"'s pointer
 		fmt.Println(*p)
 	}
