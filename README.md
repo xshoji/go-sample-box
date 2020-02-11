@@ -26,13 +26,7 @@ cd ~/.gvm/pkgsets/go1.9.7/global/src/github.com/xshoji/go-sample-box/argumentGoF
 
 等の各ディレクトリで`go run main.go`で実行します。
 
-depで依存を管理している場合は`dep ensure`で依存をインストールします。
-
-Intellijでは、
-
-`File -> Projeect Structure -> SDKs -> go1.9.7 -> Classpath -> + ~/.gvm/pkgsets/go1.9.7/global/src`
-
-で追加する。
+`go modules`を利用するので、1.12以前の場合は、`export GO111MODULE=on`でmoduleを利用できるようにします。
 
 ### Development environment
 
