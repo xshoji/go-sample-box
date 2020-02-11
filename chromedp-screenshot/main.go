@@ -3,10 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/chromedp/cdproto/cdp"
 	"github.com/chromedp/cdproto/emulation"
 	"github.com/chromedp/chromedp"
-	"github.com/chromedp/chromedp/runner"
 	"github.com/jessevdk/go-flags"
 	"io/ioutil"
 	"log"
@@ -19,6 +17,7 @@ type options struct {
 	Url           string `short:"u" long:"url" description:"URL" required:"true"`
 	QuerySelector string `short:"q" long:"queryselector" description:"Queryselector used to capture a element" required:"true"`
 	Output        string `short:"o" long:"output" description:"Output file path" default:"/tmp/img.png"`
+	Debug         bool   `short:"d" long:"debug" description:"Debug mode"`
 }
 
 // [ Usage ]
@@ -32,7 +31,7 @@ func main() {
 	opts := *new(options)
 	parser := flags.NewParser(&opts, flags.Default)
 	// set name
-	parser.Name = "chromedp-auto-screenshot"
+	parser.Name = "chromedp-screenshot"
 	if _, err := parser.Parse(); err != nil {
 		flagsError, _ := err.(*flags.Error)
 		// help時は何もしない
@@ -52,49 +51,52 @@ func main() {
 	var err error
 
 	// create context
-	ctxt, cancel := context.WithCancel(context.Background())
-	// create chrome instance
-	c, err := chromedp.New(ctxt, chromedp.WithLog(log.Printf), chromedp.WithRunnerOptions(
-		runner.Flag("headless", true),
-		runner.Flag("disable-gpu", true),
-		runner.Flag("no-first-run", true),
-		runner.Flag("no-default-browser-check", true),
-		runner.RemoteDebuggingPort(9222),
-	))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// defer handling
+	// > go - How to use Chrome headless with chromedp? - Stack Overflow
+	// > https://stackoverflow.com/questions/44067030/how-to-use-chrome-headless-with-chromedp
+	// > How to run chromedp on foreground? · Issue #495 · chromedp/chromedp
+	// > https://github.com/chromedp/chromedp/issues/495
+	ctxt, cancel := chromedp.NewExecAllocator(context.Background(), append(
+		chromedp.DefaultExecAllocatorOptions[:],
+		chromedp.Flag("headless", true),
+		chromedp.Flag("disable-gpu", true),
+		chromedp.Flag("no-first-run", true),
+		chromedp.Flag("no-default-browser-check", true),
+	)...,
+	)
 	defer cancel()
-	shutdownFunc := func() {
-		err = c.Shutdown(ctxt)
-		if err != nil {
-			log.Fatal(err)
-		}
+	loggingContextOption := chromedp.WithLogf(log.Printf)
+	if opts.Debug {
+		// debug log mode
+		loggingContextOption = chromedp.WithDebugf(log.Printf)
 	}
-	defer shutdownFunc()
+	ctxt, cancel = chromedp.NewContext(ctxt, loggingContextOption)
+	defer cancel()
+	// handle kill signal
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, os.Kill, os.Interrupt)
 	go func() {
 		<-signals
 		cancel()
-		shutdownFunc()
 		os.Exit(0)
 	}()
 
 	// > screenshot from a wrong page · Issue #205 · chromedp/chromedp
 	// > https://github.com/chromedp/chromedp/issues/205
-	param := emulation.SetDeviceMetricsOverride(1920, 1080, 1, false)
 	// set param
-	err = c.Run(ctxt, param)
+	err = chromedp.Run(ctxt, emulation.SetDeviceMetricsOverride(1920, 1080, 1, false))
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// run task list
-	err = c.Run(ctxt, screenshot(opts.Url, opts.QuerySelector, opts.Output))
+	var buf []byte
+	err = chromedp.Run(ctxt, screenshot(opts.Url, opts.QuerySelector, &buf))
 	if err != nil {
+		log.Fatal(err)
+	}
+
+	// write to file
+	if err := ioutil.WriteFile(opts.Output, buf, 0644); err != nil {
 		log.Fatal(err)
 	}
 
@@ -106,15 +108,11 @@ func main() {
 	//}
 }
 
-func screenshot(urlstr, sel string, filePath string) chromedp.Tasks {
-	var buf []byte
+func screenshot(url, sel string, buf *[]byte) chromedp.Tasks {
 	return chromedp.Tasks{
-		chromedp.Navigate(urlstr),
+		chromedp.Navigate(url),
 		chromedp.Sleep(2 * time.Second),
 		chromedp.WaitVisible(sel, chromedp.ByQuery),
-		chromedp.Screenshot(sel, &buf, chromedp.ByQuery),
-		chromedp.ActionFunc(func(context.Context, cdp.Executor) error {
-			return ioutil.WriteFile(filePath, buf, 0644)
-		}),
+		chromedp.Screenshot(sel, buf, chromedp.ByQuery),
 	}
 }
