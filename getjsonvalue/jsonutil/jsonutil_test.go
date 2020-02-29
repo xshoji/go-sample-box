@@ -243,7 +243,7 @@ func TestToJsonValue(t *testing.T) {
 		testCases := []struct {
 			TestCase string
 			Input    string
-			Expected interface{}
+			Expected string
 		}{
 			{
 				TestCase: "string",
