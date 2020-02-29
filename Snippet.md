@@ -13,6 +13,9 @@ valueBytes := []byte("test")
 fmt.Println("<< primitive >>")
 fmt.Printf("valueInt, valueInt64, valueFloat, valueRune, valueString\n%v, %v, %v, %v, %v\n", valueInt, valueInt64, valueFloat64, valueRune, valueString)
 
+// print type
+fmt.Printf("valueInt %v(%T)\n", valueInt, valueInt)
+
 //
 //
 //
@@ -97,6 +100,19 @@ anonymousStruct := struct {
 	"taro",
 	100,
 	"Japanese",
+}
+
+// anonymous struct array
+anonymousStruct := []struct {
+	Name     string
+	Age      int
+	Language string
+}{
+	{
+		Name:     "taro",
+		Age:      12,
+		Language: "taro",
+	},
 }
 
 
@@ -239,25 +255,21 @@ func ToJsonObject(body []byte) interface{} {
 }
 
 // interface{}型のjsonオブジェクトからキー指定で値を取り出す（object["aaa"][0]["bbb"] -> keyChain: "aaa.0.bbb"）
-func GetValueInInterface(object interface{}, keyChain string) interface{} {
+func Get(object interface{}, keyChain string) interface{} {
 	keys := strings.Split(keyChain, ".")
-	var v interface{}
-	var values []interface{}
-	var i int
-	var ok bool
 	var result interface{}
 	var exists bool
 	for _, key := range keys {
 		exists = false
-		if _, ok = object.(map[string]interface{}); ok {
+		if _, ok := object.(map[string]interface{}); ok {
 			exists = true
 			object = object.(map[string]interface{})[key]
 			result = object
 			continue
 		}
-		if values, ok = object.([]interface{}); ok {
-			for i, v = range values {
-				if strconv.Itoa(i) == key {
+		if values, ok := object.([]interface{}); ok {
+			for i, v := range values {
+				if strconv.FormatInt(int64(i), 10) == key {
 					exists = true
 					object = v
 					result = object
@@ -277,7 +289,6 @@ func ToJsonString(v interface{}) string {
 	result, _ := json.Marshal(v)
 	return string(result)
 }
-
 
 //
 //
