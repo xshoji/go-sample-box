@@ -13,6 +13,9 @@ valueBytes := []byte("test")
 fmt.Println("<< primitive >>")
 fmt.Printf("valueInt, valueInt64, valueFloat, valueRune, valueString\n%v, %v, %v, %v, %v\n", valueInt, valueInt64, valueFloat64, valueRune, valueString)
 
+// print type
+fmt.Printf("valueInt %v(%T)\n", valueInt, valueInt)
+
 //
 //
 //
