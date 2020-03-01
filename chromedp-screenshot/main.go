@@ -15,9 +15,10 @@ import (
 
 type options struct {
 	Url           string `short:"u" long:"url" description:"URL" required:"true"`
-	QuerySelector string `short:"q" long:"queryselector" description:"Queryselector used to capture a element" required:"true"`
+	QuerySelector string `short:"q" long:"query-selector" description:"QuerySelector used to capture a element" required:"true"`
 	Output        string `short:"o" long:"output" description:"Output file path" default:"/tmp/img.png"`
 	Debug         bool   `short:"d" long:"debug" description:"Debug mode"`
+	NoHeadless    bool   `short:"n" long:"no-headless" description:"No Headless mode"`
 }
 
 // [ Usage ]
@@ -57,7 +58,7 @@ func main() {
 	// > https://github.com/chromedp/chromedp/issues/495
 	ctxt, cancel := chromedp.NewExecAllocator(context.Background(), append(
 		chromedp.DefaultExecAllocatorOptions[:],
-		chromedp.Flag("headless", true),
+		chromedp.Flag("headless", !opts.NoHeadless),
 		chromedp.Flag("disable-gpu", true),
 		chromedp.Flag("no-first-run", true),
 		chromedp.Flag("no-default-browser-check", true),
@@ -83,7 +84,7 @@ func main() {
 	// > screenshot from a wrong page · Issue #205 · chromedp/chromedp
 	// > https://github.com/chromedp/chromedp/issues/205
 	// set param
-	err = chromedp.Run(ctxt, emulation.SetDeviceMetricsOverride(1920, 1080, 1, false))
+	err = chromedp.Run(ctxt, emulation.SetDeviceMetricsOverride(3840, 2160, 1, false))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -99,13 +100,6 @@ func main() {
 	if err := ioutil.WriteFile(opts.Output, buf, 0644); err != nil {
 		log.Fatal(err)
 	}
-
-	// headlessモードの時は不要
-	// wait for chrome to finish
-	//err = c.Wait()
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
 }
 
 func screenshot(url, sel string, buf *[]byte) chromedp.Tasks {

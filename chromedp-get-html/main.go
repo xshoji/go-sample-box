@@ -12,8 +12,9 @@ import (
 
 type options struct {
 	Url           string `short:"u" long:"url" description:"URL" required:"true"`
-	QuerySelector string `short:"q" long:"queryselector" description:"Queryselector used to output as string" required:"true"`
+	QuerySelector string `short:"q" long:"query-selector" description:"QuerySelector used to output as string" required:"true"`
 	Debug         bool   `short:"d" long:"debug" description:"Debug mode"`
+	NoHeadless    bool   `short:"n" long:"no-headless" description:"No Headless mode"`
 }
 
 // [ Usage ]
@@ -46,7 +47,7 @@ func main() {
 	// > https://github.com/chromedp/chromedp/issues/495
 	ctxt, cancel := chromedp.NewExecAllocator(context.Background(), append(
 		chromedp.DefaultExecAllocatorOptions[:],
-		chromedp.Flag("headless", true),
+		chromedp.Flag("headless", !opts.NoHeadless),
 		chromedp.Flag("disable-gpu", true),
 		chromedp.Flag("no-first-run", true),
 		chromedp.Flag("no-default-browser-check", true),
@@ -71,7 +72,7 @@ func main() {
 
 	// run task list
 	var res string
-	err = chromedp.Run(ctxt, text(opts.Url, opts.QuerySelector, &res))
+	err = chromedp.Run(ctxt, createTasks(opts.Url, opts.QuerySelector, &res))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -79,9 +80,10 @@ func main() {
 	log.Printf("\n\nresult: \n%s\n\n\n", res)
 }
 
-func text(url string, selector string, res *string) chromedp.Tasks {
+func createTasks(url string, selector string, res *string) chromedp.Tasks {
 	return chromedp.Tasks{
 		chromedp.Navigate(url),
-		chromedp.InnerHTML(selector, res, chromedp.NodeVisible, chromedp.ByQuery),
+		chromedp.WaitVisible(selector, chromedp.ByQuery),
+		chromedp.OuterHTML(selector, res, chromedp.NodeVisible, chromedp.ByQuery),
 	}
 }

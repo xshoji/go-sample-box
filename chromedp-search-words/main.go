@@ -13,9 +13,10 @@ import (
 )
 
 type options struct {
-	Words   string `short:"w" long:"words" description:"Search words" required:"true"`
-	Service string `short:"s" long:"service" description:"Service type [ yahoo | tabelog ]" default:"yahoo"`
-	Debug   bool   `short:"d" long:"debug" description:"Debug mode"`
+	Words      string `short:"w" long:"words" description:"Search words" required:"true"`
+	Service    string `short:"s" long:"service" description:"Service type [ yahoo | tabelog ]" default:"yahoo"`
+	Debug      bool   `short:"d" long:"debug" description:"Debug mode"`
+	NoHeadless bool   `short:"n" long:"no-headless" description:"No Headless mode"`
 }
 
 // [ Usage ]
@@ -48,12 +49,11 @@ func main() {
 	// > https://github.com/chromedp/chromedp/issues/495
 	ctxt, cancel := chromedp.NewExecAllocator(context.Background(), append(
 		chromedp.DefaultExecAllocatorOptions[:],
-		chromedp.Flag("headless", true),
+		chromedp.Flag("headless", !opts.NoHeadless),
 		chromedp.Flag("disable-gpu", true),
 		chromedp.Flag("no-first-run", true),
 		chromedp.Flag("no-default-browser-check", true),
-	)...,
-	)
+	)...)
 	defer cancel()
 	loggingContextOption := chromedp.WithLogf(log.Printf)
 	if opts.Debug {
@@ -90,13 +90,13 @@ func main() {
 
 func searchTasksYahoo(word string, res *string) chromedp.Tasks {
 	return chromedp.Tasks{
-		chromedp.Navigate(`https://www.yahoo.co.jp/`),
-		chromedp.WaitVisible(`#srchtxtBg`, chromedp.ByQuery),
-		chromedp.SendKeys(`#srchtxtBg > input`, word, chromedp.ByQuery),
-		chromedp.WaitVisible(`#srchbtn`, chromedp.ByQuery),
-		chromedp.Click(`#srchbtn`, chromedp.ByQuery),
-		chromedp.WaitVisible(`#mIn`, chromedp.ByQuery),
-		chromedp.InnerHTML(`#mIn`, res, chromedp.NodeVisible, chromedp.ByQuery),
+		chromedp.Navigate(`https://search.yahoo.co.jp/`),
+		chromedp.WaitVisible(`#yschsp`, chromedp.ByQuery),
+		chromedp.SendKeys(`#yschsp`, word, chromedp.ByQuery),
+		chromedp.WaitVisible(`.sbox_1 .b`, chromedp.ByQuery),
+		chromedp.Click(`.sbox_1 .b`, chromedp.ByQuery),
+		chromedp.WaitVisible(`#contents`, chromedp.ByQuery),
+		chromedp.InnerHTML(`#contents`, res, chromedp.NodeVisible, chromedp.ByQuery),
 	}
 }
 
