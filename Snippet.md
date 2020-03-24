@@ -47,10 +47,12 @@ string(valueBytes)
 //
 //map, for
 mapValues := map[string]string{
-    "aaa": "aaa",
-    "bbb": "aaa",
-    "ccc": "aaa",
+    "aaa": "aaa_value",
+    "bbb": "bbb_value",
+    "ccc": "ccc_value",
 }
+v, ok := mapValues["aaa"] // v -> "aaa_value", ok -> true
+v, ok := mapValues["xxx"] // v -> "",          ok -> false
 
 // for
 fmt.Println("<< for >>")
