@@ -14,6 +14,11 @@ const (
 	HttpContentTypeForm = "application/x-www-form-urlencoded;charset=utf-8"
 )
 
+func init() {
+	// log config
+	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds)
+}
+
 func main() {
 
 	urlBase := "http://httpbin.org"
