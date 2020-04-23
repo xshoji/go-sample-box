@@ -40,6 +40,17 @@ valueInt64, _ = strconv.ParseInt(valueString, 10, 64)
 // []byte -> string
 string(valueBytes)
 
+
+//
+//
+//
+//
+//
+//string cut
+a := "aiueo"
+fmt.Println(a[:3]) // aiu
+
+
 //
 //
 //
