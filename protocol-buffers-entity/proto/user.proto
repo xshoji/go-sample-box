@@ -1,0 +1,46 @@
+syntax = "proto3";
+package entity;
+
+import "google/protobuf/timestamp.proto";
+
+message User {
+  int32 id  = 1;
+  string name = 2;
+  oneof nickname_optional {
+    string nickname = 3; // ""とnilを区別するOptional値の表現
+  }
+  oneof age_optional {
+    int32 age = 4; // 0とnilを区別するOptional値の表現
+  }
+  Birth birth = 5;
+  Address addresss = 6;
+}
+
+message Birth {
+  google.protobuf.Timestamp datetime = 1;
+  oneof weight_optional {
+    int32 weight = 2; // 0とnilを区別するOptional値の表現
+  }
+  oneof hospital_optional {
+    string hospital = 3; // ""とnilを区別するOptional値の表現
+  }
+}
+
+message Address {
+  Country country = 1;
+  oneof zipCode_optional {
+    int32 zipCode = 2; // 0とnilを区別するOptional値の表現
+  }
+  oneof state_optional {
+    string state = 3; // ""とnilを区別するOptional値の表現
+  }
+  oneof city_optional {
+    string city = 4; // ""とnilを区別するOptional値の表現
+  }
+}
+
+enum Country {
+  UNKNOWN = 0;
+  US = 1;
+  JP = 2;
+}
