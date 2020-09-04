@@ -9,18 +9,51 @@ import (
 //> go - Flag command line parsing in golang - Stack Overflow
 //> https://stackoverflow.com/questions/19761963/flag-command-line-parsing-in-golang
 
-var helpFlag = flag.Bool("help", false, "help")
-var titleFlag = flag.String("title", "", "[required] title")
-var countFlag = flag.Int("count", 1, "[optional] count")
-var isDebugFlag = flag.Bool("debug", false, "[optional] debug")
+const Separator = ""
+
+var (
+	helpFlag    = flag.Bool("help", false, Separator)
+	titleFlag   = flag.String("title", "", Separator)
+	countFlag   = flag.Int("count", 0, Separator)
+	isDebugFlag = flag.Bool("debug", false, Separator)
+)
+
 
 func init() {
-	flag.BoolVar(helpFlag, "h", false, "= -help")
-	flag.StringVar(titleFlag, "t", "", "= -title")
-	flag.IntVar(countFlag, "c", 1, "= -count")
-	flag.BoolVar(isDebugFlag, "d", false, "= -debug")
+	flag.BoolVar(helpFlag, "h", false, "help")
+	flag.StringVar(titleFlag, "t", "", "[required] title")
+	flag.IntVar(countFlag, "c", 1, "[optional] count")
+	flag.BoolVar(isDebugFlag, "d", false, "[optional] debug")
 }
 
+// << Execution sample >>
+//
+// $ go run main.go -t test
+// title:  test
+// count:  1
+// debug:  false
+//
+// $ go run main.go -title test2
+// title:  test2
+// count:  1
+// debug:  false
+// 
+// $ go run main.go -h
+// Usage of /var/folders/2y/fcx63zfs20g9f_7ktsdhbts0bsslmr/T/go-build235323428/b001/exe/main:
+//   -c int
+//     	[optional] count (default 1)
+//   -count int
+//
+//   -d	[optional] debug
+//   -debug
+//
+//   -h	help
+//   -help
+//
+//   -t string
+//     	[required] title
+//   -title string
+//
 func main() {
 
 	flag.Parse()
