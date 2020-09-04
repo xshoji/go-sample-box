@@ -12,6 +12,7 @@ import (
 const Separator = ""
 
 var (
+	// Define long parameters ( don't set default value ).
 	helpFlag    = flag.Bool("help", false, Separator)
 	titleFlag   = flag.String("title", "", Separator)
 	countFlag   = flag.Int("count", 0, Separator)
@@ -20,6 +21,7 @@ var (
 
 
 func init() {
+	// Define short parameters and description ( set default value here if you need ).
 	flag.BoolVar(helpFlag, "h", false, "help")
 	flag.StringVar(titleFlag, "t", "", "[required] title")
 	flag.IntVar(countFlag, "c", 1, "[optional] count")
@@ -37,7 +39,7 @@ func init() {
 // title:  test2
 // count:  1
 // debug:  false
-// 
+//
 // $ go run main.go -h
 // Usage of /var/folders/2y/fcx63zfs20g9f_7ktsdhbts0bsslmr/T/go-build235323428/b001/exe/main:
 //   -c int
