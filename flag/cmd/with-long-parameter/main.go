@@ -42,14 +42,14 @@ func init() {
 	flag.IntVar(countFlag /*        */, "c", 1 /*       */, "[optional] count")
 	flag.StringVar(bStringFlag /*   */, "b", "BIG" /*   */, "[optional] bridge")
 	flag.StringVar(eStringFlag /*   */, "e", "NO" /*    */, "[optional] estimation")
-	flag.BoolVar(gBoolFlag /*       */, "g", false /*   */, "\n[optional] gulp")
+	flag.BoolVar(gBoolFlag /*       */, "g", false /*   */, "\ngulp")
 	flag.BoolVar(helpFlag /*        */, "h", false /*   */, "\nhelp")
-	flag.BoolVar(isDebugFlag /*     */, "d", false /*   */, "\n[optional] debug")
+	flag.BoolVar(isDebugFlag /*     */, "d", false /*   */, "\ndebug")
 }
 
 // << Execution sample >>
 //
-// $ go run main.go -i "param1" -t "param2" -a 100
+// $ go run cmd/with-long-parameter/main.go -i "param1" -t "param2" -a 100
 // apple:  100
 // bridge:  BIG
 // estimation:  NO
@@ -60,7 +60,7 @@ func init() {
 // count:  1
 // debug:  false
 //
-// $ go run main.go -iterator "param1" -title "param2" -apple 100
+// $ go run cmd/with-long-parameter/main.go -iterator "param1" -title "param2" -apple 100
 // apple:  100
 // bridge:  BIG
 // estimation:  NO
@@ -71,7 +71,7 @@ func init() {
 // count:  1
 // debug:  false
 //
-// $ go run main.go -h
+// $ go run cmd/with-long-parameter/main.go -h
 // Usage of /var/folders/2c/_9j92fnj5z3754dw8_h345zc0000gn/T/go-build576006264/b001/exe/main:
 //   -a int
 //         [required] apple
@@ -86,7 +86,7 @@ func init() {
 //   -count int
 //
 //   -d
-//         [optional] debug
+//         debug
 //   -debug
 //
 //   -e string
@@ -98,7 +98,7 @@ func init() {
 //   -forget int
 //
 //   -g
-//         [optional] gulp
+//         gulp
 //   -gulp
 //
 //   -h
