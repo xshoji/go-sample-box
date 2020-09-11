@@ -34,17 +34,17 @@ func init() {
 	// Define short parameters and description ( set default value here if you need ).
 	//
 	// Required parameters
-	flag.IntVar(aIntFlag /*         */, "a", 0 /*       */, "[required] apple")
-	flag.StringVar(iStringFlag /*   */, "i", "" /*      */, "[required] iterator")
-	flag.StringVar(titleFlag /*     */, "t", "" /*      */, "[required] title")
+	flag.IntVar(aIntFlag /*         */, "a", 0 /*      */, "[required] apple")
+	flag.StringVar(iStringFlag /*   */, "i", "" /*     */, "[required] iterator")
+	flag.StringVar(titleFlag /*     */, "t", "" /*     */, "[required] title")
 	// Optional parameters
-	flag.IntVar(fIntFlag /*         */, "f", 10 /*      */, "[optional] forget")
-	flag.IntVar(countFlag /*        */, "c", 1 /*       */, "[optional] count")
-	flag.StringVar(bStringFlag /*   */, "b", "BIG" /*   */, "[optional] bridge")
-	flag.StringVar(eStringFlag /*   */, "e", "NO" /*    */, "[optional] estimation")
-	flag.BoolVar(gBoolFlag /*       */, "g", false /*   */, "\ngulp")
-	flag.BoolVar(helpFlag /*        */, "h", false /*   */, "\nhelp")
-	flag.BoolVar(isDebugFlag /*     */, "d", false /*   */, "\ndebug")
+	flag.IntVar(fIntFlag /*         */, "f", 10 /*     */, "[optional] forget")
+	flag.IntVar(countFlag /*        */, "c", 1 /*      */, "[optional] count")
+	flag.StringVar(bStringFlag /*   */, "b", "BIG" /*  */, "[optional] bridge")
+	flag.StringVar(eStringFlag /*   */, "e", "NO" /*   */, "[optional] estimation")
+	flag.BoolVar(gBoolFlag /*       */, "g", false /*  */, "\ngulp")
+	flag.BoolVar(helpFlag /*        */, "h", false /*  */, "\nhelp")
+	flag.BoolVar(isDebugFlag /*     */, "d", false /*  */, "\ndebug")
 }
 
 // << Execution sample >>
