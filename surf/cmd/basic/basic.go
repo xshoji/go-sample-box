@@ -17,7 +17,7 @@ var (
 
 //
 // Usage:
-// go run main.go -u="https://www.google.com"
+// go run cmd/basic/basic.go -u="https://www.google.com"
 //
 func main() {
 
