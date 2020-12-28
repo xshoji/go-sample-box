@@ -38,7 +38,7 @@ func init() {
 	flag.StringVar(iStringFlag /*   */, "i", "" /*     */, "[required] iterator")
 	flag.StringVar(titleFlag /*     */, "t", "" /*     */, "[required] title")
 	// Optional parameters
-	flag.IntVar(fIntFlag /*         */, "f", 10 /*     */, "[optional] forget")
+	flag.IntVar(fIntFlag /*         */, "f", 10 /*     */, "[optional] flagship")
 	flag.IntVar(countFlag /*        */, "c", 1 /*      */, "[optional] count")
 	flag.StringVar(bStringFlag /*   */, "b", "BIG" /*  */, "[optional] bridge")
 	flag.StringVar(eStringFlag /*   */, "e", "NO" /*   */, "[optional] estimation")
@@ -126,7 +126,7 @@ func main() {
 	fmt.Println("apple: ", *aIntFlag)
 	fmt.Println("bridge: ", *bStringFlag)
 	fmt.Println("estimation: ", *eStringFlag)
-	fmt.Println("forget: ", *fIntFlag)
+	fmt.Println("flagship: ", *fIntFlag)
 	fmt.Println("gulp: ", *gBoolFlag)
 	fmt.Println("iterator: ", *iStringFlag)
 	fmt.Println("title: ", *titleFlag)

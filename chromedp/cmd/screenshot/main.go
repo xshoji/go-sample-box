@@ -2,10 +2,9 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"flag"
 	"github.com/chromedp/cdproto/emulation"
 	"github.com/chromedp/chromedp"
-	"github.com/jessevdk/go-flags"
 	"io/ioutil"
 	"log"
 	"os"
@@ -13,41 +12,44 @@ import (
 	"time"
 )
 
-type options struct {
-	Url           string `short:"u" long:"url" description:"URL" required:"true"`
-	QuerySelector string `short:"q" long:"query-selector" description:"QuerySelector used to capture a element" required:"true"`
-	Output        string `short:"o" long:"output" description:"Output file path" default:"/tmp/img.png"`
-	Debug         bool   `short:"d" long:"debug" description:"Debug mode"`
-	NoHeadless    bool   `short:"n" long:"no-headless" description:"No Headless mode"`
-}
+var (
+	arguments = struct {
+		url           *string
+		querySelector *string
+		outputPath    *string
+		debug         *bool
+		noHeadless    *bool
+		help          *bool
+	}{
+		flag.String("u", "" /*              */, "[Required] URL"),
+		flag.String("q", "" /*              */, "[Required] QuerySelector used to output as string"),
+		flag.String("o", `/tmp/img.png` /*  */, "[Optional] Output file path"),
+		flag.Bool("d", false /*           */, "\n[Optional] Debug mode"),
+		flag.Bool("n", false /*           */, "\n[Optional] Disable Headless mode"),
+		flag.Bool("h", false /*           */, "\nhelp"),
+	}
+)
 
 // [ Usage ]
-// go run main.go -u="https://news.yahoo.co.jp/" -q="#liveStream" -o="/tmp/yahoo_news_livestream.png"
-// go run main.go -u="https://news.yahoo.co.jp/" -q="section.toptopics" -o="/tmp/yahoo_news_toptopics.png"
+// go run cmd/screenshot/main.go -u="https://news.yahoo.co.jp/" -q="#liveStream" -o="/tmp/yahoo_news_livestream.png"
+// go run cmd/screenshot/main.go -u="https://news.yahoo.co.jp/" -q="section.toptopics" -o="/tmp/yahoo_news_toptopics.png"
 //
 // [ References ]
 // > querySelector()を使うとjQueryみたいにセレクターで要素を取得できるよ。（DOMおれおれAdvent Calendar 2015 – 02日目） ｜ Ginpen.com
 // > https://ginpen.com/2015/12/02/queryselector-api-like-jquery/
 func main() {
-	opts := *new(options)
-	parser := flags.NewParser(&opts, flags.Default)
-	// set name
-	parser.Name = "chromedp-screenshot"
-	if _, err := parser.Parse(); err != nil {
-		flagsError, _ := err.(*flags.Error)
-		// help時は何もしない
-		if flagsError.Type == flags.ErrHelp {
-			return
-		}
-		fmt.Println()
-		parser.WriteHelp(os.Stdout)
-		fmt.Println()
-		return
+
+	flag.Parse()
+	// Required parameter
+	// - [Can Go's `flag` package print usage? - Stack Overflow](https://stackoverflow.com/questions/23725924/can-gos-flag-package-print-usage)
+	if *arguments.help || *arguments.url == "" || *arguments.querySelector == "" {
+		flag.Usage()
+		os.Exit(0)
 	}
 
-	fmt.Printf("url: %v\n", opts.Url)
-	fmt.Printf("query: %v\n", opts.QuerySelector)
-	fmt.Printf("output: %v\n", opts.Output)
+	log.Printf("url: %v\n", *arguments.url)
+	log.Printf("query: %v\n", *arguments.querySelector)
+	log.Printf("output: %v\n", *arguments.outputPath)
 
 	var err error
 
@@ -58,7 +60,7 @@ func main() {
 	// > https://github.com/chromedp/chromedp/issues/495
 	ctxt, cancel := chromedp.NewExecAllocator(context.Background(), append(
 		chromedp.DefaultExecAllocatorOptions[:],
-		chromedp.Flag("headless", !opts.NoHeadless),
+		chromedp.Flag("headless", !*arguments.noHeadless),
 		chromedp.Flag("disable-gpu", true),
 		chromedp.Flag("no-first-run", true),
 		chromedp.Flag("no-default-browser-check", true),
@@ -66,7 +68,7 @@ func main() {
 	)
 	defer cancel()
 	loggingContextOption := chromedp.WithLogf(log.Printf)
-	if opts.Debug {
+	if *arguments.debug {
 		// debug log mode
 		loggingContextOption = chromedp.WithDebugf(log.Printf)
 	}
@@ -91,13 +93,13 @@ func main() {
 
 	// run task list
 	var buf []byte
-	err = chromedp.Run(ctxt, screenshot(opts.Url, opts.QuerySelector, &buf))
+	err = chromedp.Run(ctxt, screenshot(*arguments.url, *arguments.querySelector, &buf))
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// write to file
-	if err := ioutil.WriteFile(opts.Output, buf, 0644); err != nil {
+	if err := ioutil.WriteFile(*arguments.outputPath, buf, 0644); err != nil {
 		log.Fatal(err)
 	}
 }

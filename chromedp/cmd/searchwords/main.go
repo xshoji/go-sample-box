@@ -2,9 +2,8 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"flag"
 	"github.com/chromedp/chromedp"
-	"github.com/jessevdk/go-flags"
 	"github.com/yosssi/gohtml"
 	"log"
 	"os"
@@ -12,32 +11,33 @@ import (
 	"time"
 )
 
-type options struct {
-	Words      string `short:"w" long:"words" description:"Search words" required:"true"`
-	Service    string `short:"s" long:"service" description:"Service type [ yahoo | tabelog ]" default:"yahoo"`
-	Debug      bool   `short:"d" long:"debug" description:"Debug mode"`
-	NoHeadless bool   `short:"n" long:"no-headless" description:"No Headless mode"`
-}
+var (
+	arguments = struct {
+		keyword    *string
+		service    *string
+		debug      *bool
+		noHeadless *bool
+		help       *bool
+	}{
+		flag.String("k", "" /*         */, "[Required] Search keyword"),
+		flag.String("s", "yahoo" /*    */, "[Optional] Service type [ yahoo | tabelog ]"),
+		flag.Bool("d", false /*      */, "\n[Optional] Debug mode"),
+		flag.Bool("n", false /*      */, "\n[Optional] Disable Headless mode"),
+		flag.Bool("h", false /*      */, "\nhelp"),
+	}
+)
 
 // [ Usage ]
-// go run main.go -w="yahoo japan" -s="yahoo"
-// go run main.go -w="オムライス" -s="tabelog"
+// go run cmd/searchwords/main.go -w="yahoo japan"
+// go run cmd/searchwords/main.go -w="オムライス" -s="tabelog"
 func main() {
 
-	opts := *new(options)
-	parser := flags.NewParser(&opts, flags.Default)
-	// set name
-	parser.Name = "chromedp-search-words"
-	if _, err := parser.Parse(); err != nil {
-		flagsError, _ := err.(*flags.Error)
-		// help時は何もしない
-		if flagsError.Type == flags.ErrHelp {
-			return
-		}
-		fmt.Println()
-		parser.WriteHelp(os.Stdout)
-		fmt.Println()
-		return
+	flag.Parse()
+	// Required parameter
+	// - [Can Go's `flag` package print usage? - Stack Overflow](https://stackoverflow.com/questions/23725924/can-gos-flag-package-print-usage)
+	if *arguments.help || *arguments.keyword == "" {
+		flag.Usage()
+		os.Exit(0)
 	}
 
 	var err error
@@ -49,14 +49,14 @@ func main() {
 	// > https://github.com/chromedp/chromedp/issues/495
 	ctxt, cancel := chromedp.NewExecAllocator(context.Background(), append(
 		chromedp.DefaultExecAllocatorOptions[:],
-		chromedp.Flag("headless", !opts.NoHeadless),
+		chromedp.Flag("headless", !*arguments.noHeadless),
 		chromedp.Flag("disable-gpu", true),
 		chromedp.Flag("no-first-run", true),
 		chromedp.Flag("no-default-browser-check", true),
 	)...)
 	defer cancel()
 	loggingContextOption := chromedp.WithLogf(log.Printf)
-	if opts.Debug {
+	if *arguments.debug {
 		// debug log mode
 		loggingContextOption = chromedp.WithDebugf(log.Printf)
 	}
@@ -74,10 +74,10 @@ func main() {
 	// run task list
 	var res string
 	var tasks chromedp.Tasks
-	if opts.Service == "tabelog" {
-		tasks = searchTasksTabelog(opts.Words, &res)
+	if *arguments.service == "tabelog" {
+		tasks = searchTasksTabelog(*arguments.keyword, &res)
 	} else {
-		tasks = searchTasksYahoo(opts.Words, &res)
+		tasks = searchTasksYahoo(*arguments.keyword, &res)
 	}
 
 	err = chromedp.Run(ctxt, tasks)
@@ -91,10 +91,10 @@ func main() {
 func searchTasksYahoo(word string, res *string) chromedp.Tasks {
 	return chromedp.Tasks{
 		chromedp.Navigate(`https://search.yahoo.co.jp/`),
-		chromedp.WaitVisible(`#yschsp`, chromedp.ByQuery),
-		chromedp.SendKeys(`#yschsp`, word, chromedp.ByQuery),
-		chromedp.WaitVisible(`.sbox_1 .b`, chromedp.ByQuery),
-		chromedp.Click(`.sbox_1 .b`, chromedp.ByQuery),
+		chromedp.WaitVisible(`.SearchBox__searchInput`, chromedp.ByQuery),
+		chromedp.SendKeys(`.SearchBox__searchInput`, word, chromedp.ByQuery),
+		chromedp.WaitVisible(`.SearchBox__searchButton`, chromedp.ByQuery),
+		chromedp.Click(`.SearchBox__searchButton`, chromedp.ByQuery),
 		chromedp.WaitVisible(`#contents`, chromedp.ByQuery),
 		chromedp.InnerHTML(`#contents`, res, chromedp.NodeVisible, chromedp.ByQuery),
 	}
@@ -108,7 +108,7 @@ func searchTasksTabelog(word string, res *string) chromedp.Tasks {
 		chromedp.WaitVisible(`#js-global-search-btn`, chromedp.ByQuery),
 		chromedp.Click(`#js-global-search-btn`, chromedp.ByQuery),
 		chromedp.Sleep(2 * time.Second),
-		chromedp.WaitVisible(`#column-main`, chromedp.ByQuery),
-		chromedp.InnerHTML(`#column-main`, res, chromedp.NodeVisible, chromedp.ByQuery),
+		chromedp.WaitVisible(`.flexible-rstlst`, chromedp.ByQuery),
+		chromedp.InnerHTML(`.flexible-rstlst`, res, chromedp.NodeVisible, chromedp.ByQuery),
 	}
 }

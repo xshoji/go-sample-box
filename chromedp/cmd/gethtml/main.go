@@ -2,42 +2,41 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"flag"
 	"github.com/chromedp/chromedp"
-	"github.com/jessevdk/go-flags"
 	"log"
 	"os"
 	"os/signal"
 )
 
-type options struct {
-	Url           string `short:"u" long:"url" description:"URL" required:"true"`
-	QuerySelector string `short:"q" long:"query-selector" description:"QuerySelector used to output as string" required:"true"`
-	Debug         bool   `short:"d" long:"debug" description:"Debug mode"`
-	NoHeadless    bool   `short:"n" long:"no-headless" description:"No Headless mode"`
-}
+var (
+	arguments = struct {
+		url           *string
+		querySelector *string
+		debug         *bool
+		noHeadless    *bool
+		help          *bool
+	}{
+		flag.String("u", "" /*      */, "[Required] URL"),
+		flag.String("q", "" /*      */, "[Required] QuerySelector used to output as string"),
+		flag.Bool("d", false /*   */, "\n[Optional] Debug mode"),
+		flag.Bool("n", false /*   */, "\n[Optional] Disable Headless mode"),
+		flag.Bool("h", false /*   */, "\nhelp"),
+	}
+)
 
 // [ Usage ]
-// go run main.go -u="https://news.yahoo.co.jp/" -q="#liveStream"
-// go run main.go -u="https://news.yahoo.co.jp/" -q="section.toptopics"
+// go run cmd/gethtml/main.go -u="https://news.yahoo.co.jp/" -q="#liveStream"
+// go run cmd/gethtml/main.go -u="https://news.yahoo.co.jp/" -q="section.toptopics"
 func main() {
 
-	opts := *new(options)
-	parser := flags.NewParser(&opts, flags.Default)
-	// set name
-	parser.Name = "chromedp-get-html"
-	if _, err := parser.Parse(); err != nil {
-		flagsError, _ := err.(*flags.Error)
-		// help時は何もしない
-		if flagsError.Type == flags.ErrHelp {
-			return
-		}
-		fmt.Println()
-		parser.WriteHelp(os.Stdout)
-		fmt.Println()
-		return
+	flag.Parse()
+	// Required parameter
+	// - [Can Go's `flag` package print usage? - Stack Overflow](https://stackoverflow.com/questions/23725924/can-gos-flag-package-print-usage)
+	if *arguments.help || *arguments.url == "" || *arguments.querySelector == "" {
+		flag.Usage()
+		os.Exit(0)
 	}
-
 	var err error
 
 	// create context
@@ -47,7 +46,7 @@ func main() {
 	// > https://github.com/chromedp/chromedp/issues/495
 	ctxt, cancel := chromedp.NewExecAllocator(context.Background(), append(
 		chromedp.DefaultExecAllocatorOptions[:],
-		chromedp.Flag("headless", !opts.NoHeadless),
+		chromedp.Flag("headless", !*arguments.noHeadless),
 		chromedp.Flag("disable-gpu", true),
 		chromedp.Flag("no-first-run", true),
 		chromedp.Flag("no-default-browser-check", true),
@@ -55,7 +54,7 @@ func main() {
 	)
 	defer cancel()
 	loggingContextOption := chromedp.WithLogf(log.Printf)
-	if opts.Debug {
+	if *arguments.debug {
 		// debug log mode
 		loggingContextOption = chromedp.WithDebugf(log.Printf)
 	}
@@ -72,7 +71,7 @@ func main() {
 
 	// run task list
 	var res string
-	err = chromedp.Run(ctxt, createTasks(opts.Url, opts.QuerySelector, &res))
+	err = chromedp.Run(ctxt, createTasks(*arguments.url, *arguments.querySelector, &res))
 	if err != nil {
 		log.Fatal(err)
 	}
