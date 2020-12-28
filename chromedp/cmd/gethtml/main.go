@@ -31,8 +31,6 @@ var (
 func main() {
 
 	flag.Parse()
-	// Required parameter
-	// - [Can Go's `flag` package print usage? - Stack Overflow](https://stackoverflow.com/questions/23725924/can-gos-flag-package-print-usage)
 	if *arguments.help || *arguments.url == "" || *arguments.querySelector == "" {
 		flag.Usage()
 		os.Exit(0)

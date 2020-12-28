@@ -25,13 +25,10 @@ var (
 )
 
 // [ Usage ]
-// go run cmd/gethtml/main.go -u="https://news.yahoo.co.jp/" -q="#liveStream"
-// go run cmd/gethtml/main.go -u="https://news.yahoo.co.jp/" -q="section.toptopics"
+// go run cmd/evaluatejs/main.go -u="https://news.yahoo.co.jp/"
 func main() {
 
 	flag.Parse()
-	// Required parameter
-	// - [Can Go's `flag` package print usage? - Stack Overflow](https://stackoverflow.com/questions/23725924/can-gos-flag-package-print-usage)
 	if *arguments.help || *arguments.url == "" {
 		flag.Usage()
 		os.Exit(0)
