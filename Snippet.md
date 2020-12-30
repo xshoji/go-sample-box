@@ -242,10 +242,17 @@ fmt.Println(now.Format("2006 / 01 [January(Jan)] / 02 [Monday(Mon)] 15:04:05 [MS
 //---------------------
 // regexp.MatchString
 //---------------------
+// Simple match
 fmt.Println("<< regexp.MatchString >>")
 fmt.Println(regexp.MatchString(`^aaa`, mozi))
 fmt.Println(regexp.MatchString(`ccc$`, mozi))
 fmt.Println(regexp.MatchString(`ddd`, mozi))
+
+// Replace
+// > サンプルで学ぶ Go 言語：Regular Expressions  
+// > https://www.spinute.org/go-by-example/regular-expressions.html
+r := regexp.MustCompile("^/")
+fmt.Println(r.ReplaceAllString("/aaa/bbb", ""))
 ```
 
 
