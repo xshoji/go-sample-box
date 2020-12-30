@@ -1,7 +1,9 @@
 # Snippet
 
 ```go
+//---------------------
 // primitive types
+//---------------------
 var valueInt8 int8
 valueInt8 =
 valueInt := 100
@@ -15,16 +17,42 @@ fmt.Printf("valueInt, valueInt64, valueFloat, valueRune, valueString\n%v, %v, %v
 
 // print type
 fmt.Printf("valueInt %v(%T)\n", valueInt, valueInt)
+```
 
-//
-//
-//
-//
-//
+
+
+
+
+```go
+//---------------------
+// 標準入力読み込み
+// or 
+// 引数指定
+// を判断して値を読み込み
+//---------------------
+sentence := ""
+// If being piped to stdin, read stdin as sentence input.
+// > go - Check if there is something to read on STDIN in Golang - Stack Overflow
+// > https://stackoverflow.com/questions/22744443/check-if-there-is-something-to-read-on-stdin-in-golang/26567513#26567513
+stat, _ := os.Stdin.Stat()
+if (stat.Mode() & os.ModeCharDevice) == 0 {
+	sentenceBytes, _ := ioutil.ReadAll(os.Stdin)
+	sentence = string(sentenceBytes)
+}
+```
+
+
+
+
+
+
+```go
+//---------------------
 // cast
 // > Golangでの文字列・数値変換 - 小野マトペの納豆ペペロンチーノ日記
 // > http://matope.hatenablog.com/entry/2014/04/22/101127
 // FormatIntの第2引数は基数。2なら2進数、16なら16進数になる
+//---------------------
 // int -> string
 strconv.Itoa(valueInt)
 // int64 -> string
@@ -39,24 +67,31 @@ valueInt, _ = strconv.Atoi(valueString)
 valueInt64, _ = strconv.ParseInt(valueString, 10, 64)
 // []byte -> string
 string(valueBytes)
+```
 
 
-//
-//
-//
-//
-//
+
+
+
+
+```go
+//---------------------
 //string cut
+//---------------------
 a := "aiueo"
 fmt.Println(a[:3]) // aiu
+```
 
 
-//
-//
-//
-//
-//
+
+
+
+
+```go
+//---------------------
 //map, for
+//---------------------
+// map
 mapValues := map[string]string{
     "aaa": "aaa_value",
     "bbb": "bbb_value",
@@ -97,14 +132,17 @@ nestedMap2 := make(map[Key]string)
 nestedMap2[Key{"key1", "key2"}] = "value"
 fmt.Println(nestedMap2)
 fmt.Println()
+```
 
 
-//
-//
-//
-//
-//
+
+
+
+
+```go
+//---------------------
 // anonymous struct
+//---------------------
 anonymousStruct := struct {
 	Name     string
 	Age      int
@@ -127,14 +165,17 @@ anonymousStruct := []struct {
 		Language: "taro",
 	},
 }
+```
 
 
-//
-//
-//
-//
-//
+
+
+
+
+```go
+//---------------------
 // Create random integer
+//---------------------
 fmt.Println("<< random integer >>")
 createRandomNumber := func() int {
 	rand.Seed(time.Now().UnixNano())
@@ -150,13 +191,17 @@ createRandomString := func() string {
 	return hex.EncodeToString(shaBytes[:])
 }
 fmt.Println(createRandomString())
+```
 
-//
-//
-//
-//
-//
+
+
+
+
+
+```go
+//---------------------
 // DateTime format
+//---------------------
 // > Golangでの日付のフォーマット指定の方法について - Qiita
 // > https://qiita.com/unbabel/items/c8782420391c108e3cac
 fmt.Println("<< now >>")
@@ -165,25 +210,33 @@ fmt.Println("plane:")
 fmt.Println(now)
 fmt.Println("formatted:")
 fmt.Println(now.Format("2006 / 01 [January(Jan)] / 02 [Monday(Mon)] 15:04:05 [MST]"))
+```
 
-//
-//
-//
-//
-//
+
+
+
+
+
+```go
+//---------------------
 // regexp.MatchString
+//---------------------
 fmt.Println("<< regexp.MatchString >>")
 fmt.Println(regexp.MatchString(`^aaa`, mozi))
 fmt.Println(regexp.MatchString(`ccc$`, mozi))
 fmt.Println(regexp.MatchString(`ddd`, mozi))
+```
 
-//
-//
-//
-//
-//
+
+
+
+
+
+```go
+//---------------------
 // ファイルを読み込む
 // - [Go でファイルを1行ずつ読み込む（csv ファイルも） - Qiita](https://qiita.com/ikawaha/items/28186d965780fab5533d)
+//---------------------
 // １行ずつ読む
 func readEachLines(filePath *string) {
 	file, err := os.Open(*filePath)
@@ -214,23 +267,31 @@ func readAllLines(filePath *string) {
 	}
 	fmt.Printf("%v", string(contents))
 }
+```
 
-//
-//
-//
-//
-//
+
+
+
+
+
+```go
+//---------------------
 // 多段パッケージ風staticクラスの実装例
+//---------------------
 type common struct{}
 var Common = common{}
 func (c *common) GetHttp(url string) string {}
+```
 
-//
-//
-//
-//
-//
+
+
+
+
+
+```go
+//---------------------
 // httpリクエスト
+//---------------------
 
 // GET
 resp, err := http.Get(urlFull)
@@ -253,13 +314,18 @@ defer func() {
 		log.Panic("resp.Body.Close() failed.")
 	}
 }()
+```
 
 
-//
-//
-//
-//
-//
+
+
+
+
+```go
+//---------------------
+// Json handling useful utility methods
+//---------------------
+
 // リクエストBodyをinterface{}型のjsonオブジェクトに変換する
 func ToJsonObject(body []byte) interface{} {
 	var jsonObject interface{}
@@ -302,11 +368,17 @@ func ToJsonString(v interface{}) string {
 	result, _ := json.Marshal(v)
 	return string(result)
 }
+```
 
-//
-//
-//
+
+
+
+
+
+```go
+//---------------------
 // * generage code and run
+//---------------------
 // go generate ./... && go run main.go
 //
 // Enum
@@ -321,13 +393,17 @@ const (
 	DeviceTypeWindows
 	DeviceTypeLinux
 )
+```
 
 
-//
-//
-//
-//
+
+
+
+
+```go
+//---------------------
 // Test
+//---------------------
 func TestGetSuccess(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		result1, result2 := ReplaceString("test[0...10]")
@@ -339,14 +415,17 @@ func TestGetSuccess(t *testing.T) {
 		}
 	})
 }
+```
 
 
 
-//
-//
-//
+
+
+
+```go
+//---------------------
 // Safety defer pattern
-//-------------------------------
+//---------------------
 // Define defer function
 deferFunc := func() {
     log.Println("Call defer function")
@@ -365,15 +444,12 @@ go func() {
     log.Println("Execute os.Exit()")
     os.Exit(0)
 }()
-
-//-------------------------------
+//--
 // Define main logic
 for i := 0; i < 5; i++ {
     log.Printf("Loop count is %v\n", i)
     duration := time.Duration(1000 * time.Millisecond)
     time.Sleep(duration)
 }
-
 log.Println("Finish loop")
-
 ```
