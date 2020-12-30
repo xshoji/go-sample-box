@@ -253,6 +253,13 @@ fmt.Println(regexp.MatchString(`ddd`, mozi))
 // > https://www.spinute.org/go-by-example/regular-expressions.html
 r := regexp.MustCompile("^/")
 fmt.Println(r.ReplaceAllString("/aaa/bbb", ""))
+
+
+// Replace ( backward reference  )
+json := `{"protocol": "https","query": [{"key": "AAA","value": "${AAA}"}]}`
+r := regexp.MustCompile("\\${([A-Z]*)\\}")
+// {"protocol": "https","query": [{"key": "AAA","value": "{{AAA}}"}]}
+fmt.Println(r.ReplaceAllString(json, "{{$1}}"))
 ```
 
 
