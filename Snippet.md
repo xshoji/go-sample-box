@@ -25,6 +25,27 @@ fmt.Printf("valueInt %v(%T)\n", valueInt, valueInt)
 
 ```go
 //---------------------
+// slice, map
+//---------------------
+var a []string
+b := []string{} // recommended "var a []string"
+c := make([]string, 0)
+// [] [] []
+fmt.Println(a, b, c)
+	
+var d map[string]string
+e := map[string]string{}
+f := make(map[string]string)
+// map[] map[] map[]
+fmt.Println(d, e, f)
+```
+
+
+
+
+
+```go
+//---------------------
 // 標準入力読み込み
 // or 
 // 引数指定
