@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/xshoji/go-sample-box/json-dynamic/dynamicjson"
+	"github.com/xshoji/go-sample-box/jsondynamic/dynamicjson"
 )
 
 // > 動的な要素を持つJSONをいい感じにUnmarshalする - Qiita
