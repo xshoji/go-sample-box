@@ -2,6 +2,7 @@ package jsonutil
 
 import (
 	"encoding/json"
+	"reflect"
 	"testing"
 )
 
@@ -144,22 +145,22 @@ func TestGet(t *testing.T) {
 			{
 				TestCase: "stringArray",
 				Input:    "stringArray",
-				Expected: createInterfaceArray("stringValue2", "stringValue3"),
+				Expected: createInterfaceSliceIndexed("stringValue2", "stringValue3"),
 			},
 			{
 				TestCase: "numberArray",
 				Input:    "numberArray",
-				Expected: createInterfaceArray(2.0, 3.0),
+				Expected: createInterfaceSliceIndexed(2.0, 3.0),
 			},
 			{
 				TestCase: "nullArray",
 				Input:    "nullArray",
-				Expected: createInterfaceArray(nil, nil),
+				Expected: createInterfaceSliceIndexed(nil, nil),
 			},
 			{
 				TestCase: "booleanArray",
 				Input:    "booleanArray",
-				Expected: createInterfaceArray(true, false),
+				Expected: createInterfaceSliceIndexed(true, false),
 			},
 		}
 
@@ -207,7 +208,7 @@ func TestGet(t *testing.T) {
 			{
 				TestCase: "objectArray",
 				Input:    "objectArray",
-				Expected: createInterfaceArray(map[string]interface{}{"string": "stringValue5", "number": 5.0}, map[string]interface{}{"string": "stringValue6", "number": 6.0}),
+				Expected: createInterfaceSliceIndexed(map[string]interface{}{"string": "stringValue5", "number": 5.0}, map[string]interface{}{"string": "stringValue6", "number": 6.0}),
 			},
 		}
 
@@ -236,7 +237,263 @@ func TestGet(t *testing.T) {
 
 }
 
-func TestToJsonValue(t *testing.T) {
+func TestAsString(t *testing.T) {
+	t.Run("test AsString", func(t *testing.T) {
+
+		// test cases (normal case)
+		testCases := []struct {
+			TestCase string
+			Input    string
+			Expected string
+		}{
+			{
+				TestCase: "ok",
+				Input:    `{"key":"string"}`,
+				Expected: `string`,
+			},
+		}
+
+		// run
+		var jsonObject interface{}
+		for i := range testCases {
+			param := testCases[i]
+			t.Logf("Case:%v\n", param.TestCase)
+			json.Unmarshal([]byte(param.Input), &jsonObject)
+			actual := AsString(jsonObject, "key")
+			if *actual != param.Expected {
+				t.Errorf("  Failed: actual -> %v(%T), expected -> %v(%T)\n", actual, actual, param.Expected, param.Expected)
+			}
+		}
+
+		// test cases (normal case)
+		testCases2 := []struct {
+			TestCase string
+			Input    string
+			Expected *string
+		}{
+			{
+				TestCase: "nil : different type",
+				Input:    `{"key":1}`,
+				Expected: nil,
+			},
+			{
+				TestCase: "nil : key not found",
+				Input:    `{"aaa":"bbb"}`,
+				Expected: nil,
+			},
+		}
+
+		// run
+		for i := range testCases2 {
+			param := testCases2[i]
+			t.Logf("Case:%v\n", param.TestCase)
+			json.Unmarshal([]byte(param.Input), &jsonObject)
+			actual := AsString(jsonObject, "key")
+			if actual != param.Expected {
+				t.Errorf("  Failed: actual -> %v(%T), expected -> %v(%T)\n", actual, actual, param.Expected, param.Expected)
+			}
+		}
+
+	})
+}
+
+func TestAsInt(t *testing.T) {
+	t.Run("test AsInt", func(t *testing.T) {
+
+		// test cases (normal case)
+		testCases := []struct {
+			TestCase string
+			Input    string
+			Expected int
+		}{
+			{
+				TestCase: "ok",
+				Input:    `{"key":100}`,
+				Expected: 100,
+			},
+		}
+
+		// run
+		var jsonObject interface{}
+		for i := range testCases {
+			param := testCases[i]
+			t.Logf("Case:%v\n", param.TestCase)
+			json.Unmarshal([]byte(param.Input), &jsonObject)
+			actual := AsInt(jsonObject, "key")
+			if *actual != param.Expected {
+				t.Errorf("  Failed: actual -> %v(%T), expected -> %v(%T)\n", actual, actual, param.Expected, param.Expected)
+			}
+		}
+
+		// test cases (normal case)
+		testCases2 := []struct {
+			TestCase string
+			Input    string
+			Expected *int
+		}{
+			{
+				TestCase: "nil : different type",
+				Input:    `{"key":"aaa"}`,
+				Expected: nil,
+			},
+			{
+				TestCase: "nil : different type (float)",
+				Input:    `{"key":100.123}`,
+				Expected: nil,
+			}, {
+				TestCase: "nil : key not found",
+				Input:    `{"aaa":100}`,
+				Expected: nil,
+			},
+		}
+
+		// run
+		for i := range testCases2 {
+			param := testCases2[i]
+			t.Logf("Case:%v\n", param.TestCase)
+			json.Unmarshal([]byte(param.Input), &jsonObject)
+			actual := AsInt(jsonObject, "key")
+			if actual != param.Expected {
+				t.Errorf("  Failed: actual -> %v(%T), expected -> %v(%T)\n", actual, actual, param.Expected, param.Expected)
+			}
+		}
+
+	})
+}
+
+func TestAsFloat(t *testing.T) {
+	t.Run("test TestAsFloat", func(t *testing.T) {
+
+		// test cases (normal case)
+		testCases := []struct {
+			TestCase string
+			Input    string
+			Expected float64
+		}{
+			{
+				TestCase: "ok1",
+				Input:    `{"key":100}`,
+				Expected: 100,
+			},
+			{
+				TestCase: "ok2",
+				Input:    `{"key":100.123}`,
+				Expected: 100.123,
+			},
+			{
+				TestCase: "ok3",
+				Input:    `{"key":100.00}`,
+				Expected: 100.00,
+			},
+		}
+
+		// run
+		var jsonObject interface{}
+		for i := range testCases {
+			param := testCases[i]
+			t.Logf("Case:%v\n", param.TestCase)
+			json.Unmarshal([]byte(param.Input), &jsonObject)
+			actual := AsFloat(jsonObject, "key")
+			if *actual != param.Expected {
+				t.Errorf("  Failed: actual -> %v(%T), expected -> %v(%T)\n", actual, actual, param.Expected, param.Expected)
+			}
+		}
+
+		// test cases (normal case)
+		testCases2 := []struct {
+			TestCase string
+			Input    string
+			Expected *float64
+		}{
+			{
+				TestCase: "nil : different type",
+				Input:    `{"key":"aaa"}`,
+				Expected: nil,
+			},
+			{
+				TestCase: "nil : key not found",
+				Input:    `{"aaa":100.123}`,
+				Expected: nil,
+			},
+		}
+
+		// run
+		for i := range testCases2 {
+			param := testCases2[i]
+			t.Logf("Case:%v\n", param.TestCase)
+			json.Unmarshal([]byte(param.Input), &jsonObject)
+			actual := AsFloat(jsonObject, "key")
+			if actual != param.Expected {
+				t.Errorf("  Failed: actual -> %v(%T), expected -> %v(%T)\n", actual, actual, param.Expected, param.Expected)
+			}
+		}
+
+	})
+}
+
+func TestAsSlice(t *testing.T) {
+	t.Run("test TestAsSlice", func(t *testing.T) {
+
+		// test cases (normal case)
+		testCases := []struct {
+			TestCase string
+			Input    string
+			Expected []interface{}
+		}{
+			{
+				TestCase: "ok1",
+				Input:    `{"key":["a","b","c"]}`,
+				Expected: createInterfaceSliceAppended("a", "b", "c"),
+			},
+			{
+				TestCase: "ok2",
+				Input:    `{"key":["a",1,{"c":"d"}]}`,
+				Expected: createInterfaceSliceAppended("a", 1, map[string]string{"c": "d"}),
+			},
+		}
+
+		// run
+		var jsonObject interface{}
+		for i := range testCases {
+			param := testCases[i]
+			t.Logf("Case:%v\n", param.TestCase)
+			json.Unmarshal([]byte(param.Input), &jsonObject)
+			actual := AsSlice(jsonObject, "key")
+			if reflect.DeepEqual(actual, param.Expected) {
+				t.Errorf("  Failed: actual -> %v(%T), expected -> %v(%T)\n", actual, actual, param.Expected, param.Expected)
+			}
+		}
+
+		// test cases (normal case)
+		testCases2 := []struct {
+			TestCase string
+			Input    string
+		}{
+			{
+				TestCase: "nil : different type",
+				Input:    `{"key":"aaa"}`,
+			},
+			{
+				TestCase: "nil : key not found",
+				Input:    `{"aaa":["a","b","c"]}`,
+			},
+		}
+
+		// run
+		for i := range testCases2 {
+			param := testCases2[i]
+			t.Logf("Case:%v\n", param.TestCase)
+			json.Unmarshal([]byte(param.Input), &jsonObject)
+			actual := AsSlice(jsonObject, "key")
+			if actual != nil || !reflect.ValueOf(actual).IsNil() {
+				t.Errorf("  Failed: actual -> %v(%T)\n", actual, actual)
+			}
+		}
+
+	})
+}
+
+func TestToJsonString(t *testing.T) {
 	t.Run("test ToJsonString", func(t *testing.T) {
 
 		// test cases
@@ -286,10 +543,50 @@ func TestToJsonValue(t *testing.T) {
 	})
 }
 
-func createInterfaceArray(values ...interface{}) []interface{} {
+func TestToJsonStringPretty(t *testing.T) {
+	t.Run("test ToJsonStringPretty", func(t *testing.T) {
+
+		// test cases
+		testCases := []struct {
+			TestCase string
+			Input    string
+			Expected string
+		}{
+			{
+				TestCase: "string",
+				Input:    `{"key":"string"}`,
+				Expected: `{
+  "key": "string"
+}`,
+			},
+		}
+
+		// run
+		var jsonObject interface{}
+		for i := range testCases {
+			param := testCases[i]
+			t.Logf("Case:%v\n", param.TestCase)
+			json.Unmarshal([]byte(param.Input), &jsonObject)
+			actual := ToJsonStringPretty(jsonObject)
+			if actual != param.Expected {
+				t.Errorf("  Failed: actual -> %v(%T), expected -> %v(%T)\n", actual, actual, param.Expected, param.Expected)
+			}
+		}
+	})
+}
+
+func createInterfaceSliceIndexed(values ...interface{}) []interface{} {
 	result := make([]interface{}, len(values))
 	for i, s := range values {
 		result[i] = s
+	}
+	return result
+}
+
+func createInterfaceSliceAppended(values ...interface{}) []interface{} {
+	result := make([]interface{}, len(values))
+	for _, s := range values {
+		result = append(result, s)
 	}
 	return result
 }
