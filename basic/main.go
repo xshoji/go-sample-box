@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
+	"os/exec"
 	"regexp"
 	"strconv"
 	"strings"
@@ -38,7 +39,7 @@ func main() {
   "aaa", "bbb",
   "ccc": 111
 }`
-	fmt.Println("<< string sequence >>")
+	fmt.Println("<< foundString sequence >>")
 	fmt.Println(valueString2)
 	fmt.Println()
 
@@ -233,8 +234,8 @@ func main() {
 
 	//
 	//
-	// Create random string
-	fmt.Println("<< random string >>")
+	// Create random foundString
+	fmt.Println("<< random foundString >>")
 	createRandomString := func() string {
 		seed := strconv.FormatInt(time.Now().UnixNano(), 10)
 		shaBytes := sha256.Sum256([]byte(seed))
@@ -247,7 +248,7 @@ func main() {
 	sizeString := "aaa"
 	sizeArray := [10]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 	sizeSlice := make([]string, 15)
-	fmt.Printf("Size of string : %v\n", len(sizeString))
+	fmt.Printf("Size of foundString : %v\n", len(sizeString))
 	fmt.Printf("Size of array : %v\n", len(sizeArray))
 	fmt.Printf("Size of slice : %v\n", len(sizeSlice))
 	fmt.Println()
@@ -320,5 +321,34 @@ func main() {
 	//> http://www-creators.com/archives/1827
 	re = regexp.MustCompile(`(\[[^\]]*\])`)
 	fmt.Println(re.ReplaceAllString(mozi, "test"))
+	fmt.Println()
+
+	//
+	//
+	//
+	// FindAllString
+	fmt.Println("<< FindAllString >>")
+	mozi = "[111-222-333] [skdflskdjflsd] xxxx yyyy pppp 500 200 xxxx 100"
+	findRegexp := regexp.MustCompile("xxxx")
+	stringSlice := findRegexp.FindAllString(mozi, -1)
+	for _, foundString := range stringSlice {
+		fmt.Println(foundString)
+	}
+	fmt.Println()
+
+	//
+	//
+	// > go - How to run a shell command in a specific folder - Stack Overflow
+	// > https://stackoverflow.com/questions/43135919/how-to-run-a-shell-command-in-a-specific-folder
+	//
+	// Exec os command
+	fmt.Println("<< Exec os command >>")
+	cmd := exec.Command("ls", "-al")
+	cmd.Dir = "/tmp" // Working directory
+	out, err := cmd.Output()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(string(out))
 	fmt.Println()
 }

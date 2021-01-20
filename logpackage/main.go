@@ -1,6 +1,9 @@
 package main
 
-import "log"
+import (
+	"log"
+	"os"
+)
 
 // > Go 言語の log パッケージを使ってみる - 倭マン's BLOG
 // > https://waman.hatenablog.com/entry/2017/09/29/011614
@@ -21,4 +24,8 @@ func init() {
 
 func main() {
 	log.Printf("test")
+
+	// Create new logger ( Output to stdout )
+	logger := log.New(os.Stdout, "[MyLogger] ", log.Llongfile|log.LstdFlags)
+	logger.Println("test2")
 }

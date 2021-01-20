@@ -14,17 +14,17 @@ var (
 	// Define short parameters and description ( set default value here if you need ).
 	//
 	// Required parameters
-	aIntFlag    = flag.Int("a", 0 /*        */, "[required] apple")
-	iStringFlag = flag.String("i", "" /*    */, "[required] iterator")
-	titleFlag   = flag.String("t", "" /*    */, "[required] title")
+	argumentApple    = flag.Int("a", 0 /*        */, "[required] apple")
+	argumentIterator = flag.String("i", "" /*    */, "[required] iterator")
+	argumentTitle    = flag.String("t", "" /*    */, "[required] title")
 	// Optional parameters
-	fIntFlag    = flag.Int("f", 10 /*       */, "[optional] flagship")
-	countFlag   = flag.Int("c", 1 /*        */, "[optional] count")
-	bStringFlag = flag.String("b", "BIG" /* */, "[optional] bridge")
-	eStringFlag = flag.String("e", "NO" /*  */, "[optional] estimation")
-	gBoolFlag   = flag.Bool("g", false /*   */, "\ngulp")
-	helpFlag    = flag.Bool("h", false /*   */, "\nhelp")
-	isDebugFlag = flag.Bool("d", false /*   */, "\ndebug")
+	argumentFlagship   = flag.Int("f", 10 /*       */, "[optional] flagship")
+	argumentCount      = flag.Int("c", 1 /*        */, "[optional] count")
+	argumentBridge     = flag.String("b", "BIG" /* */, "[optional] bridge")
+	argumentEstimation = flag.String("e", "NO" /*  */, "[optional] estimation")
+	argumentGulp       = flag.Bool("g", false /*   */, "\ngulp")
+	argumentHelp       = flag.Bool("h", false /*   */, "\nhelp")
+	argumentDebug      = flag.Bool("d", false /*   */, "\ndebug")
 )
 
 // << Execution sample >>
@@ -79,18 +79,18 @@ func main() {
 	flag.Parse()
 	// Required parameter
 	// - [Can Go's `flag` package print usage? - Stack Overflow](https://stackoverflow.com/questions/23725924/can-gos-flag-package-print-usage)
-	if *helpFlag || *aIntFlag == 0 || *iStringFlag == "" || *titleFlag == "" {
+	if *argumentHelp || *argumentApple == 0 || *argumentIterator == "" || *argumentTitle == "" {
 		flag.Usage()
 		os.Exit(0)
 	}
 
-	fmt.Println("apple: ", *aIntFlag)
-	fmt.Println("bridge: ", *bStringFlag)
-	fmt.Println("estimation: ", *eStringFlag)
-	fmt.Println("flagship: ", *fIntFlag)
-	fmt.Println("gulp: ", *gBoolFlag)
-	fmt.Println("iterator: ", *iStringFlag)
-	fmt.Println("title: ", *titleFlag)
-	fmt.Println("count: ", *countFlag)
-	fmt.Println("debug: ", *isDebugFlag)
+	fmt.Println("apple: ", *argumentApple)
+	fmt.Println("bridge: ", *argumentBridge)
+	fmt.Println("estimation: ", *argumentEstimation)
+	fmt.Println("flagship: ", *argumentFlagship)
+	fmt.Println("gulp: ", *argumentGulp)
+	fmt.Println("iterator: ", *argumentIterator)
+	fmt.Println("title: ", *argumentTitle)
+	fmt.Println("count: ", *argumentCount)
+	fmt.Println("debug: ", *argumentDebug)
 }
