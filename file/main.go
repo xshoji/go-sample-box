@@ -47,6 +47,7 @@ func scanFileContents(filePath *string) {
 	if err != nil {
 		log.Panic(err)
 	}
+	defer createFileCloseDeferFunc(file)()
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
@@ -64,6 +65,7 @@ func readStringFileContents(filePath *string) {
 	if err != nil {
 		log.Panic(err)
 	}
+	defer createFileCloseDeferFunc(file)()
 
 	reader := bufio.NewReaderSize(file, 1024)
 	for line := ""; err == nil; line, err = reader.ReadString('\n') {
@@ -79,10 +81,20 @@ func readAllFileContents(filePath *string) {
 	if err != nil {
 		log.Panic(err)
 	}
+	defer createFileCloseDeferFunc(file)()
 
 	contents, err := ioutil.ReadAll(file)
 	if err != nil {
 		log.Panic(err)
 	}
 	fmt.Printf("%v", string(contents))
+}
+
+func createFileCloseDeferFunc(file *os.File) func() {
+	return func() {
+		fileCloseErr := file.Close()
+		if fileCloseErr != nil {
+			log.Panic(fileCloseErr)
+		}
+	}
 }
