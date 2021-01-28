@@ -1,4 +1,4 @@
 # go-sample-box
 
-Go's sample and snippet codes.
+Go's sample and snippet code.
 
