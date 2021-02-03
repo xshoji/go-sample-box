@@ -33,7 +33,7 @@ func main() {
 	// - [web applications - How do I serve CSS and JS in Go Lang - Stack Overflow](https://stackoverflow.com/questions/43601359/how-do-i-serve-css-and-js-in-go-lang)
 	http.Handle("/", http.FileServer(box))
 	port := ":" + strconv.Itoa(opts.Port)
-	fmt.Printf("server %s\n", port)
+	fmt.Printf("http://localhost%s\n", port)
 	err := http.ListenAndServe(port, nil) //監視するポートを設定します。
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)

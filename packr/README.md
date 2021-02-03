@@ -11,10 +11,12 @@ go generate ./...
 // replace package name
 sed -i '' "s/.*packrd\"/import _ \"github.com\/xshoji\/go-sample-box\/packr\/packrd\"/g" main-packr.go
 
-// build
-go build -o /tmp/webapp .
-
 // run
+go run .
+
+
+// build and run
+go build -o /tmp/webapp .
 /tmp/./webapp
 ```
 
