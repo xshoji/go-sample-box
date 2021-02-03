@@ -1,3 +1,5 @@
+//go:generate go run -tags generate cmd/gen/gen.go
+
 package main
 
 import (
@@ -43,7 +45,7 @@ func main() {
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
-	go 	http.Serve(ln, http.FileServer(FS))
+	go http.Serve(ln, http.FileServer(FS))
 	ui.Load(fmt.Sprintf("http://%s", ln.Addr()))
 	ui.Bind("create", create)
 	<-ui.Done()
