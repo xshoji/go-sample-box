@@ -1,8 +1,10 @@
+//go:generate go run github.com/gobuffalo/packr/v2/packr2 -v
+
 package main
 
 import (
 	"fmt"
-	"github.com/gobuffalo/packr"
+	"github.com/gobuffalo/packr/v2"
 	"github.com/jessevdk/go-flags"
 	"log"
 	"net/http"
@@ -13,18 +15,9 @@ type options struct {
 	Port int `short:"p" long:"port" description:"Listen port" default:"9090"`
 }
 
-//-------------------
-// << Installation >>
-// $ go get -u github.com/gobuffalo/packr/packr
-//
-// << Build >>
-// $ packr; go build -o /tmp/webapp .
-// $ packr; GOOS=linux GOARCH=amd64 go build -o /tmp/webapp .
-// $ /tmp/./webapp
-//-------------------
-// - [Using HTML Templates from a Folder (Complied) · GolangCode](https://golangcode.com/using-html-templates-from-a-folder-complied/)
-//var templates = template.Must(template.ParseGlob("resources/*"))
-var box = packr.NewBox("./resources")
+// > go generate? · Issue #48 · gobuffalo/packr
+// > https://github.com/gobuffalo/packr/issues/48#issuecomment-439528246
+var box = packr.New("resources", "./resources")
 
 // - [Choosing A Library to Embed Static Assets in Go](https://tech.townsourced.com/post/embedding-static-files-in-go/)
 // - [gobuffalo/packr： The simple and easy way to embed static files into Go binaries.](https://github.com/gobuffalo/packr)
