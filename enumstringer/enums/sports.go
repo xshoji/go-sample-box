@@ -1,6 +1,6 @@
 package sports
 
-//go:generate stringer -type=Sports
+//go:generate go run golang.org/x/tools/cmd/stringer -type=Sports
 type Sports int
 
 const (

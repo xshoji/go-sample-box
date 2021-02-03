@@ -1,6 +1,6 @@
 package enums
 
-//go:generate stringer -type=DeviceType
+//go:generate go run golang.org/x/tools/cmd/stringer -type=DeviceType
 type DeviceType int
 
 const (

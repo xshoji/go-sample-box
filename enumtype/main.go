@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/xshoji/go-sample-box/enumntype/enums"
+	"github.com/xshoji/go-sample-box/enumtype/enums"
 )
 
 type Device struct {

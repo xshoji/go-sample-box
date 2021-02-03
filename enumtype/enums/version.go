@@ -1,6 +1,6 @@
 package enums
 
-//go:generate stringer -type=Version
+//go:generate go run golang.org/x/tools/cmd/stringer -type=Version
 type Version int
 
 const (
