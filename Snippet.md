@@ -231,6 +231,7 @@ myTime = myTime.Add(time.Duration(10) * time.Minute)
 if myTime.After(time.Now()) {
 	fmt.Println("myTime > now")
 }
+myTime.Unix() // unix timestamp
 ```
 
 
