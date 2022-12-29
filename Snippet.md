@@ -121,6 +121,9 @@ mapValues := map[string]string{
 v, ok := mapValues["aaa"] // v -> "aaa_value", ok -> true
 v, ok := mapValues["xxx"] // v -> "",          ok -> false
 
+// map key delete
+delete(mapValues, "aaa")
+
 // for
 fmt.Println("<< for >>")
 fmt.Printf("valueStringSlice size:%d\n", len(valueStringSlice))
@@ -212,6 +215,22 @@ createRandomString := func() string {
 	return hex.EncodeToString(shaBytes[:])
 }
 fmt.Println(createRandomString())
+```
+
+
+
+
+
+
+```go
+//---------------------
+// Time package
+//---------------------
+myTime := time.Time.now()
+myTime = myTime.Add(time.Duration(10) * time.Minute)
+if myTime.After(time.Now()) {
+	fmt.Println("myTime > now")
+}
 ```
 
 
