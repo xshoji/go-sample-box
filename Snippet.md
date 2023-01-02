@@ -32,14 +32,79 @@ b := []string{} // recommended "var a []string"
 c := make([]string, 0)
 // [] [] []
 fmt.Println(a, b, c)
-	
+
+// append value to last of slice.
+a = append(a, "value1")
+// [value1]
+fmt.Println(a)
+
+a = append(a, "value2")
+// [value1 value2]
+fmt.Println(a)
+
+// append value to first of slice.
+a = append([]string{"value0"}, a...)
+// [value0, value1 value2]
+fmt.Println(a)
+```
+
+
+
+
+
+```go
+// define
 var d map[string]string
 e := map[string]string{}
 f := make(map[string]string)
 // map[] map[] map[]
 fmt.Println(d, e, f)
-```
 
+// define and initialize
+mapValues := map[string]string{
+    "aaa": "aaa_value",
+    "bbb": "bbb_value",
+    "ccc": "ccc_value",
+}
+v, ok := mapValues["aaa"] // v -> "aaa_value", ok -> true
+v, ok := mapValues["xxx"] // v -> "",          ok -> false
+
+// map key delete
+delete(mapValues, "aaa")
+
+// map for
+fmt.Println("<< for >>")
+fmt.Printf("valueStringSlice size:%d\n", len(valueStringSlice))
+for _, v := range valueStringSlice {
+    fmt.Println(v)
+}
+for k, v := range mapValues {
+    fmt.Println(k + ":" + v)
+}
+fmt.Println()
+
+//Nested maps
+//> Goで多次元マップ（複数のキーからなるマップ）を実現したいときにはどうするか - Qiita
+//> https://qiita.com/ruiu/items/476f65e7cec07fd3d4d7
+nestedMap := make(map[string]map[string]string)
+if _, ok := nestedMap["key1"]; !ok {
+    nestedMap["key1"] = make(map[string]string)
+}
+nestedMap["key1"]["key2"] = "value"
+fmt.Println(nestedMap)
+fmt.Println()
+
+//Nested maps (key object)
+//> Go maps in action - The Go Blog
+//> https://blog.golang.org/go-maps-in-action#TOC_5.
+type Key struct {
+    key1, key2 string
+}
+nestedMap2 := make(map[Key]string)
+nestedMap2[Key{"key1", "key2"}] = "value"
+fmt.Println(nestedMap2)
+fmt.Println()
+```
 
 
 
@@ -101,61 +166,6 @@ string(valueBytes)
 //---------------------
 a := "aiueo"
 fmt.Println(a[:3]) // aiu
-```
-
-
-
-
-
-
-```go
-//---------------------
-//map, for
-//---------------------
-// map
-mapValues := map[string]string{
-    "aaa": "aaa_value",
-    "bbb": "bbb_value",
-    "ccc": "ccc_value",
-}
-v, ok := mapValues["aaa"] // v -> "aaa_value", ok -> true
-v, ok := mapValues["xxx"] // v -> "",          ok -> false
-
-// map key delete
-delete(mapValues, "aaa")
-
-// for
-fmt.Println("<< for >>")
-fmt.Printf("valueStringSlice size:%d\n", len(valueStringSlice))
-for _, v := range valueStringSlice {
-    fmt.Println(v)
-}
-for k, v := range mapValues {
-    fmt.Println(k + ":" + v)
-}
-fmt.Println()
-
-//Nested maps
-//> Goで多次元マップ（複数のキーからなるマップ）を実現したいときにはどうするか - Qiita
-//> https://qiita.com/ruiu/items/476f65e7cec07fd3d4d7
-nestedMap := make(map[string]map[string]string)
-if _, ok := nestedMap["key1"]; !ok {
-    nestedMap["key1"] = make(map[string]string)
-}
-nestedMap["key1"]["key2"] = "value"
-fmt.Println(nestedMap)
-fmt.Println()
-
-//Nested maps (key object)
-//> Go maps in action - The Go Blog
-//> https://blog.golang.org/go-maps-in-action#TOC_5.
-type Key struct {
-    key1, key2 string
-}
-nestedMap2 := make(map[Key]string)
-nestedMap2[Key{"key1", "key2"}] = "value"
-fmt.Println(nestedMap2)
-fmt.Println()
 ```
 
 
