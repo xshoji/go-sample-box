@@ -27,7 +27,7 @@ const (
 
 // Level based logging in Golang
 // https://www.linkedin.com/pulse/level-based-logging-golang-vivek-dasgupta
-func logging(loglevel LogLevel, loglogger *log.Logger, v ...interface{}) {
+func logging(loglevel LogLevel, logLogger *log.Logger, v ...interface{}) {
 	if loggerLogLevel < loglevel {
 		return
 	}
@@ -47,7 +47,7 @@ func logging(loglevel LogLevel, loglogger *log.Logger, v ...interface{}) {
 			return ""
 		}
 	}()
-	loglogger.Println(append([]interface{}{"[" + level + "]"}, v...)...)
+	logLogger.Println(append([]interface{}{"[" + level + "]"}, v...)...)
 }
 
 func main() {
