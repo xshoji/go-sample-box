@@ -2,18 +2,23 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
-
-	"github.com/jessevdk/go-flags"
 )
 
-type options struct {
-	Port1 int `short:"p" long:"port1" description:"Listen port 1" default:"9090"`
-	Port2 int `short:"" long:"port2" description:"Listen port 2" default:"9091"`
-}
+var (
+	// Define boot arguments.
+	argsPort1 = flag.Int("p1", 9090 /*   */, "[optional] Listen port 1")
+	argsPort2 = flag.Int("p2", 9091 /*   */, "[optional] Listen port 2")
+	argsHelp  = flag.Bool("h", false /* */, "\nhelp")
+	// Logger 時刻と時刻のマイクロ秒、ディレクトリパスを含めたファイル名を出力
+	logger = log.New(os.Stdout, "[Logger] ", log.Llongfile|log.LstdFlags)
+)
 
 // Response Response
 type Response struct {
@@ -35,10 +40,14 @@ func NewResponse(name string, message string, time time.Time) Response {
 // - [Listening multiple ports on golang http servers](https://gist.github.com/filewalkwithme/0199060b2cb5bbc478c5)
 func main() {
 
-	var opts options
-	if _, err := flags.Parse(&opts); err != nil {
-		// some error handling
-		return
+	//-------------------------
+	// 引数のパース
+	flag.Parse()
+	// Required parameter
+	// - [Can Go's `flag` package print usage? - Stack Overflow](https://stackoverflow.com/questions/23725924/can-gos-flag-package-print-usage)
+	if *argsHelp {
+		flag.Usage()
+		os.Exit(0)
 	}
 
 	finish := make(chan bool)
@@ -65,13 +74,13 @@ func main() {
 	})
 
 	go func() {
-		port := ":" + strconv.Itoa(opts.Port1)
+		port := ":" + strconv.Itoa(*argsPort1)
 		fmt.Printf("server1 %s\n", port)
 		http.ListenAndServe(port, server1) //監視するポートを設定します。
 	}()
 
 	go func() {
-		port := ":" + strconv.Itoa(opts.Port2)
+		port := ":" + strconv.Itoa(*argsPort2)
 		fmt.Printf("server2 %s\n", port)
 		http.ListenAndServe(port, server2)
 	}()
