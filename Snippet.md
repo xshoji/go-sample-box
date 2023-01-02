@@ -25,7 +25,7 @@ fmt.Printf("valueInt %v(%T)\n", valueInt, valueInt)
 
 ```go
 //---------------------
-// slice, map
+// slice
 //---------------------
 var a []string
 b := []string{} // recommended "var a []string"
@@ -53,6 +53,9 @@ fmt.Println(a)
 
 
 ```go
+//---------------------
+// map
+//---------------------
 // define
 var d map[string]string
 e := map[string]string{}
