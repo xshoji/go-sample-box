@@ -14,6 +14,7 @@ type LogLevel int
 
 type customLogger struct {
 	logger              *log.Logger
+	errorLogger         *log.Logger
 	currentLoggingLevel LogLevel
 }
 
@@ -26,9 +27,10 @@ const (
 	LogLevelDebug
 )
 
-func NewCustomLogger(logger *log.Logger, logLevel LogLevel) *customLogger {
+func NewCustomLogger(logger *log.Logger, errorLogger *log.Logger, logLevel LogLevel) *customLogger {
 	return &customLogger{
 		logger:              logger,
+		errorLogger:         errorLogger,
 		currentLoggingLevel: logLevel,
 	}
 }
@@ -41,24 +43,25 @@ func InitializeLogger(customLogger *customLogger) {
 }
 
 func Panic(v ...interface{}) {
-	logging(LogLevelPanic, v)
-	globalLogger.logger.Panic(v)
+	logging(LogLevelPanic, v...)
+	globalLogger.errorLogger.Panicln(v...)
 }
 
 func Error(v ...interface{}) {
-	logging(LogLevelError, v)
+	logging(LogLevelError, v...)
+	globalLogger.errorLogger.Println(v...)
 }
 
 func Warn(v ...interface{}) {
-	logging(LogLevelWarn, v)
+	logging(LogLevelWarn, v...)
 }
 
 func Info(v ...interface{}) {
-	logging(LogLevelInfo, v)
+	logging(LogLevelInfo, v...)
 }
 
 func Debug(v ...interface{}) {
-	logging(LogLevelDebug, v)
+	logging(LogLevelDebug, v...)
 }
 
 // Level based logging in Golang

@@ -22,10 +22,15 @@ func main() {
 		flag.Usage()
 		os.Exit(0)
 	}
+	// go - Correct approach to global logging - Stack Overflow https://stackoverflow.com/questions/18361750/correct-approach-to-global-logging
 	// Initialize logger (Executable once only.)
-	customlogger.InitializeLogger(customlogger.NewCustomLogger(log.New(os.Stdout, "[Logger] ", log.Llongfile|log.LstdFlags), customlogger.LogLevel(*argsLogLevel)))
-	customlogger.InitializeLogger(customlogger.NewCustomLogger(log.New(os.Stdout, "[Aaaa] ", log.Llongfile), customlogger.LogLevel(*argsLogLevel)))
-	customlogger.InitializeLogger(customlogger.NewCustomLogger(log.New(os.Stdout, "[Bbbb] ", log.LstdFlags), customlogger.LogLevel(*argsLogLevel)))
+	customlogger.InitializeLogger(customlogger.NewCustomLogger(
+		log.New(os.Stdout, "[Logger] ", log.Llongfile|log.LstdFlags),
+		log.New(os.Stderr, "[ErrorLogger] ", log.Llongfile|log.LstdFlags),
+		customlogger.LogLevel(*argsLogLevel),
+	))
+	customlogger.InitializeLogger(customlogger.NewCustomLogger(log.New(os.Stdout, "[Aaaa] ", log.Llongfile), nil, customlogger.LogLevel(*argsLogLevel)))
+	customlogger.InitializeLogger(customlogger.NewCustomLogger(log.New(os.Stdout, "[Bbbb] ", log.LstdFlags), nil, customlogger.LogLevel(*argsLogLevel)))
 
 	customlogger.Error("Error log", "error", 222, true)
 	customlogger.Warn("Warn log", "warn", 333, false)
