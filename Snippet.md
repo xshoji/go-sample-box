@@ -69,10 +69,12 @@ mapValues := map[string]string{
     "bbb": "bbb_value",
     "ccc": "ccc_value",
 }
+
+// check if a key exists
 v, ok := mapValues["aaa"] // v -> "aaa_value", ok -> true
 v, ok := mapValues["xxx"] // v -> "",          ok -> false
 
-// map key delete
+// key delete
 delete(mapValues, "aaa")
 
 // map for
