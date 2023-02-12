@@ -7,18 +7,18 @@ import (
 	"strings"
 )
 
-type paramsMap map[string]string
+type paramsTypeMap map[string]string
 
-func NewParamsMap() (m paramsMap) {
+func NewParamsMap() (m paramsTypeMap) {
 	m = make(map[string]string)
 	return m
 }
 
-func (p *paramsMap) String() string {
+func (p *paramsTypeMap) String() string {
 	return fmt.Sprintf("%v", *p)
 }
 
-func (p *paramsMap) Set(v string) error {
+func (p *paramsTypeMap) Set(v string) error {
 	keyValue := strings.Split(v, ":")
 	m := map[string]string(*p)
 	m[keyValue[0]] = keyValue[1]

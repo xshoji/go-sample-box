@@ -7,19 +7,19 @@ import (
 	"strings"
 )
 
-type paramsArray []string
+type paramsTypeArray []string
 
-func (p *paramsArray) String() string {
+func (p *paramsTypeArray) String() string {
 	return strings.Join(*p, ", ")
 }
 
-func (p *paramsArray) Set(v string) error {
+func (p *paramsTypeArray) Set(v string) error {
 	*p = append(*p, v)
 	return nil
 }
 
 var (
-	paramsValues paramsArray
+	paramsValues paramsTypeArray
 	paramsHelp   = flag.Bool("h", false /*   */, "\ndebug")
 )
 
