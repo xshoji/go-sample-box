@@ -8,8 +8,8 @@ import (
 
 var (
 	// Define boot arguments.
-	argsLogLevel = flag.Int("l", 4 /*      */, "[optional] Log level (0:Panic, 1:Error, 2:Warn, 3:Info, 4:Debug)")
-	argsHelp     = flag.Bool("h", false /* */, "\nhelp")
+	paramsLogLevel = flag.Int("l", 4 /*      */, "[optional] Log level (0:Panic, 1:Error, 2:Warn, 3:Info, 4:Debug)")
+	paramsHelp     = flag.Bool("h", false /* */, "\nhelp")
 	// Define logger: date, time, microseconds, directory and file path are always outputted.
 	logger         = log.New(os.Stdout, "[Logger] ", log.Llongfile|log.LstdFlags)
 	loggerLogLevel = Debug
@@ -58,13 +58,13 @@ func main() {
 	// 引数のパース
 	flag.Parse()
 	// Required parameter [Can Go's `flag` package print usage? - Stack Overflow](https://stackoverflow.com/questions/23725924/can-gos-flag-package-print-usage)
-	if *argsHelp {
+	if *paramsHelp {
 		flag.Usage()
 		os.Exit(0)
 	}
 
 	// set log level
-	loggerLogLevel = LogLevel(*argsLogLevel)
+	loggerLogLevel = LogLevel(*paramsLogLevel)
 
 	logging(Panic, logger, "Panic log", "panic", 111, false)
 	logging(Error, logger, "Error log", "error", 222, true)

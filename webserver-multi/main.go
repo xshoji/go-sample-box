@@ -13,9 +13,9 @@ import (
 
 var (
 	// Define boot arguments.
-	argsPort1 = flag.Int("p1", 9090 /*   */, "[optional] Listen port 1")
-	argsPort2 = flag.Int("p2", 9091 /*   */, "[optional] Listen port 2")
-	argsHelp  = flag.Bool("h", false /* */, "\nhelp")
+	paramsPort1 = flag.Int("p1", 9090 /*   */, "[optional] Listen port 1")
+	paramsPort2 = flag.Int("p2", 9091 /*   */, "[optional] Listen port 2")
+	paramsHelp  = flag.Bool("h", false /* */, "\nhelp")
 	// Logger 時刻と時刻のマイクロ秒、ディレクトリパスを含めたファイル名を出力
 	logger = log.New(os.Stdout, "[Logger] ", log.Llongfile|log.LstdFlags)
 )
@@ -45,7 +45,7 @@ func main() {
 	flag.Parse()
 	// Required parameter
 	// - [Can Go's `flag` package print usage? - Stack Overflow](https://stackoverflow.com/questions/23725924/can-gos-flag-package-print-usage)
-	if *argsHelp {
+	if *paramsHelp {
 		flag.Usage()
 		os.Exit(0)
 	}
@@ -74,13 +74,13 @@ func main() {
 	})
 
 	go func() {
-		port := ":" + strconv.Itoa(*argsPort1)
+		port := ":" + strconv.Itoa(*paramsPort1)
 		fmt.Printf("server1 %s\n", port)
 		http.ListenAndServe(port, server1) //監視するポートを設定します。
 	}()
 
 	go func() {
-		port := ":" + strconv.Itoa(*argsPort2)
+		port := ":" + strconv.Itoa(*paramsPort2)
 		fmt.Printf("server2 %s\n", port)
 		http.ListenAndServe(port, server2)
 	}()

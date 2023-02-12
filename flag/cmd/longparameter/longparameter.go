@@ -16,17 +16,17 @@ var (
 	// Define long parameters ( don't set default value ).
 	//
 	// Required parameters
-	argsApple    = flag.Int("apple" /*          */, 0, Usage)
-	argsIterator = flag.String("iterator" /*    */, "", Usage)
-	argsTitle    = flag.String("title" /*       */, "", Usage)
+	paramsApple    = flag.Int("apple" /*          */, 0, Usage)
+	paramsIterator = flag.String("iterator" /*    */, "", Usage)
+	paramsTitle    = flag.String("title" /*       */, "", Usage)
 	// Optional parameters
-	argsFlagship   = flag.Int("flagship" /*       */, 0, Usage)
-	argsCount      = flag.Int("count" /*          */, 0, Usage)
-	argsBridge     = flag.String("bridge" /*      */, "", Usage)
-	argsEstimation = flag.String("estimation" /*  */, "", Usage)
-	argsGulp       = flag.Bool("gulp" /*          */, false, Usage)
-	argsHelp       = flag.Bool("help" /*          */, false, Usage)
-	argsDebug      = flag.Bool("debug" /*         */, false, Usage)
+	paramsFlagship   = flag.Int("flagship" /*       */, 0, Usage)
+	paramsCount      = flag.Int("count" /*          */, 0, Usage)
+	paramsBridge     = flag.String("bridge" /*      */, "", Usage)
+	paramsEstimation = flag.String("estimation" /*  */, "", Usage)
+	paramsGulp       = flag.Bool("gulp" /*          */, false, Usage)
+	paramsHelp       = flag.Bool("help" /*          */, false, Usage)
+	paramsDebug      = flag.Bool("debug" /*         */, false, Usage)
 )
 
 func init() {
@@ -34,17 +34,17 @@ func init() {
 	// Define short parameters and description ( set default value here if you need ).
 	//
 	// Required parameters
-	flag.IntVar(argsApple /*         */, "a", 0 /*     */, "[required] apple")
-	flag.StringVar(argsIterator /*   */, "i", "" /*    */, "[required] iterator")
-	flag.StringVar(argsTitle /*      */, "t", "" /*    */, "[required] title")
+	flag.IntVar(paramsApple /*         */, "a", 0 /*     */, "[required] apple")
+	flag.StringVar(paramsIterator /*   */, "i", "" /*    */, "[required] iterator")
+	flag.StringVar(paramsTitle /*      */, "t", "" /*    */, "[required] title")
 	// Optional parameters
-	flag.IntVar(argsFlagship /*      */, "f", 10 /*    */, "[optional] flagship")
-	flag.IntVar(argsCount /*         */, "c", 1 /*     */, "[optional] count")
-	flag.StringVar(argsBridge /*     */, "b", "BIG" /* */, "[optional] bridge")
-	flag.StringVar(argsEstimation /* */, "e", "NO" /*  */, "[optional] estimation")
-	flag.BoolVar(argsGulp /*         */, "g", false /* */, "\ngulp")
-	flag.BoolVar(argsHelp /*         */, "h", false /* */, "\nhelp")
-	flag.BoolVar(argsDebug /*        */, "d", false /* */, "\ndebug")
+	flag.IntVar(paramsFlagship /*      */, "f", 10 /*    */, "[optional] flagship")
+	flag.IntVar(paramsCount /*         */, "c", 1 /*     */, "[optional] count")
+	flag.StringVar(paramsBridge /*     */, "b", "BIG" /* */, "[optional] bridge")
+	flag.StringVar(paramsEstimation /* */, "e", "NO" /*  */, "[optional] estimation")
+	flag.BoolVar(paramsGulp /*         */, "g", false /* */, "\ngulp")
+	flag.BoolVar(paramsHelp /*         */, "h", false /* */, "\nhelp")
+	flag.BoolVar(paramsDebug /*        */, "d", false /* */, "\ndebug")
 }
 
 // << Execution sample >>
@@ -118,18 +118,18 @@ func main() {
 	flag.Parse()
 	// Required parameter
 	// - [Can Go's `flag` package print usage? - Stack Overflow](https://stackoverflow.com/questions/23725924/can-gos-flag-package-print-usage)
-	if *argsHelp || *argsApple == 0 || *argsIterator == "" || *argsTitle == "" {
+	if *paramsHelp || *paramsApple == 0 || *paramsIterator == "" || *paramsTitle == "" {
 		flag.Usage()
 		os.Exit(0)
 	}
 
-	fmt.Println("apple: ", *argsApple)
-	fmt.Println("bridge: ", *argsBridge)
-	fmt.Println("estimation: ", *argsEstimation)
-	fmt.Println("flagship: ", *argsFlagship)
-	fmt.Println("gulp: ", *argsGulp)
-	fmt.Println("iterator: ", *argsIterator)
-	fmt.Println("title: ", *argsTitle)
-	fmt.Println("count: ", *argsCount)
-	fmt.Println("debug: ", *argsDebug)
+	fmt.Println("apple: ", *paramsApple)
+	fmt.Println("bridge: ", *paramsBridge)
+	fmt.Println("estimation: ", *paramsEstimation)
+	fmt.Println("flagship: ", *paramsFlagship)
+	fmt.Println("gulp: ", *paramsGulp)
+	fmt.Println("iterator: ", *paramsIterator)
+	fmt.Println("title: ", *paramsTitle)
+	fmt.Println("count: ", *paramsCount)
+	fmt.Println("debug: ", *paramsDebug)
 }

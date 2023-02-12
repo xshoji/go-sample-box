@@ -12,9 +12,9 @@ import (
 
 var (
 	// Define boot arguments.
-	argsPort         = flag.Int("p", 8080 /*   */, "[optional] Listen port")
-	argsHttpsEnabled = flag.Bool("s", false /* */, "\n[optional] Enable TLS (flag option)")
-	argsHelp         = flag.Bool("h", false /* */, "\nhelp")
+	paramsPort         = flag.Int("p", 8080 /*   */, "[optional] Listen port")
+	paramsHttpsEnabled = flag.Bool("s", false /* */, "\n[optional] Enable TLS (flag option)")
+	paramsHelp         = flag.Bool("h", false /* */, "\nhelp")
 	// Logger 時刻と時刻のマイクロ秒、ディレクトリパスを含めたファイル名を出力
 	logger = log.New(os.Stdout, "[Logger] ", log.Llongfile|log.LstdFlags)
 )
@@ -26,7 +26,7 @@ func main() {
 	flag.Parse()
 	// Required parameter
 	// - [Can Go's `flag` package print usage? - Stack Overflow](https://stackoverflow.com/questions/23725924/can-gos-flag-package-print-usage)
-	if *argsHelp {
+	if *paramsHelp {
 		flag.Usage()
 		os.Exit(0)
 	}
@@ -69,8 +69,8 @@ func main() {
 	})
 
 	var err error
-	port := ":" + strconv.Itoa(*argsPort)
-	if *argsHttpsEnabled {
+	port := ":" + strconv.Itoa(*paramsPort)
+	if *paramsHttpsEnabled {
 		logger.Printf("server(https) %s\n", port)
 		err = http.ListenAndServeTLS(port, certFile, keyFile, nil)
 	} else {

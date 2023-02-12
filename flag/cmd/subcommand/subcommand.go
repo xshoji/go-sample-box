@@ -47,7 +47,7 @@ import (
 //
 func main() {
 	flagSetMain := flag.NewFlagSet("main", flag.ContinueOnError)
-	argsHelp := flagSetMain.Bool("h", false, "\nhelp")
+	paramsHelp := flagSetMain.Bool("h", false, "\nhelp")
 	flagSetMain.Usage = func() {
 		fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s [commit|checkout]\n", os.Args[0])
 		flagSetMain.PrintDefaults()
@@ -55,7 +55,7 @@ func main() {
 	if err := flagSetMain.Parse(os.Args[1:]); err != nil {
 		log.Fatal(err)
 	}
-	if *argsHelp || len(os.Args) < 2 {
+	if *paramsHelp || len(os.Args) < 2 {
 		flagSetMain.Usage()
 		os.Exit(0)
 	}
@@ -79,9 +79,9 @@ func main() {
 func commit() error {
 	flagSetCommit := flag.NewFlagSet("commit", flag.ContinueOnError)
 	var (
-		argsMessage     = flagSetCommit.String("m", "", "[required] commit message")
-		argsAll         = flagSetCommit.String("a", "", "[optional] commit all changed files")
-		argsFlagSetHelp = flagSetCommit.Bool("h", false, "\nhelp")
+		paramsMessage     = flagSetCommit.String("m", "", "[required] commit message")
+		paramsAll         = flagSetCommit.String("a", "", "[optional] commit all changed files")
+		paramsFlagSetHelp = flagSetCommit.Bool("h", false, "\nhelp")
 	)
 	flagSetCommit.Usage = func() {
 		fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s commit [options]\n", os.Args[0])
@@ -90,22 +90,22 @@ func commit() error {
 	if err := flagSetCommit.Parse(os.Args[2:]); err != nil {
 		return err
 	}
-	if *argsFlagSetHelp || *argsMessage == "" {
+	if *paramsFlagSetHelp || *paramsMessage == "" {
 		flagSetCommit.Usage()
 		os.Exit(0)
 	}
 
-	fmt.Println("message: ", *argsMessage)
-	fmt.Println("all: ", *argsAll)
+	fmt.Println("message: ", *paramsMessage)
+	fmt.Println("all: ", *paramsAll)
 	return nil
 }
 
 func checkout() error {
 	flagSetCheckout := flag.NewFlagSet("checkout", flag.ContinueOnError)
 	var (
-		argsBranch      = flagSetCheckout.String("b", "", "[required] create and checkout a new branch")
-		argsProgress    = flagSetCheckout.Bool("p", false, "[optional] force progress reporting")
-		argsFlagSetHelp = flagSetCheckout.Bool("h", false, "\nhelp")
+		paramsBranch      = flagSetCheckout.String("b", "", "[required] create and checkout a new branch")
+		paramsProgress    = flagSetCheckout.Bool("p", false, "[optional] force progress reporting")
+		paramsFlagSetHelp = flagSetCheckout.Bool("h", false, "\nhelp")
 	)
 	flagSetCheckout.Usage = func() {
 		fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s checkout [options]\n", os.Args[0])
@@ -114,12 +114,12 @@ func checkout() error {
 	if err := flagSetCheckout.Parse(os.Args[2:]); err != nil {
 		return err
 	}
-	if *argsFlagSetHelp || *argsBranch == "" {
+	if *paramsFlagSetHelp || *paramsBranch == "" {
 		flagSetCheckout.Usage()
 		os.Exit(0)
 	}
 
-	fmt.Println("branch: ", *argsBranch)
-	fmt.Println("progress: ", *argsProgress)
+	fmt.Println("branch: ", *paramsBranch)
+	fmt.Println("progress: ", *paramsProgress)
 	return nil
 }

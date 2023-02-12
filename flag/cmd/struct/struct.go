@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	args = struct {
+	params = struct {
 		// Required parameters
 		apple    *int
 		iterator *string
@@ -62,14 +62,14 @@ func main() {
 	flag.Parse()
 	// Required parameter
 	// - [Can Go's `flag` package print usage? - Stack Overflow](https://stackoverflow.com/questions/23725924/can-gos-flag-package-print-usage)
-	if *args.help || *args.apple == 0 || *args.iterator == "" {
+	if *params.help || *params.apple == 0 || *params.iterator == "" {
 		flag.Usage()
 		os.Exit(0)
 	}
 
-	fmt.Println("apple: ", *args.apple)
-	fmt.Println("iterator: ", *args.iterator)
-	fmt.Println("flagship: ", *args.flagship)
-	fmt.Println("bridge: ", *args.bridge)
-	fmt.Println("debug: ", *args.debug)
+	fmt.Println("apple: ", *params.apple)
+	fmt.Println("iterator: ", *params.iterator)
+	fmt.Println("flagship: ", *params.flagship)
+	fmt.Println("bridge: ", *params.bridge)
+	fmt.Println("debug: ", *params.debug)
 }

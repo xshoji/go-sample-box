@@ -11,10 +11,10 @@ import (
 )
 
 var (
-	argsTcpEndpoint = flag.String("t", "" /*    */, "[req] tcp end point ( e.g. 172.217.175.3:8080 )")
-	argsPayload     = flag.String("b", "" /*    */, "[req] payload ( e.g. GET / HTTP/1.0\\r\\n )")
-	argsHelp        = flag.Bool("h", false /*   */, "\nhelp")
-	argsDebug       = flag.Bool("d", false /*   */, "\ndebug")
+	paramsTcpEndpoint = flag.String("t", "" /*    */, "[req] tcp end point ( e.g. 172.217.175.3:8080 )")
+	paramsPayload     = flag.String("b", "" /*    */, "[req] payload ( e.g. GET / HTTP/1.0\\r\\n )")
+	paramsHelp        = flag.Bool("h", false /*   */, "\nhelp")
+	paramsDebug       = flag.Bool("d", false /*   */, "\ndebug")
 )
 
 // Usage:
@@ -25,16 +25,16 @@ var (
 func main() {
 
 	flag.Parse()
-	if *argsHelp || *argsTcpEndpoint == "" || *argsPayload == "" {
+	if *paramsHelp || *paramsTcpEndpoint == "" || *paramsPayload == "" {
 		flag.Usage()
 		os.Exit(0)
 	}
-	requestData := strings.Replace(*argsPayload, "\\n", "\n", -1)
+	requestData := strings.Replace(*paramsPayload, "\\n", "\n", -1)
 	requestData = strings.Replace(requestData, "\\r", "\r", -1)
 
 	// Create TcpAddress
-	tcpAddress, err := net.ResolveTCPAddr("tcp4", *argsTcpEndpoint)
-	handleError(err, *argsTcpEndpoint+" is unexpected TCP end point format.")
+	tcpAddress, err := net.ResolveTCPAddr("tcp4", *paramsTcpEndpoint)
+	handleError(err, *paramsTcpEndpoint+" is unexpected TCP end point format.")
 	log.Println(tcpAddress)
 
 	// Establish tcp connection
