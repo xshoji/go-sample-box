@@ -9,8 +9,7 @@ import (
 
 type paramsMap map[string]string
 
-func NewParamsMap() paramsMap {
-	var m paramsMap
+func NewParamsMap() (m paramsMap) {
 	m = make(map[string]string)
 	return m
 }
