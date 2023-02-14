@@ -9,11 +9,6 @@ import (
 
 type paramsTypeMap map[string]string
 
-func NewParamsMap() (m paramsTypeMap) {
-	m = make(map[string]string)
-	return m
-}
-
 func (p *paramsTypeMap) String() string {
 	return fmt.Sprintf("%v", *p)
 }
@@ -26,7 +21,7 @@ func (p *paramsTypeMap) Set(v string) error {
 }
 
 var (
-	paramsValueMap = NewParamsMap()
+	paramsValueMap = paramsTypeMap(make(map[string]string))
 	paramsHelp     = flag.Bool("h", false /*   */, "\ndebug")
 )
 
