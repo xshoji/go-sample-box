@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -39,7 +41,7 @@ func main() {
 	http.HandleFunc("/get", func(w http.ResponseWriter, r *http.Request) {
 		// - [How can I handle http requests of different methods to / in Go? - Stack Overflow](https://stackoverflow.com/questions/15240884/how-can-i-handle-http-requests-of-different-methods-to-in-go)
 		if r.Method != "GET" {
-			fmt.Fprintf(w, "Incorrect method. GET only.\n")
+			responseError(w, errors.New("incorrect method ( GET only )"))
 			return
 		}
 		// Get all query strings as map
@@ -55,12 +57,12 @@ func main() {
 	// curl http://localhost:8080/post -d "name=xshoji" -d "id=1001" -X POST
 	http.HandleFunc("/post", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
-			fmt.Fprintf(w, "Incorrect method. POST only.\n")
+			responseError(w, errors.New("incorrect method ( POST only )"))
 			return
 		}
 		// Call ParseForm() to parse the raw query and update r.PostForm and r.Form.
 		if err := r.ParseForm(); err != nil {
-			fmt.Fprintf(w, "ParseForm() err: %v", err)
+			responseError(w, err)
 			return
 		}
 		name := r.PostForm.Get("name")
@@ -80,4 +82,13 @@ func main() {
 	if err != nil {
 		logger.Fatal("ListenAndServe: ", err)
 	}
+}
+
+func responseError(w http.ResponseWriter, err error) {
+	response, _ := json.Marshal(map[string]string{
+		"error": fmt.Sprintf("%s", err),
+	})
+	w.Header().Set("content-type", "application/json")
+	w.WriteHeader(500)
+	_, _ = fmt.Fprintf(w, string(response))
 }
