@@ -55,6 +55,9 @@ func main() {
 		fmt.Println("      vp.Field(i).CanComplex():  ", vp.Field(i).CanComplex())
 		fmt.Println("      vp.Field(i).CanInt():      ", vp.Field(i).CanInt())
 		fmt.Println("      vp.Field(i).CanInterface():", vp.Field(i).CanInterface())
+		if vp.Field(i).CanInterface() {
+			fmt.Println("      vp.Field(i).Interface():", vp.Field(i).Interface())
+		}
 	}
 	pt := reflect.PtrTo(tp)
 	fmt.Println("pt:", pt)
