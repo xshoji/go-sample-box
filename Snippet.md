@@ -261,10 +261,8 @@ if myTime.After(time.Now()) {
 	fmt.Println("myTime > now")
 }
 myTime.Unix() // unix timestamp
-time.Now().Format("2006-01-02 15:04:05.000000") // micro second
 ```
 
-* [Format_a_time_with_a_customized_layout_YYYYMMDDHHMMSS - Golang Time Format Examples ［With Explanation］ | GoLinuxCloud](https://www.golinuxcloud.com/golang-time-format/#Format_a_time_with_a_customized_layout_YYYYMMDDHHMMSS)
 
 
 
@@ -303,8 +301,10 @@ fmt.Println("plane:")
 fmt.Println(now)
 fmt.Println("formatted:")
 fmt.Println(now.Format("2006 / 01 [January(Jan)] / 02 [Monday(Mon)] 15:04:05 [MST]"))
+time.Now().Format("2006-01-02 15:04:05.000000") // micro second
 ```
 
+* [Format_a_time_with_a_customized_layout_YYYYMMDDHHMMSS - Golang Time Format Examples ［With Explanation］ | GoLinuxCloud](https://www.golinuxcloud.com/golang-time-format/#Format_a_time_with_a_customized_layout_YYYYMMDDHHMMSS)
 
 
 
