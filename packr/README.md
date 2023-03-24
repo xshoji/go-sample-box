@@ -5,6 +5,13 @@ packr's web app sample.
 ## Build and run
 
 ```
+# Initialize command
+go mod init "github.com/xshoji/go-sample-box/packr"
+go mod tidy
+```
+
+
+```
 // generage code
 go generate ./...
 

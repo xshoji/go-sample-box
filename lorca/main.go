@@ -34,10 +34,9 @@ func create() {
 
 // > zserge/lorca： Build cross-platform modern desktop apps in Go + HTML5
 // > https://github.com/zserge/lorca
-// go run gen.go
-// go build -o /tmp/app main.go assets.go
+// go build -o /tmp/app .
 func main() {
-	ui, _ := lorca.New("", "", 480, 320)
+	ui, _ := lorca.New("", "", 480, 320, "--remote-allow-origins=*")
 	defer ui.Close()
 
 	// - [web applications - How do I serve CSS and JS in Go Lang - Stack Overflow](https://stackoverflow.com/questions/43601359/how-do-i-serve-css-and-js-in-go-lang)

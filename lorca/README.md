@@ -5,15 +5,17 @@ lorca's sample application.
 ## Build and run
 
 ```
+# Initialize command
+go mod init "github.com/xshoji/go-sample-box/lorca"
+go mod tidy
+```
+
+```
 // generage code
 go generate ./...
 
-// run
-/tmp/./webapp
-
 // build
 go build -o /tmp/app .
-
 
 ```
 

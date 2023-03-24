@@ -12,10 +12,10 @@ var (
 	md5info   string
 	base64src string
 	// Optional parameters
-	paramsMd5       = flag.Bool("m", false, "\n[optional] Print md5 main.go")
-	paramsBase64Src = flag.Bool("s", false, "\n[optional] Print main.go")
-	paramsPanic     = flag.Bool("p", false, "\n[optional] Spawn panic")
-	paramsHelp      = flag.Bool("h", false, "\nhelp")
+	paramsPrintMd5 = flag.Bool("print-md5", false, "[optional] Print md5 main.go")
+	paramsPrintSrc = flag.Bool("print-src", false, "[optional] Print main.go")
+	paramsPanic    = flag.Bool("p", false /* */, "\n[optional] Spawn panic")
+	paramsHelp     = flag.Bool("h", false /* */, "\nhelp")
 )
 
 // Build
@@ -28,10 +28,10 @@ func main() {
 		flag.Usage()
 		os.Exit(0)
 	}
-	if *paramsMd5 {
+	if *paramsPrintMd5 {
 		fmt.Println(md5info)
 	}
-	if *paramsBase64Src {
+	if *paramsPrintSrc {
 		fmt.Println(base64src)
 	}
 	if *paramsPanic {

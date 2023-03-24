@@ -1,19 +1,21 @@
 package main
 
 import (
+	"crypto/md5"
+	"crypto/sha1"
 	"crypto/sha256"
+	"crypto/sha512"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/xshoji/go-sample-box/basic/structs"
+	"github.com/xshoji/go-sample-box/basic/utils"
 	"math/rand"
 	"os/exec"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/xshoji/go-sample-box/basic/structs"
-	"github.com/xshoji/go-sample-box/basic/utils"
 )
 
 func main() {
@@ -351,4 +353,18 @@ func main() {
 	}
 	fmt.Println(string(out))
 	fmt.Println()
+
+	//
+	//
+	//
+	//
+	//
+	//
+	// hash algorithm
+	// - [Golang - How to hash a string using MD5.](https://gist.github.com/sergiotapia/8263278)
+	fmt.Println("md5.Sum: ", fmt.Sprintf("%x", md5.Sum([]byte("test"))))
+	fmt.Println("sha1.Sum: ", fmt.Sprintf("%x", sha1.Sum([]byte("test"))))
+	fmt.Println("sha256.Sum256: ", fmt.Sprintf("%x", sha256.Sum256([]byte("test"))))
+	fmt.Println("sha512.Sum512: ", fmt.Sprintf("%x", sha512.Sum512([]byte("test"))))
+
 }
