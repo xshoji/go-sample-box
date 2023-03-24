@@ -8,6 +8,7 @@ import (
 type Person struct {
 	Name   string
 	Age    int8
+	Tags   []string
 	gender int8
 }
 
