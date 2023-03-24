@@ -1,11 +1,16 @@
 # Build snippet
 
+
 ```bash
 APP="/tmp/app"; MAIN="main.go"; GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w -X main.md5info=$(md5 ${MAIN} |sed 's/ //g')" -trimpath -o "${APP}" "${MAIN}"; chmod +x "${APP}"
 # APP=/tmp/app_linux;   MAIN="main.go"; GOOS=linux GOARCH=amd64   go build -ldflags="-s -w -X main.md5info=$(md5 ${MAIN} |sed 's/ //g')" -trimpath -o "${APP}" "${MAIN}"; chmod +x "${APP}" # linux
 # APP=/tmp/app_mac;     MAIN="main.go"; GOOS=darwin GOARCH=amd64  go build -ldflags="-s -w -X main.md5info=$(md5 ${MAIN} |sed 's/ //g')" -trimpath -o "${APP}" "${MAIN}"; chmod +x "${APP}" # macOS
 # APP=/tmp/app_win.exe; MAIN="main.go"; GOOS=windows GOARCH=amd64 go build -ldflags="-s -w -X main.md5info=$(md5 ${MAIN} |sed 's/ //g')" -trimpath -o "${APP}" "${MAIN}"; chmod +x "${APP}" # windows
 ```
+
+* [overridegobuild - Inject build-time variables with Golang](https://blog.alexellis.io/inject-build-time-vars-golang/#overridegobuild)
+* [trimpath-オプションを付けてビルド - Goメモ-111 （ビルド時にデバッグ情報とかを消してサイズを小さくする, ldflags, trimpath, upx） - いろいろ備忘録日記](https://devlights.hatenablog.com/entry/2020/10/21/192615#trimpath-%E3%82%AA%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3%E3%82%92%E4%BB%98%E3%81%91%E3%81%A6%E3%83%93%E3%83%AB%E3%83%89)
+
 
 # Snippet
 
