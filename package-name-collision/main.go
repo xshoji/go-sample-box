@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/xshoji/go-sample-box/packagenamecollision/oauth/logic/authenticator"
-	authenticator2 "github.com/xshoji/go-sample-box/packagenamecollision/user/authenticator"
+	"github.com/xshoji/go-sample-box/package-name-collision/oauth/logic/authenticator"
+	authenticator2 "github.com/xshoji/go-sample-box/package-name-collision/user/authenticator"
 )
 
 func main() {

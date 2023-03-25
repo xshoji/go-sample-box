@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 )
@@ -11,7 +12,7 @@ var (
 	paramsLogLevel = flag.Int("l", 4 /*      */, "[optional] Log level (0:Panic, 1:Error, 2:Warn, 3:Info, 4:Debug)")
 	paramsHelp     = flag.Bool("h", false /* */, "\nhelp")
 	// Define logger: date, time, microseconds, directory and file path are always outputted.
-	logger         = log.New(os.Stdout, "[Logger] ", log.Llongfile|log.LstdFlags)
+	logger         = log.New(os.Stdout, "[Logger] ", log.Lshortfile|log.LstdFlags)
 	loggerLogLevel = Debug
 )
 
@@ -32,7 +33,7 @@ func logging(loglevel LogLevel, logLogger *log.Logger, v ...interface{}) {
 		return
 	}
 	level := func() string {
-		switch loggerLogLevel {
+		switch loglevel {
 		case Panic:
 			return "Panic"
 		case Error:
@@ -49,7 +50,7 @@ func logging(loglevel LogLevel, logLogger *log.Logger, v ...interface{}) {
 	}()
 	logLogger.Println(append([]interface{}{"[" + level + "]"}, v...)...)
 	if loglevel == Panic {
-		logLogger.Panic(append([]interface{}{"[" + level + "]"}, v...)...)
+		logLogger.Panic(fmt.Sprintln(append([]interface{}{"[" + level + "]"}, v...)...))
 	}
 }
 
@@ -66,9 +67,9 @@ func main() {
 	// set log level
 	loggerLogLevel = LogLevel(*paramsLogLevel)
 
-	logging(Panic, logger, "Panic log", "panic", 111, false)
 	logging(Error, logger, "Error log", "error", 222, true)
 	logging(Warn, logger, "Warn log", "warn", 333, false)
 	logging(Info, logger, "Info log", "info", 444, false)
 	logging(Debug, logger, "Debug log", "debug", 555, false)
+	logging(Panic, logger, "Panic log", "panic", 111, false)
 }

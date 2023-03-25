@@ -18,14 +18,14 @@ import (
 //)
 
 func init() {
-	// 時刻と時刻のマイクロ秒、ディレクトリパスを含めたファイル名を出力
-	log.SetFlags(log.Llongfile | log.LstdFlags)
+	// 時刻と時刻のマイクロ秒、ファイル名を出力
+	log.SetFlags(log.Lshortfile | log.LstdFlags)
 }
 
 func main() {
 	log.Printf("test")
 
 	// Create new logger ( Output to stdout )
-	logger := log.New(os.Stdout, "[MyLogger] ", log.Llongfile|log.LstdFlags)
+	logger := log.New(os.Stdout, "[MyLogger] ", log.Lshortfile|log.LstdFlags)
 	logger.Println("test2")
 }

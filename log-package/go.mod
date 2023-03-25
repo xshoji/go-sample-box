@@ -1,3 +1,3 @@
-module github.com/xshoji/go-sample-box/logpackage
+module github.com/xshoji/go-sample-box/log-package
 
-go 1.15
+go 1.19

@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/xshoji/go-sample-box/jsongetvalue/jsonnullable"
+	"github.com/xshoji/go-sample-box/json-get-value/jsonnullable"
 	"log"
 )
 

@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"github.com/xshoji/go-sample-box/sync-once/customlogger"
+	"github.com/xshoji/go-sample-box/log-global/customlogger"
 	"log"
 	"os"
 )
@@ -25,11 +25,11 @@ func main() {
 	// go - Correct approach to global logging - Stack Overflow https://stackoverflow.com/questions/18361750/correct-approach-to-global-logging
 	// Initialize logger (Executable once only.)
 	customlogger.InitializeLogger(customlogger.NewCustomLogger(
-		log.New(os.Stdout, "[Logger] ", log.Llongfile|log.LstdFlags),
-		log.New(os.Stderr, "[ErrorLogger] ", log.Llongfile|log.LstdFlags),
+		log.New(os.Stdout, "[Logger] ", log.Lshortfile|log.LstdFlags),
+		log.New(os.Stderr, "[ErrorLogger] ", log.Lshortfile|log.LstdFlags),
 		customlogger.LogLevel(*paramsLogLevel),
 	))
-	customlogger.InitializeLogger(customlogger.NewCustomLogger(log.New(os.Stdout, "[Aaaa] ", log.Llongfile), nil, customlogger.LogLevel(*paramsLogLevel)))
+	customlogger.InitializeLogger(customlogger.NewCustomLogger(log.New(os.Stdout, "[Aaaa] ", log.Lshortfile), nil, customlogger.LogLevel(*paramsLogLevel)))
 	customlogger.InitializeLogger(customlogger.NewCustomLogger(log.New(os.Stdout, "[Bbbb] ", log.LstdFlags), nil, customlogger.LogLevel(*paramsLogLevel)))
 
 	customlogger.Error("Error log", "error", 222, true)
