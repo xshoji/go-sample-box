@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/xshoji/go-sample-box/httprequest-goroutine/client"
-	"github.com/xshoji/go-sample-box/httprequest-goroutine/consumer"
+	"github.com/xshoji/go-sample-box/http-request-goroutine/client"
+	"github.com/xshoji/go-sample-box/http-request-goroutine/consumer"
 )
 
 const (

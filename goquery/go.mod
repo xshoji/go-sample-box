@@ -1,9 +1,10 @@
 module github.com/xshoji/go-sample-box/goquery
 
-go 1.13
+go 1.19
 
 require (
-	github.com/PuerkitoBio/goquery v1.5.0
-	github.com/andybalholm/cascadia v1.0.0
-	golang.org/x/net v0.0.0-20190628185345-da137c7871d7
+	github.com/PuerkitoBio/goquery v1.8.1
+	golang.org/x/net v0.8.0
 )
+
+require github.com/andybalholm/cascadia v1.3.1 // indirect

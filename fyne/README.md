@@ -2,19 +2,6 @@
 
 fyne
 
-## dep
-
-```
-$ dep init
-$ dep ensure -add fyne.io/fyne
--> なぜかうまく動かない
-```
-
-## go get
-
-```
-go get fyne.io/fyne
-```
 
 ## References
 
