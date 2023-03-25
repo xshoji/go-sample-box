@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"flag"
 	"fmt"
 	"log"
@@ -32,7 +33,8 @@ func main() {
 		fmt.Println(md5info)
 	}
 	if *paramsPrintSrc {
-		fmt.Println(base64src)
+		decodedSrcBytes, _ := base64.StdEncoding.DecodeString(base64src)
+		fmt.Println(string(decodedSrcBytes))
 	}
 	if *paramsPanic {
 		log.Panic("Panic!")
