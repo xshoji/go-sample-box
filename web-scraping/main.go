@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/xshoji/go-sample-box/webscraping/client"
+	"github.com/xshoji/go-sample-box/web-scraping/client"
 )
 
 func main() {

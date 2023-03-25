@@ -5,7 +5,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/xshoji/go-sample-box/syncwaitgroup/worker"
+	"github.com/xshoji/go-sample-box/sync-wait-group/worker"
 )
 
 // channelを使わないお手軽非同期並行処理
