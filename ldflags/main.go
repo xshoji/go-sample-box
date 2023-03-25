@@ -21,7 +21,7 @@ var (
 
 // Build
 // ------
-// $ APP="/tmp/app"; MAIN="main.go"; GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w -X main.md5info=$(md5 ${MAIN} |sed 's/ //g') -X main.base64src=$(cat ${MAIN} |base64)" -trimpath -o "${APP}" "${MAIN}"; chmod +x "${APP}"
+// $ APP="/tmp/app"; MAIN="main.go"; GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w -X 'main.md5info=$(md5 ${MAIN})' -X 'main.base64src=$(cat ${MAIN} |base64)'" -trimpath -o "${APP}" "${MAIN}"; chmod +x "${APP}"
 func main() {
 
 	flag.Parse()
@@ -33,8 +33,8 @@ func main() {
 		fmt.Println(md5info)
 	}
 	if *paramsPrintSrc {
-		decodedSrcBytes, _ := base64.StdEncoding.DecodeString(base64src)
-		fmt.Println(string(decodedSrcBytes))
+		b, _ := base64.StdEncoding.DecodeString(base64src)
+		fmt.Printf("%s", b)
 	}
 	if *paramsPanic {
 		log.Panic("Panic!")
