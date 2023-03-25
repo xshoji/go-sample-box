@@ -368,6 +368,5 @@ func main() {
 	fmt.Println("sha256.Sum256:", fmt.Sprintf("%x", sha256.Sum256([]byte("test"))))
 	fmt.Println("sha512.Sum512:", fmt.Sprintf("%x", sha512.Sum512([]byte("test"))))
 	fmt.Println("base64.StdEncoding.EncodeToString:", fmt.Sprintf("%s", base64.StdEncoding.EncodeToString([]byte("test"))))
-	decodedString, _ := base64.StdEncoding.DecodeString("dGVzdA==")
-	fmt.Println("base64.StdEncoding.DecodeString:", string(decodedString))
+	fmt.Printf("base64.StdEncoding.DecodeString:%s\n", func() (b []byte) { b, _ = base64.StdEncoding.DecodeString("dGVzdA=="); return }())
 }
