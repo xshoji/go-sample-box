@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/xshoji/go-sample-box/enumstringer/enums"
+	sports "github.com/xshoji/go-sample-box/enum-stringer/enums"
 )
 
 func main() {
