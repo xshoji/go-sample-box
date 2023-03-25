@@ -5,6 +5,7 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/sha512"
+	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -362,9 +363,11 @@ func main() {
 	//
 	// hash algorithm
 	// - [Golang - How to hash a string using MD5.](https://gist.github.com/sergiotapia/8263278)
-	fmt.Println("md5.Sum: ", fmt.Sprintf("%x", md5.Sum([]byte("test"))))
-	fmt.Println("sha1.Sum: ", fmt.Sprintf("%x", sha1.Sum([]byte("test"))))
-	fmt.Println("sha256.Sum256: ", fmt.Sprintf("%x", sha256.Sum256([]byte("test"))))
-	fmt.Println("sha512.Sum512: ", fmt.Sprintf("%x", sha512.Sum512([]byte("test"))))
-
+	fmt.Println("md5.Sum:", fmt.Sprintf("%x", md5.Sum([]byte("test"))))
+	fmt.Println("sha1.Sum:", fmt.Sprintf("%x", sha1.Sum([]byte("test"))))
+	fmt.Println("sha256.Sum256:", fmt.Sprintf("%x", sha256.Sum256([]byte("test"))))
+	fmt.Println("sha512.Sum512:", fmt.Sprintf("%x", sha512.Sum512([]byte("test"))))
+	fmt.Println("base64.StdEncoding.EncodeToString:", fmt.Sprintf("%s", base64.StdEncoding.EncodeToString([]byte("test"))))
+	decodedString, _ := base64.StdEncoding.DecodeString("dGVzdA==")
+	fmt.Println("base64.StdEncoding.DecodeString:", string(decodedString))
 }
