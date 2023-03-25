@@ -1,3 +1,3 @@
-module github.com/xshoji/go-sample-box/jsongetvalue
+module github.com/xshoji/go-sample-box/json-get-value
 
-go 1.15
+go 1.19

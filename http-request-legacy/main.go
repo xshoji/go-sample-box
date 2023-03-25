@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/xshoji/go-sample-box/httprequest/client"
+	"github.com/xshoji/go-sample-box/http-request-legacy/client"
 )
 
 func main() {

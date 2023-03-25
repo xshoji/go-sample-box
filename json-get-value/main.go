@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/xshoji/go-sample-box/jsongetvalue/jsonutil"
+	"github.com/xshoji/go-sample-box/json-get-value/jsonutil"
 )
 
 func main() {
