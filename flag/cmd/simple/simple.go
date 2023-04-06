@@ -39,7 +39,6 @@ var (
 //
 // $ go run cmd/simple/simple.go -h
 // Usage of /var/folders/2c/_9j92fnj5z3754dw8_h345zc0000gn/T/go-build548286484/b001/exe/simple:
-//
 //	-a int
 //	      [required] apple
 //	-b string
@@ -60,6 +59,7 @@ var (
 //	      [required] iterator
 //	-t string
 //	      [required] title
+
 func main() {
 
 	flag.Parse()

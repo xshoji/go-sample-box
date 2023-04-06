@@ -37,7 +37,6 @@ var (
 //
 // $ go run cmd/struct/struct.go -h
 // Usage of /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build46637023/b001/exe/struct:
-//
 //	-a int
 //	  	[Required] add
 //	-b string
@@ -50,6 +49,7 @@ var (
 //	  	help
 //	-i string
 //	  	[Required] iterator
+
 func main() {
 
 	flag.Parse()

@@ -107,8 +107,8 @@ func init() {
 func main() {
 
 	// Set Usage
-	var b bytes.Buffer
-	flag.CommandLine.SetOutput(&b)
+	b := new(bytes.Buffer)
+	flag.CommandLine.SetOutput(b)
 	flag.Usage()
 	usage := strings.Replace(b.String(), "\n    \t"+Usage, "", -1)
 	usage = strings.Replace(usage, "\t"+Usage, "", -1)
