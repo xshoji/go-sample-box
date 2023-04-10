@@ -5,10 +5,10 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strings"
+	"regexp"
 )
 
-const Usage = "########"
+const DummyUsage = "########"
 
 // go - Flag command line parsing in golang - Stack Overflow
 // https://stackoverflow.com/questions/19761963/flag-command-line-parsing-in-golang
@@ -17,17 +17,17 @@ var (
 	// Define long parameters ( don't set default value ).
 	//
 	// Required parameters
-	paramsAdd      = flag.Int("a", 0, Usage)
-	paramsIncrease = flag.String("i", "", Usage)
-	paramsTitle    = flag.String("t", "", Usage)
+	paramsAdd      = flag.Int("a", 0, DummyUsage)
+	paramsIncrease = flag.String("i", "", DummyUsage)
+	paramsTitle    = flag.String("t", "", DummyUsage)
 	// Optional parameters
-	paramsFilesize    = flag.Int("f", 0, Usage)
-	paramsCount       = flag.Int("c", 0, Usage)
-	paramsBinary      = flag.String("b", "", Usage)
-	paramsEnvironment = flag.String("e", "", Usage)
-	paramsGlobal      = flag.Bool("g", false, Usage)
-	paramsHelp        = flag.Bool("h", false, Usage)
-	paramsDebug       = flag.Bool("d", false, Usage)
+	paramsFilesize    = flag.Int("f", 0, DummyUsage)
+	paramsCount       = flag.Int("c", 0, DummyUsage)
+	paramsBinary      = flag.String("b", "", DummyUsage)
+	paramsEnvironment = flag.String("e", "", DummyUsage)
+	paramsGlobal      = flag.Bool("g", false, DummyUsage)
+	paramsHelp        = flag.Bool("h", false, DummyUsage)
+	paramsDebug       = flag.Bool("d", false, DummyUsage)
 )
 
 func init() {
@@ -60,7 +60,7 @@ func init() {
 // count: 1
 // debug: false
 //
-// $ $ go run cmd/longparameter/longparameter.go -increase "param1" -title "param2" -add 100
+// $ go run cmd/longparameter/longparameter.go --increase "param1" --title "param2" --add 100
 // add: 100
 // binary: 00010101
 // environment: DEV
@@ -72,41 +72,41 @@ func init() {
 // debug: false
 //
 // $ go run cmd/longparameter/longparameter.go -h
-// Usage of /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build1111939584/b001/exe/longparameter:
-//   -a int
-//   -add int
-//     	[required] add
-//   -b string
-//   -binary string
-//     	[optional] binary (default "00010101")
-//   -c int
-//   -count int
-//     	[optional] count (default 1)
-//   -d
-//   -debug
-//     	debug
-//   -e string
-//   -environment string
-//     	[optional] environment (default "DEV")
-//   -f int
-//   -filesize int
-//     	[optional] filesize (default 10)
-//   -g
-//   -global
-//     	global
-//   -h
-//   -help
-//     	help
-//   -i string
-//   -increase string
-//     	[required] increase
-//   -t string
-//   -title string
-//     	[required] title
+// Usage of /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build189824387/b001/exe/longparameter:
+//
+//  -a, --add int
+//    	[required] add
+//
+//  -b, --binary string
+//    	[optional] binary (default "00010101")
+//
+//  -c, --count int
+//    	[optional] count (default 1)
+//
+//  -d, --debug
+//    	debug
+//
+//  -e, --environment string
+//    	[optional] environment (default "DEV")
+//
+//  -f, --filesize int
+//    	[optional] filesize (default 10)
+//
+//  -g, --global
+//    	global
+//
+//  -h, --help
+//    	help
+//
+//  -i, --increase string
+//    	[required] increase
+//
+//  -t, --title string
+//    	[required] title
 
 func main() {
 
-	// Set Usage
+	// Set DummyUsage
 	b := new(bytes.Buffer)
 	flag.CommandLine.SetOutput(b)
 	flag.Usage()
