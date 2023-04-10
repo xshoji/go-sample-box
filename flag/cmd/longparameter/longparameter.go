@@ -72,36 +72,26 @@ func init() {
 // debug: false
 //
 // $ go run cmd/longparameter/longparameter.go -h
-// Usage of /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build189824387/b001/exe/longparameter:
-//
-//  -a, --add int
+// Usage of /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build466311492/b001/exe/longparameter:
+//    -a, --add int
 //    	[required] add
-//
-//  -b, --binary string
+//    -b, --binary string
 //    	[optional] binary (default "00010101")
-//
-//  -c, --count int
+//    -c, --count int
 //    	[optional] count (default 1)
-//
-//  -d, --debug
+//    -d, --debug
 //    	debug
-//
-//  -e, --environment string
+//    -e, --environment string
 //    	[optional] environment (default "DEV")
-//
-//  -f, --filesize int
+//    -f, --filesize int
 //    	[optional] filesize (default 10)
-//
-//  -g, --global
+//    -g, --global
 //    	global
-//
-//  -h, --help
+//    -h, --help
 //    	help
-//
-//  -i, --increase string
+//    -i, --increase string
 //    	[required] increase
-//
-//  -t, --title string
+//    -t, --title string
 //    	[required] title
 
 func main() {
@@ -111,7 +101,7 @@ func main() {
 	flag.CommandLine.SetOutput(b)
 	flag.Usage()
 	re := regexp.MustCompile("(-\\S+)( *\\S*)+\n*\\s+" + DummyUsage + "\n*\\s+(-\\S+)( *\\S*)+\n")
-	usage := re.ReplaceAllString(b.String(), "\n  $1, -$3$4\n")
+	usage := re.ReplaceAllString(b.String(), "  $1, -$3$4\n")
 	flag.CommandLine.SetOutput(os.Stderr)
 	flag.Usage = func() {
 		_, _ = fmt.Fprintf(flag.CommandLine.Output(), usage)
