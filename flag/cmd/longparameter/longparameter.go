@@ -110,8 +110,8 @@ func main() {
 	b := new(bytes.Buffer)
 	flag.CommandLine.SetOutput(b)
 	flag.Usage()
-	usage := strings.Replace(b.String(), "\n    \t"+Usage, "", -1)
-	usage = strings.Replace(usage, "\t"+Usage, "", -1)
+	re := regexp.MustCompile("(-\\S+)( *\\S*)+\n*\\s+" + DummyUsage + "\n*\\s+(-\\S+)( *\\S*)+\n")
+	usage := re.ReplaceAllString(b.String(), "\n  $1, -$3$4\n")
 	flag.CommandLine.SetOutput(os.Stderr)
 	flag.Usage = func() {
 		_, _ = fmt.Fprintf(flag.CommandLine.Output(), usage)
