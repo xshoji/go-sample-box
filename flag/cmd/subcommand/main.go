@@ -9,42 +9,40 @@ import (
 
 // << Execution sample >>
 // -----
-// $ go run cmd/subcommand/subcommand.go -h
+// $ go run cmd/subcommand/main.go -h
 // Usage of /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build174983893/b001/exe/subcommand [commit|checkout]
-//  -h
-//    	help
 //
-//
+//	-h
+//	  	help
 //
 // -----
-// $ go run cmd/subcommand/subcommand.go commit -h
+// $ go run cmd/subcommand/main.go commit -h
 // Usage of /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build049923371/b001/exe/subcommand commit [options]
-//  -a string
-//    	[optional] commit all changed files
-//  -h
-//    	help
-//  -m string
-//    	[required] commit message
 //
-// $ go run cmd/subcommand/subcommand.go commit -m mmm -a aaa
+//	-a string
+//	  	[optional] commit all changed files
+//	-h
+//	  	help
+//	-m string
+//	  	[required] commit message
+//
+// $ go run cmd/subcommand/main.go commit -m mmm -a aaa
 // message:  mmm
 // all:  aaa
 //
-//
-//
 // -----
-// $ go run cmd/subcommand/subcommand.go checkout -h
+// $ go run cmd/subcommand/main.go checkout -h
 // Usage of /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build206366477/b001/exe/subcommand checkout [options]
-//  -b string
-//    	[required] create and checkout a new branch
-//  -h
-//    	help
-//  -p	[optional] force progress reporting
 //
-// $ go run cmd/subcommand/subcommand.go checkout -b bbb -p
+//	-b string
+//	  	[required] create and checkout a new branch
+//	-h
+//	  	help
+//	-p	[optional] force progress reporting
+//
+// $ go run cmd/subcommand/main.go checkout -b bbb -p
 // branch:  bbb
 // progress:  true
-//
 func main() {
 	flagSetMain := flag.NewFlagSet("main", flag.ContinueOnError)
 	paramsHelp := flagSetMain.Bool("h", false, "\nhelp")

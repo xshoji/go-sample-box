@@ -26,7 +26,7 @@ var (
 
 // << Execution sample >>
 //
-// $ go run cmd/simple/simple.go -i "param1" -t "param2" -a 100
+// $ go run cmd/simple/main.go -i "param1" -t "param2" -a 100
 // add: 100
 // binary: 00101
 // environment: DEV
@@ -37,7 +37,7 @@ var (
 // count: 1
 // debug: false
 //
-// $ go run cmd/simple/simple.go -h
+// $ go run cmd/simple/main.go -h
 // Usage of /var/folders/2c/_9j92fnj5z3754dw8_h345zc0000gn/T/go-build548286484/b001/exe/simple:
 //	-a int
 //	      [required] apple

@@ -14,13 +14,10 @@ const DummyUsage = "########"
 // https://stackoverflow.com/questions/19761963/flag-command-line-parsing-in-golang
 
 var (
-	// Define long parameters ( don't set default value ).
-	//
-	// Required parameters
-	paramsAdd      = flag.Int("a", 0, DummyUsage)
-	paramsIncrease = flag.String("i", "", DummyUsage)
-	paramsTitle    = flag.String("t", "", DummyUsage)
-	// Optional parameters
+	// Define short parameters ( don't set default value ).
+	paramsAdd         = flag.Int("a", 0, DummyUsage)
+	paramsIncrease    = flag.String("i", "", DummyUsage)
+	paramsTitle       = flag.String("t", "", DummyUsage)
 	paramsFilesize    = flag.Int("f", 0, DummyUsage)
 	paramsCount       = flag.Int("c", 0, DummyUsage)
 	paramsBinary      = flag.String("b", "", DummyUsage)
@@ -31,7 +28,7 @@ var (
 )
 
 func init() {
-	// Define short parameters and description ( set default value here if you need ).
+	// Define long parameters and description ( set default value here if you need ).
 	//
 	// Required parameters
 	flag.IntVar(paramsAdd /*            */, "add" /*         */, 0 /*          */, "[required] add")
@@ -49,7 +46,7 @@ func init() {
 
 // << Execution sample >>
 //
-// $ go run cmd/longparameter/longparameter.go -i "param1" -t "param2" -a 100
+// $ go run cmd/longparameter/main.go -i "param1" -t "param2" -a 100
 // add: 100
 // binary: 00010101
 // environment: DEV
@@ -60,7 +57,7 @@ func init() {
 // count: 1
 // debug: false
 //
-// $ go run cmd/longparameter/longparameter.go --increase "param1" --title "param2" --add 100
+// $ go run cmd/longparameter/main.go --increase "param1" --title "param2" --add 100
 // add: 100
 // binary: 00010101
 // environment: DEV
@@ -71,7 +68,7 @@ func init() {
 // count: 1
 // debug: false
 //
-// $ go run cmd/longparameter/longparameter.go -h
+// $ go run cmd/longparameter/main.go -h
 // Usage of /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build466311492/b001/exe/longparameter:
 //    -a, --add int
 //    	[required] add

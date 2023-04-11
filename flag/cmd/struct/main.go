@@ -28,14 +28,14 @@ var (
 
 // << Execution sample >>
 //
-// $ go run cmd/struct/struct.go -a 100 -i "iterator"
+// $ go run cmd/struct/main.go -a 100 -i "iterator"
 // add: 100
 // iterator: iterator
 // filesize: 10
 // binary: 000101
 // debug: false
 //
-// $ go run cmd/struct/struct.go -h
+// $ go run cmd/struct/main.go -h
 // Usage of /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build46637023/b001/exe/struct:
 //	-a int
 //	  	[Required] add
