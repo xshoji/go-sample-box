@@ -16,7 +16,7 @@ const DummyUsage = "########"
 var (
 	// Define short parameters ( don't set default value ).
 	paramsAdd         = flag.Int("a", 0, DummyUsage)
-	paramsIncrease    = flag.String("i", "", DummyUsage)
+	paramsItemName    = flag.String("i", "", DummyUsage)
 	paramsTitle       = flag.String("t", "", DummyUsage)
 	paramsFilesize    = flag.Int("f", 0, DummyUsage)
 	paramsCount       = flag.Int("c", 0, DummyUsage)
@@ -32,7 +32,7 @@ func init() {
 	//
 	// Required parameters
 	flag.IntVar(paramsAdd /*            */, "add" /*         */, 0 /*          */, "[required] add")
-	flag.StringVar(paramsIncrease /*    */, "increase" /*    */, "" /*         */, "[required] increase")
+	flag.StringVar(paramsItemName /*    */, "item-name" /*   */, "" /*         */, "[required] item name")
 	flag.StringVar(paramsTitle /*       */, "title" /*       */, "" /*         */, "[required] title")
 	// Optional parameters
 	flag.IntVar(paramsFilesize /*       */, "filesize" /*    */, 10 /*         */, "[optional] filesize")
@@ -52,44 +52,44 @@ func init() {
 // environment: DEV
 // filesize: 10
 // global: false
-// increase: param1
+// item-name: param1
 // title: param2
 // count: 1
 // debug: false
 //
-// $ go run cmd/longparameter/main.go --increase "param1" --title "param2" --add 100
+// $ go run cmd/longparameter/main.go --item-name "param1" --title "param2" --add 100
 // add: 100
 // binary: 00010101
 // environment: DEV
 // filesize: 10
 // global: false
-// increase: param1
+// item-name: param1
 // title: param2
 // count: 1
 // debug: false
 //
 // $ go run cmd/longparameter/main.go -h
-// Usage of /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build466311492/b001/exe/longparameter:
-//    -a, --add int
-//    	[required] add
-//    -b, --binary string
-//    	[optional] binary (default "00010101")
-//    -c, --count int
-//    	[optional] count (default 1)
-//    -d, --debug
-//    	debug
-//    -e, --environment string
-//    	[optional] environment (default "DEV")
-//    -f, --filesize int
-//    	[optional] filesize (default 10)
-//    -g, --global
-//    	global
-//    -h, --help
-//    	help
-//    -i, --increase string
-//    	[required] increase
-//    -t, --title string
-//    	[required] title
+// Usage of /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build4248489645/b001/exe/main:
+//     -a, --add int
+//     	[required] add
+//     -b, --binary string
+//     	[optional] binary (default "00010101")
+//     -c, --count int
+//     	[optional] count (default 1)
+//     -d, --debug
+//     	debug
+//     -e, --environment string
+//     	[optional] environment (default "DEV")
+//     -f, --filesize int
+//     	[optional] filesize (default 10)
+//     -g, --global
+//     	global
+//     -h, --help
+//     	help
+//     -i, --item-name string
+//     	[required] item name
+//     -t, --title string
+//     	[required] title
 
 func main() {
 
@@ -105,7 +105,7 @@ func main() {
 	}
 
 	flag.Parse()
-	if *paramsHelp || *paramsAdd == 0 || *paramsIncrease == "" || *paramsTitle == "" {
+	if *paramsHelp || *paramsAdd == 0 || *paramsItemName == "" || *paramsTitle == "" {
 		flag.Usage()
 		os.Exit(0)
 	}
@@ -115,7 +115,7 @@ func main() {
 	fmt.Println("environment:", *paramsEnvironment)
 	fmt.Println("filesize:", *paramsFilesize)
 	fmt.Println("global:", *paramsGlobal)
-	fmt.Println("increase:", *paramsIncrease)
+	fmt.Println("item-name:", *paramsItemName)
 	fmt.Println("title:", *paramsTitle)
 	fmt.Println("count:", *paramsCount)
 	fmt.Println("debug:", *paramsDebug)

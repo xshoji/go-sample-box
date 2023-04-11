@@ -13,7 +13,7 @@ var (
 	// Define short parameters and description ( set default value here if you need ).
 	//
 	paramsAdd         = flag.Int("a" /*    */, 0 /*       */, "[required] add")
-	paramsIncrease    = flag.String("i" /* */, "" /*      */, "[required] increase")
+	paramsItemName    = flag.String("i" /* */, "" /*      */, "[required] item name")
 	paramsTitle       = flag.String("t" /* */, "" /*      */, "[required] title")
 	paramsFilesize    = flag.Int("f" /*    */, 10 /*      */, "[optional] filesize")
 	paramsCount       = flag.Int("c" /*    */, 1 /*       */, "[optional] count")
@@ -32,40 +32,40 @@ var (
 // environment: DEV
 // filesize: 10
 // global: false
-// increase: param1
+// item-name: param1
 // title: param2
 // count: 1
 // debug: false
 //
 // $ go run cmd/simple/main.go -h
-// Usage of /var/folders/2c/_9j92fnj5z3754dw8_h345zc0000gn/T/go-build548286484/b001/exe/simple:
-//	-a int
-//	      [required] apple
-//	-b string
-//	      [optional] bridge (default "BIG")
-//	-c int
-//	      [optional] count (default 1)
-//	-d
-//	      debug
-//	-e string
-//	      [optional] estimation (default "NO")
-//	-f int
-//	      [optional] forget (default 10)
-//	-g
-//	      gulp
-//	-h
-//	      help
-//	-i string
-//	      [required] iterator
-//	-t string
-//	      [required] title
+// Usage of /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build131759646/b001/exe/main:
+//  -a int
+//    	[required] add
+//  -b string
+//    	[optional] binary (default "00101")
+//  -c int
+//    	[optional] count (default 1)
+//  -d
+//    	debug
+//  -e string
+//    	[optional] environment (default "DEV")
+//  -f int
+//    	[optional] filesize (default 10)
+//  -g
+//    	global
+//  -h
+//    	help
+//  -i string
+//    	[required] item name
+//  -t string
+//    	[required] title
 
 func main() {
 
 	flag.Parse()
 	// Required parameter
 	// - [Can Go's `flag` package print usage? - Stack Overflow](https://stackoverflow.com/questions/23725924/can-gos-flag-package-print-usage)
-	if *paramsHelp || *paramsAdd == 0 || *paramsIncrease == "" || *paramsTitle == "" {
+	if *paramsHelp || *paramsAdd == 0 || *paramsItemName == "" || *paramsTitle == "" {
 		flag.Usage()
 		os.Exit(0)
 	}
@@ -75,7 +75,7 @@ func main() {
 	fmt.Println("environment:", *paramsEnvironment)
 	fmt.Println("filesize:", *paramsFilesize)
 	fmt.Println("global:", *paramsGlobal)
-	fmt.Println("increase:", *paramsIncrease)
+	fmt.Println("item-name:", *paramsItemName)
 	fmt.Println("title:", *paramsTitle)
 	fmt.Println("count:", *paramsCount)
 	fmt.Println("debug:", *paramsDebug)
