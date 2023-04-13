@@ -10,7 +10,7 @@ var (
 	params = struct {
 		// Required parameters
 		add      *int
-		iterator *string
+		itemName *string
 		// Optional parameters
 		filesize *int
 		binary   *string
@@ -18,7 +18,7 @@ var (
 		help     *bool
 	}{
 		flag.Int("a", 0 /*           */, "[Required] add"),
-		flag.String("i", "" /*       */, "[Required] iterator"),
+		flag.String("i", "" /*       */, "[Required] item-name"),
 		flag.Int("f", 10 /*          */, "[Optional] filesize"),
 		flag.String("b", "000101" /* */, "[Optional] binary"),
 		flag.Bool("d", false /*      */, "\ndebug"),
@@ -28,9 +28,9 @@ var (
 
 // << Execution sample >>
 //
-// $ go run cmd/struct/main.go -a 100 -i "iterator"
+// $ go run cmd/struct/main.go -a 100 -i "itemName"
 // add: 100
-// iterator: iterator
+// item-name: itemName
 // filesize: 10
 // binary: 000101
 // debug: false
@@ -48,20 +48,20 @@ var (
 //	-h
 //	  	help
 //	-i string
-//	  	[Required] iterator
+//	  	[Required] item-name
 
 func main() {
 
 	flag.Parse()
 	// Required parameter
 	// - [Can Go's `flag` package print usage? - Stack Overflow](https://stackoverflow.com/questions/23725924/can-gos-flag-package-print-usage)
-	if *params.help || *params.add == 0 || *params.iterator == "" {
+	if *params.help || *params.add == 0 || *params.itemName == "" {
 		flag.Usage()
 		os.Exit(0)
 	}
 
 	fmt.Println("add:", *params.add)
-	fmt.Println("iterator:", *params.iterator)
+	fmt.Println("item-name:", *params.itemName)
 	fmt.Println("filesize:", *params.filesize)
 	fmt.Println("binary:", *params.binary)
 	fmt.Println("debug:", *params.debug)
