@@ -19,9 +19,9 @@ var (
 	}{
 		flag.String("u", "" /*      */, "[Required] URL"),
 		flag.String("q", "" /*      */, "[Required] QuerySelector used to output as string"),
-		flag.Bool("d", false /*   */, "\n[Optional] Debug mode"),
-		flag.Bool("n", false /*   */, "\n[Optional] Disable Headless mode"),
-		flag.Bool("h", false /*   */, "\nhelp"),
+		flag.Bool("d", false /*   */, "\nEnable debug mode"),
+		flag.Bool("n", false /*   */, "\nDisable Headless mode"),
+		flag.Bool("h", false /*   */, "\nShow help"),
 	}
 )
 

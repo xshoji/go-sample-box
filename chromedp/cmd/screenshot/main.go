@@ -17,26 +17,32 @@ var (
 		url           *string
 		querySelector *string
 		outputPath    *string
+		windowWidth   *int64
+		windowHeight  *int64
 		debug         *bool
 		noHeadless    *bool
 		help          *bool
 	}{
 		flag.String("u", "" /*              */, "[Required] URL"),
-		flag.String("q", "" /*              */, "[Required] QuerySelector used to output as string"),
-		flag.String("o", `/tmp/img.png` /*  */, "[Optional] Output file path"),
-		flag.Bool("d", false /*           */, "\n[Optional] Debug mode"),
-		flag.Bool("n", false /*           */, "\n[Optional] Disable Headless mode"),
-		flag.Bool("h", false /*           */, "\nhelp"),
+		flag.String("q", "" /*              */, "[Required] Query selector. A screenshot target is the first element node matching the selector. ( e.g. -q=\".className#id\" )"),
+		flag.String("o", `/tmp/img.png` /*  */, "Output path of screenshot"),
+		flag.Int64("wi", 3840 /*            */, "Set width of window"),
+		flag.Int64("he", 2160 /*            */, "Set height of window"),
+		flag.Bool("d", false /*             */, "\nEnable debug mode"),
+		flag.Bool("n", false /*             */, "\nDisable Headless mode"),
+		flag.Bool("h", false /*             */, "\nShow help"),
 	}
 )
 
 // [ Usage ]
 // go run cmd/screenshot/main.go -u="https://news.yahoo.co.jp/" -q="#liveStream" -o="/tmp/yahoo_news_livestream.png"
 // go run cmd/screenshot/main.go -u="https://news.yahoo.co.jp/" -q="section.toptopics" -o="/tmp/yahoo_news_toptopics.png"
+// # full screenshot
+// go run cmd/screenshot/main.go -u="https://www.yahoo.co.jp/" -q="html" -wi=1280 -he=800 -o=/tmp/s.png
 //
 // [ References ]
-// > querySelector()を使うとjQueryみたいにセレクターで要素を取得できるよ。（DOMおれおれAdvent Calendar 2015 – 02日目） ｜ Ginpen.com
-// > https://ginpen.com/2015/12/02/queryselector-api-like-jquery/
+// querySelector()を使うとjQueryみたいにセレクターで要素を取得できるよ。（DOMおれおれAdvent Calendar 2015 – 02日目） ｜ Ginpen.com
+// https://ginpen.com/2015/12/02/queryselector-api-like-jquery/
 func main() {
 
 	flag.Parse()
@@ -48,6 +54,8 @@ func main() {
 	log.Printf("url: %v\n", *arguments.url)
 	log.Printf("query: %v\n", *arguments.querySelector)
 	log.Printf("output: %v\n", *arguments.outputPath)
+	log.Printf("width: %v\n", *arguments.windowWidth)
+	log.Printf("height: %v\n", *arguments.windowHeight)
 
 	var err error
 
@@ -84,7 +92,7 @@ func main() {
 	// > screenshot from a wrong page · Issue #205 · chromedp/chromedp
 	// > https://github.com/chromedp/chromedp/issues/205
 	// set param
-	err = chromedp.Run(ctxt, emulation.SetDeviceMetricsOverride(3840, 2160, 1, false))
+	err = chromedp.Run(ctxt, emulation.SetDeviceMetricsOverride(*arguments.windowWidth, *arguments.windowHeight, 1, false))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -105,7 +113,7 @@ func main() {
 func screenshot(url, sel string, buf *[]byte) chromedp.Tasks {
 	return chromedp.Tasks{
 		chromedp.Navigate(url),
-		chromedp.Sleep(2 * time.Second),
+		chromedp.Sleep(1 * time.Second),
 		chromedp.WaitVisible(sel, chromedp.ByQuery),
 		chromedp.Screenshot(sel, buf, chromedp.ByQuery),
 	}
