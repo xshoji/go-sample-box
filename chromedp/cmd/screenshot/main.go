@@ -9,10 +9,28 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"runtime"
 	"time"
 )
 
 var (
+	ColorPrinter = struct {
+		Red      string
+		Green    string
+		Yellow   string
+		Colorize func(string, string) string
+	}{
+		Red:    "\033[31m",
+		Green:  "\033[32m",
+		Yellow: "\033[33m",
+		Colorize: func(color string, text string) string {
+			if runtime.GOOS == "windows" {
+				return text
+			}
+			colorReset := "\033[0m"
+			return color + text + colorReset
+		},
+	}
 	arguments = struct {
 		url           *string
 		querySelector *string
@@ -23,11 +41,11 @@ var (
 		noHeadless    *bool
 		help          *bool
 	}{
-		flag.String("u", "" /*              */, "[Required] URL"),
-		flag.String("q", "" /*              */, "[Required] Query selector. A screenshot target is the first element node matching the selector. ( e.g. -q=\".className#id\" )"),
+		flag.String("u", "" /*              */, ColorPrinter.Colorize(ColorPrinter.Yellow, "[Required]")+" URL"),
+		flag.String("q", "" /*              */, ColorPrinter.Colorize(ColorPrinter.Yellow, "[Required]")+" Query selector. A screenshot target is the first element node matching the selector. ( e.g. -q=\".className#id\" )"),
 		flag.String("o", `/tmp/img.png` /*  */, "Output path of screenshot"),
-		flag.Int64("wi", 3840 /*            */, "Set width of window"),
-		flag.Int64("he", 2160 /*            */, "Set height of window"),
+		flag.Int64("wi", 1440 /*            */, "Set width of window"),
+		flag.Int64("he", 1000 /*            */, "Set height of window"),
 		flag.Bool("d", false /*             */, "\nEnable debug mode"),
 		flag.Bool("n", false /*             */, "\nDisable Headless mode"),
 		flag.Bool("h", false /*             */, "\nShow help"),
