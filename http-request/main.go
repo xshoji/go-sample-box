@@ -2,13 +2,33 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/http/httputil"
 	"strconv"
 	"strings"
 )
+
+// Debugging HTTP Client requests with Go · Jamie Tanna | Software Engineer
+// https://www.jvt.me/posts/2023/03/11/go-debug-http/
+type loggingTransport struct{}
+
+func (s *loggingTransport) RoundTrip(r *http.Request) (*http.Response, error) {
+	bytes, _ := httputil.DumpRequestOut(r, true)
+
+	resp, err := http.DefaultTransport.RoundTrip(r)
+
+	respBytes, _ := httputil.DumpResponse(resp, true)
+	bytes = append(bytes, []byte("\n\n")...)
+	bytes = append(bytes, respBytes...)
+
+	fmt.Printf("%s\n", bytes)
+
+	return resp, err
+}
 
 const (
 	HttpContentTypeHeader = "Content-Type"
@@ -26,99 +46,94 @@ func init() {
 func main() {
 
 	urlBase := "http://httpbin.org"
+	client := http.Client{
+		Transport: &loggingTransport{},
+	}
 
-	responseBody := DoHttpGet(urlBase+"/get?name=taro&age=20", HttpHeaderEmptyMap)
-	log.Println(ToJsonString(responseBody))
-	log.Printf("args.name               => %v\n", Get(responseBody, "args.name"))
-	log.Printf("headers.X-Amzn-Trace-Id => %v\n", Get(responseBody, "headers.X-Amzn-Trace-Id"))
+	log.Printf("\n<< HttpGet >>")
+	resp, err := HttpGet(client, urlBase+"/get?name=taro&age=20")
+	body := handleResponse(resp, err)
+	jsonBody := ToJsonObject(body)
+	log.Println(ToJsonString(jsonBody))
+	log.Printf("args.name               => %v\n", Get(jsonBody, "args.name"))
+	log.Printf("headers.X-Amzn-Trace-Id => %v\n", Get(jsonBody, "headers.X-Amzn-Trace-Id"))
 	log.Printf("\n\n\n")
 
-	responseBody = DoHttpPost(urlBase+"/post", HttpHeaderContentTypeFrom, "name=taro&age=20")
-	log.Println(responseBody)
-	log.Println(ToJsonString(responseBody))
-	log.Printf("form.name               => %v\n", Get(responseBody, "form.name"))
-	log.Printf("headers.X-Amzn-Trace-Id => %v\n", Get(responseBody, "headers.X-Amzn-Trace-Id"))
+	log.Printf("\n<< HttpGetWithHeaders >>")
+	resp, err = HttpGetWithHeaders(client, urlBase+"/get?name=taro&age=20", map[string]string{
+		"X-Test-Custom-Header": "test",
+	})
+	body = handleResponse(resp, err)
+	jsonBody = ToJsonObject(body)
+	log.Println(ToJsonString(jsonBody))
+	log.Printf("args.name               => %v\n", Get(jsonBody, "args.name"))
+	log.Printf("headers.X-Amzn-Trace-Id => %v\n", Get(jsonBody, "headers.X-Amzn-Trace-Id"))
 	log.Printf("\n\n\n")
 
-	responseBody = DoHttpPost(urlBase+"/post", HttpHeaderContentTypeJson, `{"name":"taro", "age":20}`)
-	log.Println(responseBody)
-	log.Println(ToJsonString(responseBody))
-	log.Printf("data                    => %v\n", Get(responseBody, "data"))
-	log.Printf("json.name               => %v\n", Get(responseBody, "json.name"))
-	log.Printf("headers.X-Amzn-Trace-Id => %v\n", Get(responseBody, "headers.X-Amzn-Trace-Id"))
+	log.Printf("\n<< HttpPostWithHeaders >>")
+	resp, err = HttpPostWithHeaders(client, urlBase+"/post", HttpHeaderContentTypeFrom, "name=taro&age=20")
+	body = handleResponse(resp, err)
+	jsonBody = ToJsonObject(body)
+	log.Println(ToJsonString(jsonBody))
+	log.Printf("form.name               => %v\n", Get(jsonBody, "form.name"))
+	log.Printf("headers.X-Amzn-Trace-Id => %v\n", Get(jsonBody, "headers.X-Amzn-Trace-Id"))
+	log.Printf("\n\n\n")
+
+	log.Printf("\n<< HttpPostWithHeaders >>")
+	resp, err = HttpPostWithHeaders(client, urlBase+"/post", HttpHeaderContentTypeJson, `{"name":"taro", "age":20}`)
+	body = handleResponse(resp, err)
+	jsonBody = ToJsonObject(body)
+	log.Println(ToJsonString(jsonBody))
+	log.Printf("data                    => %v\n", Get(jsonBody, "data"))
+	log.Printf("json.name               => %v\n", Get(jsonBody, "json.name"))
+	log.Printf("headers.X-Amzn-Trace-Id => %v\n", Get(jsonBody, "headers.X-Amzn-Trace-Id"))
 
 }
 
-//=======================================
-// HTTP Utils
-//=======================================
-
-// Get request
-func DoHttpGet(url string, headers map[string]string) interface{} {
-	// GET
-	log.Println(">---------- Get request start ---------->")
-	log.Printf("url : %v\n", url)
-	resp, err := DoHttpRequest("GET", url, nil, headers)
-	r := handleResponse(resp, err)
-	log.Printf("responseBody : %v\n", r)
-	log.Println("<----------  Get request end  ----------<")
-	return r
-}
-
-// Post request
-func DoHttpPost(url string, headers map[string]string, requestBody string) interface{} {
-	// POST
-	log.Println(">---------- Post request start ---------->")
-	log.Printf("url : %v\n", url)
-	log.Printf("requestBody : %v\n", requestBody)
-	resp, err := DoHttpRequest("POST", url, strings.NewReader(requestBody), headers)
-	r := handleResponse(resp, err)
-	log.Printf("responseBody : %v\n", r)
-	log.Println("<----------  Post request end  ----------<")
-	return r
-}
-
-func DoHttpRequest(method string, url string, body io.Reader, headers map[string]string) (*http.Response, error) {
-	req, err := http.NewRequest(method, url, body)
+func handleError(err error) {
 	if err != nil {
 		log.Fatal(err)
-		return nil, err
 	}
+}
+
+// HttpGet Get =======================================
+// HTTP Utils
+//=======================================
+// HttpGet Get request
+func HttpGet(client http.Client, url string) (*http.Response, error) {
+	return client.Get(url)
+}
+
+// HttpGetWithHeaders Get request with headers
+func HttpGetWithHeaders(client http.Client, url string, headers map[string]string) (resp *http.Response, err error) {
+	return DoHttpRequest(client, "GET", url, headers, nil)
+}
+
+// HttpPost POST request
+func HttpPost(client http.Client, url string, requestBody string) (*http.Response, error) {
+	return client.Post(url, HttpContentTypeHeader, strings.NewReader(requestBody))
+}
+
+// HttpPostWithHeaders POST request
+func HttpPostWithHeaders(client http.Client, url string, headers map[string]string, requestBody string) (*http.Response, error) {
+	return DoHttpRequest(client, "POST", url, headers, strings.NewReader(requestBody))
+}
+
+func DoHttpRequest(client http.Client, method string, url string, headers map[string]string, body io.Reader) (*http.Response, error) {
+	req, err := http.NewRequest(method, url, body)
+	handleError(err)
 	for key, value := range headers {
 		log.Printf("header [%s] : %s\n", key, value)
 		req.Header.Set(key, value)
 	}
-	return http.DefaultClient.Do(req)
+	return client.Do(req)
 }
 
-func handleResponse(resp *http.Response, err error) interface{} {
-	if err != nil {
-		log.Fatal(err)
-		return nil
-	}
-	result, err := readBody(resp)
-	if err != nil {
-		log.Fatal(err)
-		return nil
-	}
-	return result
-}
-
-func readBody(resp *http.Response) (interface{}, error) {
-	// Response handling
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	var result interface{}
-	json.Unmarshal(body, &result)
-	defer func() {
-		err := resp.Body.Close()
-		if err != nil {
-			log.Panic("resp.Body.Close() failed.")
-		}
-	}()
-	return result, nil
+func handleResponse(resp *http.Response, err error) []byte {
+	handleError(err)
+	responseBodyBytes, err := ioutil.ReadAll(resp.Body)
+	handleError(err)
+	return responseBodyBytes
 }
 
 //=======================================
