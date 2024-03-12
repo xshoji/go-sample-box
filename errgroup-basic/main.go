@@ -40,7 +40,6 @@ func main() {
 	errGroup, _ := errgroup.WithContext(rootCtx)
 
 	createRandomNumber := func() int {
-		rand.Seed(time.Now().UnixNano())
 		return rand.Intn(*paramsMaxWaitSecond-1) + 1
 	}
 

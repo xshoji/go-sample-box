@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 )
@@ -33,7 +32,7 @@ func main() {
 	fmt.Println("")
 
 	fmt.Println("ReadFile")
-	contents, err := ioutil.ReadFile(*filePath)
+	contents, err := os.ReadFile(*filePath)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -83,7 +82,7 @@ func readAllFileContents(filePath *string) {
 	}
 	defer createFileCloseDeferFunc(file)()
 
-	contents, err := ioutil.ReadAll(file)
+	contents, err := io.ReadAll(file)
 	if err != nil {
 		log.Panic(err)
 	}

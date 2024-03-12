@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -91,7 +91,7 @@ func getJsonResponse(url string) string {
 	resp, err := http.Get(url)
 
 	// Response handling
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	var result interface{}
 	json.Unmarshal(body, &result)
 	defer func() {
