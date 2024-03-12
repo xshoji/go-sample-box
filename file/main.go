@@ -91,9 +91,8 @@ func readAllFileContents(filePath *string) {
 
 func createFileCloseDeferFunc(file *os.File) func() {
 	return func() {
-		fileCloseErr := file.Close()
-		if fileCloseErr != nil {
-			log.Panic(fileCloseErr)
+		if err := file.Close(); err != nil {
+			log.Panic(err)
 		}
 	}
 }
