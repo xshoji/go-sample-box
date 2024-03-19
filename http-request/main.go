@@ -35,7 +35,7 @@ const (
 )
 
 var HttpHeaderEmptyMap = make(map[string]string, 0)
-var HttpHeaderContentTypeFrom = map[string]string{HttpContentTypeHeader: "application/x-www-form-urlencoded;charset=utf-8"}
+var HttpHeaderContentTypeForm = map[string]string{HttpContentTypeHeader: "application/x-www-form-urlencoded;charset=utf-8"}
 var HttpHeaderContentTypeJson = map[string]string{HttpContentTypeHeader: "application/json;charset=utf-8"}
 
 func init() {
@@ -71,7 +71,7 @@ func main() {
 	log.Printf("\n\n\n")
 
 	log.Printf("\n<< HttpPostWithHeaders >>")
-	resp, err = HttpPostWithHeaders(client, urlBase+"/post", HttpHeaderContentTypeFrom, "name=taro&age=20")
+	resp, err = HttpPostWithHeaders(client, urlBase+"/post", HttpHeaderContentTypeForm, "name=taro&age=20")
 	body = handleResponse(resp, err)
 	jsonBody = ToJsonObject(body)
 	log.Println(ToJsonString(jsonBody))
@@ -98,7 +98,7 @@ func handleError(err error) {
 
 // HttpGet Get =======================================
 // HTTP Utils
-//=======================================
+// =======================================
 // HttpGet Get request
 func HttpGet(client http.Client, url string) (*http.Response, error) {
 	return client.Get(url)
