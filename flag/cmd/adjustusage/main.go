@@ -4,14 +4,15 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+	"math"
 	"os"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 )
 
-const UsageRequiredPrefix = "[required] "
-const UsageParamNameWidth = "15"
+const UsageRequiredPrefix = "\u001B[33m[required]\u001B[0m "
 
 var (
 	// Define short parameters
@@ -65,30 +66,27 @@ func main() {
 func adjustUsage() {
 	// Get default flags usage
 	b := new(bytes.Buffer)
-	flag.CommandLine.SetOutput(b)
-	flag.Usage()
-	flag.CommandLine.SetOutput(os.Stderr)
+	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
 	// Sort params and description ( order by UsageRequiredPrefix )
 	regex := "\\s+(-\\S+ *\\S*)+\n*\\s+(.+)"
 	re := regexp.MustCompile(regex)
 	usageParams := re.FindAllString(b.String(), -1)
+	maxLengthParam := 0.0
 	sort.Slice(usageParams, func(i, j int) bool {
+		maxLengthParam = math.Max(maxLengthParam, float64(len(re.ReplaceAllString(usageParams[i], "$1, -$3$4"))))
+		maxLengthParam = math.Max(maxLengthParam, float64(len(re.ReplaceAllString(usageParams[j], "$1, -$3$4"))))
 		isRequired1 := strings.Index(usageParams[i], UsageRequiredPrefix) >= 0
 		isRequired2 := strings.Index(usageParams[j], UsageRequiredPrefix) >= 0
-		if isRequired1 && isRequired2 {
+		if isRequired1 == isRequired2 {
 			return strings.Compare(usageParams[i], usageParams[j]) == -1
-		} else if isRequired1 {
-			return true
 		} else {
-			return false
+			return isRequired1
 		}
 	})
 	// Adjust usage
 	usage := strings.Split(b.String(), "\n")[0] + "\n"
 	for _, v := range usageParams {
-		usage = usage + fmt.Sprintf("%-"+UsageParamNameWidth+"s", re.ReplaceAllString(v, "  $1")) + re.ReplaceAllString(v, "$2\n")
+		usage = usage + fmt.Sprintf("%-"+strconv.Itoa(int(maxLengthParam+2.0))+"s", re.ReplaceAllString(v, "  $1")) + re.ReplaceAllString(v, "$2\n")
 	}
-	flag.Usage = func() {
-		_, _ = fmt.Fprintf(flag.CommandLine.Output(), usage)
-	}
+	flag.Usage = func() { _, _ = fmt.Fprintf(flag.CommandLine.Output(), usage) }
 }

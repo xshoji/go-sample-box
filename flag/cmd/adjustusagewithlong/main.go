@@ -13,7 +13,7 @@ import (
 )
 
 const UsageDummy = "########"
-const UsageRequiredPrefix = "[required] "
+const UsageRequiredPrefix = "\u001B[33m[required]\u001B[0m "
 
 var (
 	// Define short parameters ( don't set default value ).
@@ -77,9 +77,7 @@ func main() {
 func adjustUsage() {
 	// Get default flags usage
 	b := new(bytes.Buffer)
-	flag.CommandLine.SetOutput(b)
-	flag.Usage()
-	flag.CommandLine.SetOutput(os.Stderr)
+	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
 	// Sort params and description ( order by UsageRequiredPrefix )
 	re := regexp.MustCompile("(-\\S+)( *\\S*)+\n*\\s+" + UsageDummy + "\n*\\s+(-\\S+)( *\\S*)+\n\\s+(.+)")
 	usageParams := re.FindAllString(b.String(), -1)
