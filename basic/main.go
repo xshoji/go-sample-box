@@ -56,7 +56,7 @@ func main() {
 	fmt.Printf("valueInt: %d    -> valueString: %s\n", valueInt, strconv.Itoa(valueInt))
 	fmt.Printf("valueInt8: %d   -> valueString: %s\n", valueInt, strconv.FormatInt(int64(valueInt8), 10))
 	fmt.Printf("valueInt64: %d  -> valueString: %s\n", valueInt64, strconv.FormatInt(valueInt64, 10))
-	fmt.Printf("valueFloat: %v  -> valueString: %s\n", valueFloat64, strconv.FormatFloat(valueFloat64, 'f', 4, 32))
+	fmt.Printf("valueFloat: %v  -> valueString: %s\n", valueFloat64, strconv.FormatFloat(valueFloat64, 'f', -1, 64))
 	fmt.Printf("valueFloat: %v  -> valueInt: %v\n", valueFloat64, int(valueFloat64))
 	fmt.Printf("valueInt: %v    -> valueFloat: %v\n", valueInt, float64(valueInt))
 	fmt.Printf("valueString: %v -> value[]byte: %v\n", valueString, []byte(valueString))
