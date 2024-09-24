@@ -286,16 +286,28 @@ func ToJsonString(v interface{}) string {
 // Common Utils
 // =======================================
 
+// Create uuid
 func createUuid() string {
 	seed := strconv.FormatInt(time.Now().UnixNano(), 10)
 	shaBytes := sha256.Sum256([]byte(seed))
 	return hex.EncodeToString(shaBytes[:16])
 }
 
+// Handle error
 func handleError(err error, prefixErrMessage string) {
 	if err != nil {
 		fmt.Printf("%s [ERROR %s]: %v\n", time.Now().Format(TimeFormat), prefixErrMessage, err)
 	}
+}
+
+// Get environment value ( with default value )
+func getEnv(key string, defaultValue string) string {
+	value := defaultValue
+	v := os.Getenv(key)
+	if v != "" {
+		value = v
+	}
+	return value
 }
 
 func adjustUsage() {
