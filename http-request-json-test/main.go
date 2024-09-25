@@ -45,6 +45,9 @@ var (
 	httpHeaderEmptyMap        = make(map[string]string)
 	httpHeaderContentTypeForm = map[string]string{HttpContentTypeHeader: "application/x-www-form-urlencoded;charset=utf-8"}
 	httpHeaderContentTypeJson = map[string]string{HttpContentTypeHeader: "application/json;charset=utf-8"}
+
+	// Masking console log
+	muskingRegex = regexp.MustCompile(`(Accept-Encoding:|Etag:|"key1":)(.*)`)
 )
 
 func init() {
@@ -142,9 +145,9 @@ func (s *CustomTransport) RoundTrip(r *http.Request) (*http.Response, error) {
 		},
 	}))
 
-	// mask request header values
+	// mask request header and body
 	httpMessageString := string(httpMessageBytes)
-	httpMessageString = regexp.MustCompile(`(Accept-Encoding: .*)`).ReplaceAllString(httpMessageString, "Accept-Encoding: ****")
+	httpMessageString = muskingRegex.ReplaceAllString(httpMessageString, "$1 ****")
 	fmt.Printf("Req. %s%s", time.Now().Format(TimeFormat), adjustMessage("\n"+httpMessageString+"\n"))
 
 	resp, err := s.Transport.RoundTrip(r)
@@ -153,9 +156,9 @@ func (s *CustomTransport) RoundTrip(r *http.Request) (*http.Response, error) {
 	respBytes, err := httputil.DumpResponse(resp, false)
 	handleError(err, "httputil.DumpResponse(resp, true)")
 
-	// mask response header values
+	// mask response header
 	respBodyString := string(respBytes)
-	respBodyString = regexp.MustCompile(`(Etag: .*)`).ReplaceAllString(respBodyString, "Etag: ****")
+	respBodyString = muskingRegex.ReplaceAllString(respBodyString, "$1 ****")
 	fmt.Printf("Res. %s%s\n", time.Now().Format(TimeFormat), adjustMessage("\n"+respBodyString))
 
 	return resp, err
@@ -220,9 +223,11 @@ func internalDoHttpRequest(ctx context.Context, client http.Client, method strin
 	responseBody, err := io.ReadAll(res.Body)
 	handleError(err, "io.ReadAll(res.Body)")
 	responseBodyJsonObject := ToJsonObject(responseBody)
-	prettyJson, err := json.MarshalIndent(responseBodyJsonObject, "", "  ")
+	prettyJsonBytes, err := json.MarshalIndent(responseBodyJsonObject, "", "  ")
 	handleError(err, "json.MarshalIndent(ToJsonObject(responseBody), \"\", \"  \")")
-	fmt.Printf("%s\n", prettyJson)
+	// mask response body
+	prettyJsonString := muskingRegex.ReplaceAllString(string(prettyJsonBytes), "$1 ****")
+	fmt.Printf("%s\n", prettyJsonString)
 	return responseBodyJsonObject
 }
 
