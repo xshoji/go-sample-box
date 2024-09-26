@@ -19,6 +19,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"path/filepath"
 	"regexp"
 	"sort"
 	"strconv"
@@ -191,7 +192,8 @@ func DoHttpRequestMultipartFormData(ctx context.Context, client http.Client, met
 		var fw io.Writer
 		var err error
 		if fileContent, ok := ioReader.(*os.File); ok {
-			fw, err = multipartWriter.CreateFormFile(fieldName, fileContent.Name())
+			_, fileName := filepath.Split(fileContent.Name())
+			fw, err = multipartWriter.CreateFormFile(fieldName, fileName)
 			handleError(err, "multipartWriter.CreateFormFile(fieldName, fileContent.Name())")
 			_, err = io.Copy(fw, fileContent)
 		} else {
