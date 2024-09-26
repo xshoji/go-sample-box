@@ -29,7 +29,7 @@ import (
 const (
 	UsageRequiredPrefix     = "\u001B[33m[required]\u001B[0m "
 	UsageDummy              = "########"
-	HttpContentTypeHeader   = "Content-Type"
+	HttpContentTypeHeader   = "content-type"
 	ContextKeyPrettyHttpLog = "ContextKeyLoggingPrettyHttpLog"
 	TimeFormat              = "2006-01-02 15:04:05.9999 [MST]"
 )
@@ -193,14 +193,16 @@ func DoHttpRequestMultipartFormData(ctx context.Context, client http.Client, met
 		if fileContent, ok := ioReader.(*os.File); ok {
 			fw, err = multipartWriter.CreateFormFile(fieldName, fileContent.Name())
 			handleError(err, "multipartWriter.CreateFormFile(fieldName, fileContent.Name())")
+			_, err = io.Copy(fw, fileContent)
 		} else {
 			fw, err = multipartWriter.CreateFormField(fieldName)
 			handleError(err, "multipartWriter.CreateFormField(fieldName)")
+			_, err = io.Copy(fw, ioReader)
 		}
-		_, err = io.Copy(fw, body)
 
 	}
-	defer multipartWriter.Close()
+	multipartWriter.Close()
+	headers["content-type"] = multipartWriter.FormDataContentType()
 	return internalDoHttpRequest(ctx, client, method, url, headers, body)
 }
 
