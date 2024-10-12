@@ -28,16 +28,16 @@ import (
 )
 
 const (
-	UsageRequiredPrefix     = "\u001B[33m[required]\u001B[0m "
-	UsageDummy              = "########"
-	HttpContentTypeHeader   = "content-type"
-	ContextKeyPrettyHttpLog = "ContextKeyLoggingPrettyHttpLog"
-	TimeFormat              = "2006-01-02 15:04:05.9999 [MST]"
+	UsageRequiredPrefix       = "\u001B[33m[required]\u001B[0m "
+	UsageDummy                = "########"
+	HttpContentTypeHeader     = "content-type"
+	ContextKeyCompressHttpLog = "ContextKeyLoggingCompressHttpLog"
+	TimeFormat                = "2006-01-02 15:04:05.9999 [MST]"
 )
 
 var (
 	// Define short parameters ( this default value will be not used ).
-	paramsPrettyHttpMessage   = flag.Bool("p", true, UsageDummy)
+	paramsCompressHttpMessage = flag.Bool("c", false, UsageDummy)
 	paramsSkipTlsVerification = flag.Bool("s", false, UsageDummy)
 	paramsDisableHttp2        = flag.Bool("d", false, UsageDummy)
 	paramsHelp                = flag.Bool("h", false, UsageDummy)
@@ -53,7 +53,7 @@ var (
 
 func init() {
 	// Define long parameters
-	flag.BoolVar(paramsPrettyHttpMessage /*   */, "pretty-http-message" /*    */, true /*   */, "print pretty http message")
+	flag.BoolVar(paramsCompressHttpMessage /* */, "compress-http-message" /*  */, false /*   */, "compress http message")
 	flag.BoolVar(paramsSkipTlsVerification /* */, "skip-tls-verification" /*  */, false /*   */, "skip tls verification")
 	flag.BoolVar(paramsDisableHttp2 /*        */, "disable-http2" /*          */, false /*   */, "disable HTTP/2")
 	flag.BoolVar(paramsHelp /*                */, "help" /*                   */, false /*   */, "show help")
@@ -82,12 +82,12 @@ func main() {
 	fmt.Println("#--------------------")
 	fmt.Println("# Command information")
 	fmt.Println("#--------------------")
-	fmt.Printf("pretty http message   : %t\n", *paramsPrettyHttpMessage)
+	fmt.Printf("pretty http message   : %t\n", *paramsCompressHttpMessage)
 	fmt.Printf("skip tls Verification : %t\n", *paramsSkipTlsVerification)
 	fmt.Printf("disable HTTP/2        : %t\n", *paramsDisableHttp2)
 
 	ctx := context.Background()
-	ctx = context.WithValue(ctx, ContextKeyPrettyHttpLog, *paramsPrettyHttpMessage)
+	ctx = context.WithValue(ctx, ContextKeyCompressHttpLog, *paramsCompressHttpMessage)
 
 	headers := maps.Clone(httpHeaderContentTypeJson)
 
@@ -132,7 +132,7 @@ func (s *CustomTransport) RoundTrip(r *http.Request) (*http.Response, error) {
 	handleError(err, "httputil.DumpRequestOut(r, true)")
 
 	adjustMessage := func(message string) string {
-		if !r.Context().Value(ContextKeyPrettyHttpLog).(bool) {
+		if r.Context().Value(ContextKeyCompressHttpLog).(bool) {
 			message = strings.Replace(message, "\r\n", ", ", -1)
 			message = strings.Replace(message, "\n", " ", -1)
 		}
@@ -158,9 +158,9 @@ func (s *CustomTransport) RoundTrip(r *http.Request) (*http.Response, error) {
 	handleError(err, "httputil.DumpResponse(resp, true)")
 
 	// mask response header
-	respBodyString := string(respBytes)
-	respBodyString = muskingRegex.ReplaceAllString(respBodyString, "$1 ****")
-	fmt.Printf("Res. %s%s\n", time.Now().Format(TimeFormat), adjustMessage("\n"+respBodyString))
+	respString := string(respBytes)
+	respString = muskingRegex.ReplaceAllString(respString, "$1 ****")
+	fmt.Printf("Res. %s%s", time.Now().Format(TimeFormat), adjustMessage("\n"+respString))
 
 	return resp, err
 }
@@ -227,10 +227,22 @@ func internalDoHttpRequest(ctx context.Context, client http.Client, method strin
 	responseBody, err := io.ReadAll(res.Body)
 	handleError(err, "io.ReadAll(res.Body)")
 	responseBodyJsonObject := ToJsonObject(responseBody)
-	prettyJsonBytes, err := json.MarshalIndent(responseBodyJsonObject, "", "  ")
-	handleError(err, "json.MarshalIndent(ToJsonObject(responseBody), \"\", \"  \")")
+
+	var jsonString string
+	var jsonBytes []byte
+	if ctx.Value(ContextKeyCompressHttpLog).(bool) {
+		jsonBytes, err = json.Marshal(responseBodyJsonObject)
+		handleError(err, "json.MarshalIndent(ToJsonObject(responseBody), \"\", \"  \")")
+		jsonString = strings.Replace(string(jsonBytes), "\r\n", ", ", -1)
+		jsonString = strings.Replace(jsonString, "\n", " ", -1)
+	} else {
+		jsonBytes, err := json.MarshalIndent(responseBodyJsonObject, "", "  ")
+		handleError(err, "json.MarshalIndent(ToJsonObject(responseBody), \"\", \"  \")")
+		jsonString = string(jsonBytes)
+	}
+
 	// mask response body
-	prettyJsonString := muskingRegex.ReplaceAllString(string(prettyJsonBytes), "$1 ****")
+	prettyJsonString := muskingRegex.ReplaceAllString(jsonString, "$1 ****")
 	fmt.Printf("%s\n", prettyJsonString)
 	return responseBodyJsonObject
 }
