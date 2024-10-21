@@ -64,26 +64,15 @@ func main() {
 }
 
 func adjustUsage() {
-	// Get default flags usage
 	b := new(bytes.Buffer)
 	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
-	// Sort params and description ( order by UsageRequiredPrefix )
-	regex := "\\s+(-\\S+ *\\S*)+\n*\\s+(.+)"
-	re := regexp.MustCompile(regex)
+	re := regexp.MustCompile("\\s+(-\\S+ *\\S*)+\n*\\s+(.+)")
 	usageParams := re.FindAllString(b.String(), -1)
 	maxLengthParam := 0.0
 	sort.Slice(usageParams, func(i, j int) bool {
-		maxLengthParam = math.Max(maxLengthParam, float64(len(re.ReplaceAllString(usageParams[i], "$1, -$3$4"))))
-		maxLengthParam = math.Max(maxLengthParam, float64(len(re.ReplaceAllString(usageParams[j], "$1, -$3$4"))))
-		isRequired1 := strings.Index(usageParams[i], UsageRequiredPrefix) >= 0
-		isRequired2 := strings.Index(usageParams[j], UsageRequiredPrefix) >= 0
-		if isRequired1 == isRequired2 {
-			return strings.Compare(usageParams[i], usageParams[j]) == -1
-		} else {
-			return isRequired1
-		}
+		maxLengthParam = math.Max(maxLengthParam, math.Max(float64(len(re.ReplaceAllString(usageParams[i], "$1, -$3$4"))), float64(len(re.ReplaceAllString(usageParams[j], "$1, -$3$4")))))
+		return strings.Index(usageParams[i], UsageRequiredPrefix) >= 0 || strings.Compare(usageParams[i], usageParams[j]) == -1
 	})
-	// Adjust usage
 	usage := strings.Split(b.String(), "\n")[0] + "\n"
 	for _, v := range usageParams {
 		usage = usage + fmt.Sprintf("%-"+strconv.Itoa(int(maxLengthParam+2.0))+"s", re.ReplaceAllString(v, "  $1")) + re.ReplaceAllString(v, "$2\n")
