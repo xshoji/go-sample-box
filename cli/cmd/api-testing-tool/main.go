@@ -30,7 +30,7 @@ import (
 const (
 	UsageRequiredPrefix       = "\u001B[33m[required]\u001B[0m "
 	UsageDummy                = "########"
-	CommandDescription        = "HTTP Request tool."
+	CommandDescription        = "Web API testing tool."
 	HttpContentTypeHeader     = "content-type"
 	ContextKeyCompressHttpLog = "ContextKeyLoggingCompressHttpLog"
 	TimeFormat                = "2006-01-02 15:04:05.9999 [MST]"
