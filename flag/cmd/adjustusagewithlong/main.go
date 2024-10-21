@@ -12,8 +12,11 @@ import (
 	"strings"
 )
 
-const UsageDummy = "########"
-const UsageRequiredPrefix = "\u001B[33m[required]\u001B[0m "
+const (
+	UsageRequiredPrefix = "\u001B[33m[required]\u001B[0m "
+	UsageDummy          = "########"
+	CommandDescription  = "Command description is here."
+)
 
 var (
 	// Define short parameters ( don't set default value ).
@@ -84,7 +87,7 @@ func adjustUsage() {
 		maxLengthParam = math.Max(maxLengthParam, math.Max(float64(len(re.ReplaceAllString(usageParams[i], "$1, -$3$4"))), float64(len(re.ReplaceAllString(usageParams[j], "$1, -$3$4")))))
 		return strings.Index(usageParams[i], UsageRequiredPrefix) >= 0 || strings.Compare(usageParams[i], usageParams[j]) == -1
 	})
-	usage := strings.Split(b.String(), "\n")[0] + "\n"
+	usage := strings.Split(b.String(), "\n")[0] + "\n\nDescription:\n  " + CommandDescription + "\n\nOptions:\n"
 	for _, v := range usageParams {
 		usage += fmt.Sprintf("%-"+strconv.Itoa(int(maxLengthParam+4.0))+"s", re.ReplaceAllString(v, "  $1, -$3$4")) + re.ReplaceAllString(v, "$5\n")
 	}
