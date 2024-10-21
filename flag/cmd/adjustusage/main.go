@@ -67,18 +67,24 @@ func main() {
 }
 
 func adjustUsage() {
+	// Get default flags usage
 	b := new(bytes.Buffer)
 	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
+	// Get default flags usage
 	re := regexp.MustCompile("\\s+(-\\S+ *\\S*)+\n*\\s+(.+)")
 	usageParams := re.FindAllString(b.String(), -1)
 	maxLengthParam := 0.0
 	sort.Slice(usageParams, func(i, j int) bool {
 		maxLengthParam = math.Max(maxLengthParam, math.Max(float64(len(re.ReplaceAllString(usageParams[i], "$1, -$3$4"))), float64(len(re.ReplaceAllString(usageParams[j], "$1, -$3$4")))))
-		return strings.Index(usageParams[i], UsageRequiredPrefix) >= 0 || strings.Compare(usageParams[i], usageParams[j]) == -1
+		if len(strings.Split(usageParams[i]+usageParams[j], UsageRequiredPrefix))%2 == 1 {
+			return strings.Compare(usageParams[i], usageParams[j]) == -1
+		} else {
+			return strings.Index(usageParams[i], UsageRequiredPrefix) >= 0
+		}
 	})
 	usage := strings.Split(b.String(), "\n")[0] + "\n\nDescription:\n  " + CommandDescription + "\n\nOptions:\n"
 	for _, v := range usageParams {
-		usage = usage + fmt.Sprintf("%-"+strconv.Itoa(int(maxLengthParam+2.0))+"s", re.ReplaceAllString(v, "  $1")) + re.ReplaceAllString(v, "$2\n")
+		usage += fmt.Sprintf("%-"+strconv.Itoa(int(maxLengthParam+2.0))+"s", re.ReplaceAllString(v, "  $1")) + re.ReplaceAllString(v, "$2\n")
 	}
 	flag.Usage = func() { _, _ = fmt.Fprintf(flag.CommandLine.Output(), usage) }
 }
