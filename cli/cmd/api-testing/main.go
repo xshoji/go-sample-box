@@ -17,9 +17,9 @@ import (
 	"net/http"
 	"net/http/httptrace"
 	"net/http/httputil"
+	"net/textproto"
 	"net/url"
 	"os"
-	"path/filepath"
 	"regexp"
 	"sort"
 	"strconv"
@@ -123,9 +123,26 @@ func main() {
   }
 }
 `
-
 	response := DoHttpRequest(ctx, client, "POST", targetUrl, headers, body)
-	fmt.Println("\"obj.list.0.key1\": " + Get(response, "json.obj.list.0.key1").(string))
+	fmt.Printf("\"obj.list.0.key1\": %s\n\n\n\n", Get(response, "json.obj.list.0.key1").(string))
+
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	response = DoHttpRequestMultipartFormData(ctx, client, "POST", targetUrl, headers, map[string]map[string]io.Reader{
+		"request": {
+			"application/json; charset=utf-8": bytes.NewReader([]byte(`{"title":"movie_title"}`)),
+		},
+		"file": {
+			"text/csv; charset=utf-8": func() (f *os.File) { f, _ = os.Open("/tmp/aaa.csv"); return }(),
+		},
+	})
+	fmt.Println(response)
 
 }
 
@@ -197,22 +214,35 @@ func CreateCustomTransport(tlsConfig *tls.Config, disableHttp2 bool, networkType
 	return customTr
 }
 
-func DoHttpRequestMultipartFormData(ctx context.Context, client http.Client, method string, url string, headers map[string]string, multipartValues map[string]io.Reader) interface{} {
+func DoHttpRequestMultipartFormData(ctx context.Context, client http.Client, method string, url string, headers map[string]string, multipartValues map[string]map[string]io.Reader) interface{} {
 	body := &bytes.Buffer{}
 	multipartWriter := multipart.NewWriter(body)
-	for fieldName, ioReader := range multipartValues {
+	for fieldName, contentTypeAndIoReader := range multipartValues {
+
+		// Create MIME encoded form files that auto-detect the content type. by danny-cheung · Pull Request #170 · go-openapi/runtime
+		// https://github.com/go-openapi/runtime/pull/170/files
+
+		// Create the MIME headers for the new part
+		var contentType string
+		var ioReader io.Reader
 		var fw io.Writer
 		var err error
-		if fileContent, ok := ioReader.(*os.File); ok {
-			_, fileName := filepath.Split(fileContent.Name())
-			fw, err = multipartWriter.CreateFormFile(fieldName, fileName)
-			handleError(err, "multipartWriter.CreateFormFile(fieldName, fileContent.Name())")
-			_, err = io.Copy(fw, fileContent)
-		} else {
-			fw, err = multipartWriter.CreateFormField(fieldName)
-			handleError(err, "multipartWriter.CreateFormField(fieldName)")
-			_, err = io.Copy(fw, ioReader)
+		for c, i := range contentTypeAndIoReader {
+			contentType = c
+			ioReader = i
 		}
+		h := make(textproto.MIMEHeader)
+		h.Set("Content-Type", contentType)
+		if _, ok := ioReader.(*os.File); ok {
+			// Create the MIME headers for the new part
+			h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="dummyFileName"`, fieldName))
+		} else {
+			h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"`, fieldName))
+		}
+		fw, err = multipartWriter.CreatePart(h)
+		handleError(err, "multipartWriter.CreatePart(h)")
+		_, err = io.Copy(fw, ioReader)
+		handleError(err, "io.Copy(fw, fileContent)")
 
 	}
 	multipartWriter.Close()
