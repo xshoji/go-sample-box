@@ -72,7 +72,6 @@ var (
 )
 
 func init() {
-
 	adjustUsage()
 }
 
