@@ -61,7 +61,7 @@ var (
 		flag.BoolVar(v, "help", false, "show help")
 		return
 	}()
-
+	
 	// HTTP Header templates
 	httpHeaderEmptyMap        = make(map[string]string)
 	httpHeaderContentTypeForm = map[string]string{HttpContentTypeHeader: "application/x-www-form-urlencoded;charset=utf-8"}
@@ -134,12 +134,25 @@ func main() {
 	//
 	//
 	//
+	csvFileContents := `title,length,memo
+movie1,120,Horror movie
+movie2,240,Action movie
+movie3,5,Short movie
+`
+	f, err := os.CreateTemp("", "temp.csv")
+	handleError(err, "os.CreateTemp(\"\", \"temoporary.csv\")")
+	defer os.Remove(f.Name())
+	err = os.WriteFile(f.Name(), []byte(csvFileContents), 0655)
+	handleError(err, "os.WriteFile(f.Name(), []byte(csvFileContents), 0655)")
+	fmt.Printf("temp.csv: %s\n\n\n", f.Name())
+
 	response = DoHttpRequestMultipartFormData(ctx, client, "POST", targetUrl, headers, map[string]map[string]io.Reader{
 		"request": {
 			"application/json; charset=utf-8": bytes.NewReader([]byte(`{"title":"movie_title"}`)),
 		},
 		"file": {
-			"text/csv; charset=utf-8": func() (f *os.File) { f, _ = os.Open("/tmp/aaa.csv"); return }(),
+			//"text/csv; charset=utf-8": func() (f *os.File) { f, _ = os.Open("/tmp/aaa.csv"); return }(),
+			"text/csv; charset=utf-8": f,
 		},
 	})
 	fmt.Println(response)
