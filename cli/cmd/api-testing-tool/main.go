@@ -100,9 +100,9 @@ func main() {
 	//
 	//
 	//
-	targetUrl := "https://my-json-server.typicode.com/typicode/demo/posts/"
+	targetUrl := "https://httpbin.org/post"
 	body := `{
-  "title": "hoge2",
+  "title": "title1",
   "obj": {
     "list": [
       {
@@ -114,7 +114,7 @@ func main() {
 `
 
 	response := DoHttpRequest(ctx, client, "POST", targetUrl, headers, body)
-	fmt.Println("\"obj.list.0.key1\": " + Get(response, "obj.list.0.key1").(string))
+	fmt.Println("\"obj.list.0.key1\": " + Get(response, "json.obj.list.0.key1").(string))
 
 }
 
@@ -333,10 +333,8 @@ func getEnv(key string, defaultValue string) string {
 }
 
 func adjustUsage() {
-	// Get default flags usage
 	b := new(bytes.Buffer)
 	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
-	// Get default flags usage
 	re := regexp.MustCompile("(-\\S+)( *\\S*)+\n*\\s+" + UsageDummy + "\n*\\s+(-\\S+)( *\\S*)+\n\\s+(.+)")
 	usageParams := re.FindAllString(b.String(), -1)
 	maxLengthParam := 0.0
@@ -348,7 +346,7 @@ func adjustUsage() {
 			return strings.Index(usageParams[i], UsageRequiredPrefix) >= 0
 		}
 	})
-	usage := strings.Split(b.String(), "\n")[0] + "\n\nDescription:\n  " + CommandDescription + "\n\nOptions:\n"
+	usage := strings.Replace(strings.Replace(strings.Split(b.String(), "\n")[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + CommandDescription + "\n\nOptions:\n"
 	for _, v := range usageParams {
 		usage += fmt.Sprintf("%-"+strconv.Itoa(int(maxLengthParam+4.0))+"s", re.ReplaceAllString(v, "  $1, -$3$4")) + re.ReplaceAllString(v, "$5\n")
 	}
