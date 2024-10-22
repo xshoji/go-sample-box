@@ -30,12 +30,43 @@ var (
 	//go:embed main.go
 	srcBytes []byte
 
-	// Define short parameters ( don't set default value ).
-	paramsFilePath  = flag.String("f", "", UsageDummy)
-	paramsUrl       = flag.String("u", "", UsageDummy)
-	paramsLineIndex = flag.Int("l", 0, UsageDummy)
-	paramsPrintSrc  = flag.Bool("p", false, UsageDummy)
-	paramsHelp      = flag.Bool("h", false, UsageDummy)
+	//-------------------
+	// Define options
+	//-------------------
+
+	// Required parameters
+	paramsFilePath = func() (v *string) {
+		// Define short parameters ( this default value and usage will be not used ).
+		v = flag.String("f", "", UsageDummy)
+		// Define long parameters and description ( set default value here if you need ).
+		flag.StringVar(v, "file-path", "", UsageRequiredPrefix+"file path")
+		return
+	}()
+
+	// Optional parameters
+	paramsUrl = func() (v *string) {
+		v = flag.String("u", "", UsageDummy)
+		flag.StringVar(v, "url", "https://httpbin.org/get", "url")
+		return
+	}()
+	paramsLineIndex = func() (v *int) {
+		v = flag.Int("l", 0, UsageDummy)
+		flag.IntVar(v, "line-index", 10, "index of line")
+		return
+	}()
+	paramsPrintSrc = func() (v *bool) {
+		v = flag.Bool("p", false, UsageDummy)
+		flag.BoolVar(v, "print-src", false, "print source code")
+		return
+	}()
+	paramsHelp = func() (v *bool) {
+		v = flag.Bool("h", false, UsageDummy)
+		flag.BoolVar(v, "help", false, "help")
+		return
+	}()
+
+	// Set environment variable
+	environmentValueLoopCount, _ = strconv.Atoi(GetEnvOrDefault("LOOP_COUNT", "10"))
 
 	// ColorPrinter colorize string
 	ColorPrinter = struct {
@@ -58,16 +89,6 @@ var (
 )
 
 func init() {
-	// Define long parameters and description ( set default value here if you need ).
-	//
-	// Required parameters
-	flag.StringVar(paramsFilePath /* */, "file-path" /*  */, "" /*    */, UsageRequiredPrefix+"file path")
-	// Optional parameters
-	flag.StringVar(paramsUrl /*      */, "url" /*        */, "https://httpbin.org/get" /*    */, "URL")
-	flag.IntVar(paramsLineIndex /*   */, "line-index" /* */, 10 /*                           */, "index of line")
-	flag.BoolVar(paramsPrintSrc /*   */, "print-src" /*  */, false /*                        */, "print source code")
-	flag.BoolVar(paramsHelp /*       */, "help" /*       */, false /*                        */, "help")
-
 	adjustUsage()
 }
 
@@ -84,10 +105,11 @@ func main() {
 		os.Exit(0)
 	}
 
-	fmt.Println("file-path:", *paramsFilePath)
-	fmt.Println("line-index:", *paramsLineIndex)
+	fmt.Printf("[ Environment variable ]\nLOOP_COUNT: %d\n\n", environmentValueLoopCount)
+	fmt.Printf("[ Options ]\nfile-path: %s\n", *paramsFilePath)
+	fmt.Printf("line-index: %d\n\n", *paramsLineIndex)
 
-	contents := readAllFileContents(paramsFilePath)
+	contents := ReadAllFileContents(paramsFilePath)
 	fmt.Println(strings.Split(contents, "\n")[*paramsLineIndex])
 
 	res := HttpGetJson(*paramsUrl + "?" + fmt.Sprintf("paramsLineIndex=%d", *paramsLineIndex))
@@ -153,7 +175,7 @@ func Get(object interface{}, keyChain string) interface{} {
 // File Utils
 // =======================================
 
-func readAllFileContents(filePath *string) string {
+func ReadAllFileContents(filePath *string) string {
 	file, err := os.Open(*filePath)
 	handleError(err, "os.Open(*filePath)")
 	defer createFileCloseDeferFunc(file)()
@@ -175,7 +197,15 @@ func createFileCloseDeferFunc(file *os.File) func() {
 // Common Utils
 // =======================================
 
-// Handle error
+func GetEnvOrDefault(key string, defaultValue string) string {
+	value := defaultValue
+	v := os.Getenv(key)
+	if v != "" {
+		value = v
+	}
+	return value
+}
+
 func handleError(err error, prefixErrMessage string) {
 	if err != nil {
 		fmt.Printf("%s [ERROR %s]: %v\n", time.Now().Format(TimeFormat), prefixErrMessage, err)
@@ -198,7 +228,7 @@ func adjustUsage() {
 			return strings.Index(usageParams[i], UsageRequiredPrefix) >= 0
 		}
 	})
-	usage := strings.Replace(strings.Replace(strings.Split(b.String(), "\n")[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + CommandDescription + "\n\nOptions:\n"
+	usage := strings.Replace(strings.Replace(strings.Split(b.String(), "\n")[0], ":", " [Options]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + CommandDescription + "\n\nOptions:\n"
 	for _, v := range usageParams {
 		usage += fmt.Sprintf("%-"+strconv.Itoa(int(maxLengthParam+4.0))+"s", re.ReplaceAllString(v, "  $1, -$3$4")) + re.ReplaceAllString(v, "$5\n")
 	}

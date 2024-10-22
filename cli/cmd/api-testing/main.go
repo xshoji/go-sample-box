@@ -37,11 +37,30 @@ const (
 )
 
 var (
-	// Define short parameters ( this default value will be not used ).
-	paramsCompressHttpMessage = flag.Bool("c", false, UsageDummy)
-	paramsSkipTlsVerification = flag.Bool("s", false, UsageDummy)
-	paramsDisableHttp2        = flag.Bool("d", false, UsageDummy)
-	paramsHelp                = flag.Bool("h", false, UsageDummy)
+	//-------------------
+	// Define options
+	//-------------------
+
+	paramsCompressHttpMessage = func() (v *bool) {
+		v = flag.Bool("c", false, UsageDummy)
+		flag.BoolVar(v, "compress-http-message", false, "compress http message")
+		return
+	}()
+	paramsSkipTlsVerification = func() (v *bool) {
+		v = flag.Bool("s", false, UsageDummy)
+		flag.BoolVar(v, "skip-tls-verification", false, "skip tls verification")
+		return
+	}()
+	paramsDisableHttp2 = func() (v *bool) {
+		v = flag.Bool("d", false, UsageDummy)
+		flag.BoolVar(v, "disable-http2", false, "disable HTTP/2")
+		return
+	}()
+	paramsHelp = func() (v *bool) {
+		v = flag.Bool("h", false, UsageDummy)
+		flag.BoolVar(v, "help", false, "show help")
+		return
+	}()
 
 	// HTTP Header templates
 	httpHeaderEmptyMap        = make(map[string]string)
@@ -53,11 +72,6 @@ var (
 )
 
 func init() {
-	// Define long parameters
-	flag.BoolVar(paramsCompressHttpMessage /* */, "compress-http-message" /*  */, false /*   */, "compress http message")
-	flag.BoolVar(paramsSkipTlsVerification /* */, "skip-tls-verification" /*  */, false /*   */, "skip tls verification")
-	flag.BoolVar(paramsDisableHttp2 /*        */, "disable-http2" /*          */, false /*   */, "disable HTTP/2")
-	flag.BoolVar(paramsHelp /*                */, "help" /*                   */, false /*   */, "show help")
 
 	adjustUsage()
 }
@@ -72,9 +86,7 @@ func main() {
 
 	client := http.Client{
 		Transport: CreateCustomTransport(
-			&tls.Config{
-				InsecureSkipVerify: *paramsSkipTlsVerification,
-			},
+			&tls.Config{InsecureSkipVerify: *paramsSkipTlsVerification},
 			*paramsDisableHttp2,
 			"tcp4",
 		),
@@ -83,9 +95,9 @@ func main() {
 	fmt.Println("#--------------------")
 	fmt.Println("# Command information")
 	fmt.Println("#--------------------")
-	fmt.Printf("pretty http message   : %t\n", *paramsCompressHttpMessage)
+	fmt.Printf("compress http message : %t\n", *paramsCompressHttpMessage)
 	fmt.Printf("skip tls Verification : %t\n", *paramsSkipTlsVerification)
-	fmt.Printf("disable HTTP/2        : %t\n", *paramsDisableHttp2)
+	fmt.Printf("disable HTTP/2        : %t\n\n\n", *paramsDisableHttp2)
 
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, ContextKeyCompressHttpLog, *paramsCompressHttpMessage)
@@ -346,7 +358,7 @@ func adjustUsage() {
 			return strings.Index(usageParams[i], UsageRequiredPrefix) >= 0
 		}
 	})
-	usage := strings.Replace(strings.Replace(strings.Split(b.String(), "\n")[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + CommandDescription + "\n\nOptions:\n"
+	usage := strings.Replace(strings.Replace(strings.Split(b.String(), "\n")[0], ":", " [Options]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + CommandDescription + "\n\nOptions:\n"
 	for _, v := range usageParams {
 		usage += fmt.Sprintf("%-"+strconv.Itoa(int(maxLengthParam+4.0))+"s", re.ReplaceAllString(v, "  $1, -$3$4")) + re.ReplaceAllString(v, "$5\n")
 	}
