@@ -140,7 +140,7 @@ movie2,240,Action movie
 movie3,5,Short movie
 `
 	f, err := os.CreateTemp("", "temp.csv")
-	handleError(err, "os.CreateTemp(\"\", \"temoporary.csv\")")
+	handleError(err, `os.CreateTemp("", "temp.csv")`)
 	defer os.Remove(f.Name())
 	err = os.WriteFile(f.Name(), []byte(csvFileContents), 0655)
 	handleError(err, "os.WriteFile(f.Name(), []byte(csvFileContents), 0655)")
