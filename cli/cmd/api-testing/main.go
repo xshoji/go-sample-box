@@ -261,10 +261,10 @@ func DoHttpRequest(ctx context.Context, client http.Client, method string, url s
 
 func internalDoHttpRequest(ctx context.Context, client http.Client, method string, url string, headers map[string]string, body io.Reader) interface{} {
 	req, err := http.NewRequestWithContext(ctx, method, url, body)
+	handleError(err, "http.NewRequestWithContext")
 	for key, value := range headers {
 		req.Header.Set(key, value)
 	}
-	handleError(err, "http.NewRequestWithContext")
 	res, err := client.Do(req)
 	handleError(err, "client.Do(req)")
 	responseBody, err := io.ReadAll(res.Body)
@@ -275,12 +275,12 @@ func internalDoHttpRequest(ctx context.Context, client http.Client, method strin
 	var jsonBytes []byte
 	if ctx.Value(ContextKeyCompressHttpLog).(bool) {
 		jsonBytes, err = json.Marshal(responseBodyJsonObject)
-		handleError(err, "json.MarshalIndent(ToJsonObject(responseBody), \"\", \"  \")")
+		handleError(err, `json.Marshal(responseBodyJsonObject)`)
 		jsonString = strings.Replace(string(jsonBytes), "\r\n", ", ", -1)
 		jsonString = strings.Replace(jsonString, "\n", " ", -1)
 	} else {
-		jsonBytes, err := json.MarshalIndent(responseBodyJsonObject, "", "  ")
-		handleError(err, "json.MarshalIndent(ToJsonObject(responseBody), \"\", \"  \")")
+		jsonBytes, err = json.MarshalIndent(responseBodyJsonObject, "", "  ")
+		handleError(err, `json.MarshalIndent(responseBodyJsonObject, "", "  ")`)
 		jsonString = string(jsonBytes)
 	}
 
