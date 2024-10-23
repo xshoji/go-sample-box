@@ -52,7 +52,7 @@ var (
 		return maps.Clone(map[string]string{HttpContentTypeHeader: "application/x-www-form-urlencoded;charset=utf-8"})
 	}
 	createHttpHeaderContentTypeJson = func() map[string]string {
-		return maps.Clone(map[string]string{HttpContentTypeHeader: "application/json;charset=utf-8"})
+		return maps.Clone(map[string]string{HttpContentTypeHeader: "application/json"})
 	}
 
 	// Masking console log
