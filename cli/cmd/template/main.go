@@ -7,7 +7,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"log"
 	"math"
 	"net/http"
 	"os"
@@ -30,40 +29,14 @@ var (
 	//go:embed main.go
 	srcBytes []byte
 
-	//-------------------
-	// Define options
-	//-------------------
-
 	// Required parameters
-	paramsFilePath = func() (v *string) {
-		// Define short parameters ( this default value and usage will be not used ).
-		v = flag.String("f", "", UsageDummy)
-		// Define long parameters and description ( set default value here if you need ).
-		flag.StringVar(v, "file-path", "", UsageRequiredPrefix+"file path")
-		return
-	}()
+	paramsFilePath = defineStringParam("f", "file-path", UsageRequiredPrefix+"file path", "")
 
 	// Optional parameters
-	paramsUrl = func() (v *string) {
-		v = flag.String("u", "", UsageDummy)
-		flag.StringVar(v, "url", "https://httpbin.org/get", "url")
-		return
-	}()
-	paramsLineIndex = func() (v *int) {
-		v = flag.Int("l", 0, UsageDummy)
-		flag.IntVar(v, "line-index", 10, "index of line")
-		return
-	}()
-	paramsPrintSrc = func() (v *bool) {
-		v = flag.Bool("p", false, UsageDummy)
-		flag.BoolVar(v, "print-src", false, "print source code")
-		return
-	}()
-	paramsHelp = func() (v *bool) {
-		v = flag.Bool("h", false, UsageDummy)
-		flag.BoolVar(v, "help", false, "help")
-		return
-	}()
+	paramsUrl       = defineStringParam("u", "url", "url", "https://httpbin.org/get")
+	paramsLineIndex = defineIntParam("l", "line-index", "index of line", 10)
+	paramsPrintSrc  = defineBoolParam("p", "print-src", "print source code")
+	paramsHelp      = defineBoolParam("h", "help", "help")
 
 	// Set environment variable
 	environmentValueLoopCount, _ = strconv.Atoi(GetEnvOrDefault("LOOP_COUNT", "10"))
@@ -178,19 +151,11 @@ func Get(object interface{}, keyChain string) interface{} {
 func ReadAllFileContents(filePath *string) string {
 	file, err := os.Open(*filePath)
 	handleError(err, "os.Open(*filePath)")
-	defer createFileCloseDeferFunc(file)()
+	defer func() { handleError(file.Close(), "file.Close()") }()
 
 	contents, err := io.ReadAll(file)
 	handleError(err, "io.ReadAll(file)")
 	return string(contents)
-}
-
-func createFileCloseDeferFunc(file *os.File) func() {
-	return func() {
-		if err := file.Close(); err != nil {
-			log.Panic(err)
-		}
-	}
 }
 
 // =======================================
@@ -210,6 +175,26 @@ func handleError(err error, prefixErrMessage string) {
 	if err != nil {
 		fmt.Printf("%s [ERROR %s]: %v\n", time.Now().Format(TimeFormat), prefixErrMessage, err)
 	}
+}
+
+func defineStringParam(short, long, description, defaultValue string) (v *string) {
+	// Define short parameters ( this default value and usage will be not used ).
+	v = flag.String(short, "", UsageDummy)
+	// Define long parameters and description ( set default value here if you need ).
+	flag.StringVar(v, long, defaultValue, description)
+	return
+}
+
+func defineIntParam(short, long, description string, defaultValue int) (v *int) {
+	v = flag.Int(short, 0, UsageDummy)
+	flag.IntVar(v, long, defaultValue, description)
+	return
+}
+
+func defineBoolParam(short, long, description string) (v *bool) {
+	v = flag.Bool(short, false, UsageDummy)
+	flag.BoolVar(v, long, false, description)
+	return
 }
 
 func adjustUsage() {

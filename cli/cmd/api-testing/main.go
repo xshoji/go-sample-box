@@ -20,6 +20,7 @@ import (
 	"net/textproto"
 	"net/url"
 	"os"
+	"path/filepath"
 	"regexp"
 	"sort"
 	"strconv"
@@ -37,35 +38,22 @@ const (
 )
 
 var (
-	//-------------------
 	// Define options
-	//-------------------
+	paramsCompressHttpMessage = defineBoolParam("c", "compress-http-message", "compress http message")
+	paramsSkipTlsVerification = defineBoolParam("s", "skip-tls-verification", "skip tls verification")
+	paramsDisableHttp2        = defineBoolParam("d", "disable-http2", "disable HTTP/2")
+	paramsHelp                = defineBoolParam("h", "help", "show help")
 
-	paramsCompressHttpMessage = func() (v *bool) {
-		v = flag.Bool("c", false, UsageDummy)
-		flag.BoolVar(v, "compress-http-message", false, "compress http message")
-		return
-	}()
-	paramsSkipTlsVerification = func() (v *bool) {
-		v = flag.Bool("s", false, UsageDummy)
-		flag.BoolVar(v, "skip-tls-verification", false, "skip tls verification")
-		return
-	}()
-	paramsDisableHttp2 = func() (v *bool) {
-		v = flag.Bool("d", false, UsageDummy)
-		flag.BoolVar(v, "disable-http2", false, "disable HTTP/2")
-		return
-	}()
-	paramsHelp = func() (v *bool) {
-		v = flag.Bool("h", false, UsageDummy)
-		flag.BoolVar(v, "help", false, "show help")
-		return
-	}()
-	
 	// HTTP Header templates
-	httpHeaderEmptyMap        = make(map[string]string)
-	httpHeaderContentTypeForm = map[string]string{HttpContentTypeHeader: "application/x-www-form-urlencoded;charset=utf-8"}
-	httpHeaderContentTypeJson = map[string]string{HttpContentTypeHeader: "application/json;charset=utf-8"}
+	createHttpHeaderEmpty = func() map[string]string {
+		return maps.Clone(make(map[string]string))
+	}
+	createHttpHeaderContentTypeForm = func() map[string]string {
+		return maps.Clone(map[string]string{HttpContentTypeHeader: "application/x-www-form-urlencoded;charset=utf-8"})
+	}
+	createHttpHeaderContentTypeJson = func() map[string]string {
+		return maps.Clone(map[string]string{HttpContentTypeHeader: "application/json;charset=utf-8"})
+	}
 
 	// Masking console log
 	muskingRegex = regexp.MustCompile(`(Accept-Encoding:|Etag:|"key1":)(.*)`)
@@ -101,7 +89,7 @@ func main() {
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, ContextKeyCompressHttpLog, *paramsCompressHttpMessage)
 
-	headers := maps.Clone(httpHeaderContentTypeJson)
+	headers := createHttpHeaderContentTypeJson()
 
 	//
 	//
@@ -139,20 +127,20 @@ movie1,120,Horror movie
 movie2,240,Action movie
 movie3,5,Short movie
 `
-	f, err := os.CreateTemp("", "temp.csv")
-	handleError(err, `os.CreateTemp("", "temp.csv")`)
+	f, err := os.CreateTemp("", "")
+	handleError(err, `os.CreateTemp("", "")`)
 	defer os.Remove(f.Name())
 	err = os.WriteFile(f.Name(), []byte(csvFileContents), 0655)
 	handleError(err, "os.WriteFile(f.Name(), []byte(csvFileContents), 0655)")
-	fmt.Printf("temp.csv: %s\n\n\n", f.Name())
+	fmt.Printf("temp file: %s\n\n\n", f.Name())
 
 	response = DoHttpRequestMultipartFormData(ctx, client, "POST", targetUrl, headers, map[string]map[string]io.Reader{
 		"request": {
-			"application/json; charset=utf-8": bytes.NewReader([]byte(`{"title":"movie_title"}`)),
+			"application/json": bytes.NewReader([]byte(`{"title":"movie_title"}`)),
 		},
 		"file": {
 			//"text/csv; charset=utf-8": func() (f *os.File) { f, _ = os.Open("/tmp/aaa.csv"); return }(),
-			"text/csv; charset=utf-8": f,
+			"text/csv;charset=utf-8": f,
 		},
 	})
 	fmt.Println(response)
@@ -246,9 +234,9 @@ func DoHttpRequestMultipartFormData(ctx context.Context, client http.Client, met
 		}
 		h := make(textproto.MIMEHeader)
 		h.Set("Content-Type", contentType)
-		if _, ok := ioReader.(*os.File); ok {
+		if file, ok := ioReader.(*os.File); ok {
 			// Create the MIME headers for the new part
-			h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="dummyFileName"`, fieldName))
+			h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, fieldName, filepath.Base(file.Name())))
 		} else {
 			h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"`, fieldName))
 		}
@@ -376,14 +364,20 @@ func handleError(err error, prefixErrMessage string) {
 	}
 }
 
-// Get environment value ( with default value )
-func getEnv(key string, defaultValue string) string {
+// GetEnvOrDefault environment value ( with default value )
+func GetEnvOrDefault(key string, defaultValue string) string {
 	value := defaultValue
 	v := os.Getenv(key)
 	if v != "" {
 		value = v
 	}
 	return value
+}
+
+func defineBoolParam(short, long, description string) (v *bool) {
+	v = flag.Bool(short, false, UsageDummy)
+	flag.BoolVar(v, long, false, description)
+	return
 }
 
 func adjustUsage() {
