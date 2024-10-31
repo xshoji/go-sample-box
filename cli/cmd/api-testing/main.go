@@ -29,12 +29,11 @@ import (
 )
 
 const (
-	UsageRequiredPrefix       = "\u001B[33m[required]\u001B[0m "
-	UsageDummy                = "########"
-	CommandDescription        = "Web API testing tool."
-	HttpContentTypeHeader     = "content-type"
-	ContextKeyCompressHttpLog = "ContextKeyLoggingCompressHttpLog"
-	TimeFormat                = "2006-01-02 15:04:05.9999 [MST]"
+	UsageRequiredPrefix   = "\u001B[33m[required]\u001B[0m "
+	UsageDummy            = "########"
+	CommandDescription    = "Web API testing tool."
+	HttpContentTypeHeader = "content-type"
+	TimeFormat            = "2006-01-02 15:04:05.9999 [MST]"
 )
 
 var (
@@ -86,9 +85,6 @@ func main() {
 	fmt.Printf("skip tls Verification : %t\n", *paramsSkipTlsVerification)
 	fmt.Printf("disable HTTP/2        : %t\n\n\n", *paramsDisableHttp2)
 
-	ctx := context.Background()
-	ctx = context.WithValue(ctx, ContextKeyCompressHttpLog, *paramsCompressHttpMessage)
-
 	headers := createHttpHeaderContentTypeJson()
 
 	//
@@ -111,7 +107,7 @@ func main() {
   }
 }
 `
-	response := DoHttpRequest(ctx, client, "POST", targetUrl, headers, body)
+	response := DoHttpRequest(client, "POST", targetUrl, headers, body)
 	fmt.Printf("\"obj.list.0.key1\": %s\n\n\n\n", Get(response, "json.obj.list.0.key1").(string))
 
 	//
@@ -134,7 +130,7 @@ movie3,5,Short movie
 	handleError(err, "os.WriteFile(f.Name(), []byte(csvFileContents), 0655)")
 	fmt.Printf("temp file: %s\n\n\n", f.Name())
 
-	response = DoHttpRequestMultipartFormData(ctx, client, "POST", targetUrl, headers, map[string]map[string]io.Reader{
+	response = DoHttpRequestMultipartFormData(client, "POST", targetUrl, headers, map[string]map[string]io.Reader{
 		"request": {
 			"application/json": bytes.NewReader([]byte(`{"title":"movie_title"}`)),
 		},
@@ -162,7 +158,7 @@ func (s *CustomTransport) RoundTrip(r *http.Request) (*http.Response, error) {
 	handleError(err, "httputil.DumpRequestOut(r, true)")
 
 	adjustMessage := func(message string) string {
-		if r.Context().Value(ContextKeyCompressHttpLog).(bool) {
+		if *paramsCompressHttpMessage {
 			message = strings.Replace(message, "\r\n", ", ", -1)
 			message = strings.Replace(message, "\n", " ", -1)
 		}
@@ -215,7 +211,7 @@ func CreateCustomTransport(tlsConfig *tls.Config, disableHttp2 bool, networkType
 	return customTr
 }
 
-func DoHttpRequestMultipartFormData(ctx context.Context, client http.Client, method string, url string, headers map[string]string, multipartValues map[string]map[string]io.Reader) interface{} {
+func DoHttpRequestMultipartFormData(client http.Client, method string, url string, headers map[string]string, multipartValues map[string]map[string]io.Reader) interface{} {
 	body := &bytes.Buffer{}
 	multipartWriter := multipart.NewWriter(body)
 	for fieldName, contentTypeAndIoReader := range multipartValues {
@@ -248,20 +244,20 @@ func DoHttpRequestMultipartFormData(ctx context.Context, client http.Client, met
 	}
 	multipartWriter.Close()
 	headers["content-type"] = multipartWriter.FormDataContentType()
-	return internalDoHttpRequest(ctx, client, method, url, headers, body)
+	return internalDoHttpRequest(client, method, url, headers, body)
 }
 
-func DoHttpRequestFormUrlencoded(ctx context.Context, client http.Client, method string, url string, headers map[string]string, values url.Values) interface{} {
-	return internalDoHttpRequest(ctx, client, method, url, headers, strings.NewReader(values.Encode()))
+func DoHttpRequestFormUrlencoded(client http.Client, method string, url string, headers map[string]string, values url.Values) interface{} {
+	return internalDoHttpRequest(client, method, url, headers, strings.NewReader(values.Encode()))
 }
 
-func DoHttpRequest(ctx context.Context, client http.Client, method string, url string, headers map[string]string, body string) interface{} {
-	return internalDoHttpRequest(ctx, client, method, url, headers, strings.NewReader(body))
+func DoHttpRequest(client http.Client, method string, url string, headers map[string]string, body string) interface{} {
+	return internalDoHttpRequest(client, method, url, headers, strings.NewReader(body))
 }
 
-func internalDoHttpRequest(ctx context.Context, client http.Client, method string, url string, headers map[string]string, body io.Reader) interface{} {
-	req, err := http.NewRequestWithContext(ctx, method, url, body)
-	handleError(err, "http.NewRequestWithContext")
+func internalDoHttpRequest(client http.Client, method string, url string, headers map[string]string, body io.Reader) interface{} {
+	req, err := http.NewRequest(method, url, body)
+	handleError(err, "http.NewRequest(method, url, body)")
 	for key, value := range headers {
 		req.Header.Set(key, value)
 	}
@@ -273,7 +269,8 @@ func internalDoHttpRequest(ctx context.Context, client http.Client, method strin
 
 	var jsonString string
 	var jsonBytes []byte
-	if ctx.Value(ContextKeyCompressHttpLog).(bool) {
+
+	if *paramsCompressHttpMessage {
 		jsonBytes, err = json.Marshal(responseBodyJsonObject)
 		handleError(err, `json.Marshal(responseBodyJsonObject)`)
 		jsonString = strings.Replace(string(jsonBytes), "\r\n", ", ", -1)
