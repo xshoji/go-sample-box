@@ -391,7 +391,7 @@ func adjustUsage() {
 			return strings.Index(usageParams[i], UsageRequiredPrefix) >= 0
 		}
 	})
-	usage := strings.Replace(strings.Replace(strings.Split(b.String(), "\n")[0], ":", " [Options]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + CommandDescription + "\n\nOptions:\n"
+	usage := strings.Replace(strings.Replace(strings.Split(b.String(), "\n")[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + CommandDescription + "\n\nOptions:\n"
 	for _, v := range usageParams {
 		usage += fmt.Sprintf("%-6s%-"+strconv.Itoa(int(maxLengthParam))+"s", re.ReplaceAllString(v, "  $1,"), re.ReplaceAllString(v, "-$3$4")) + re.ReplaceAllString(v, "$5\n")
 	}
