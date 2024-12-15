@@ -97,7 +97,7 @@ func main() {
 	b := new(bytes.Buffer)
 	flag.CommandLine.SetOutput(b)
 	flag.Usage()
-	re := regexp.MustCompile("(-\\S+)( *\\S*)+\n*\\s+" + DummyUsage + "\n*\\s+(-\\S+)( *\\S*)+\n")
+	re := regexp.MustCompile("(-\\S+)( *\\S*)+\n*\\s+" + DummyUsage + ".*\n*\\s+(-\\S+)( *\\S*)+\n")
 	usage := re.ReplaceAllString(b.String(), "  $1, -$3$4\n")
 	flag.CommandLine.SetOutput(os.Stderr)
 	flag.Usage = func() {
