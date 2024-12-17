@@ -20,11 +20,13 @@ import (
 	"net/textproto"
 	"net/url"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"regexp"
 	"sort"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 )
 
@@ -38,10 +40,10 @@ const (
 
 var (
 	// Define options
-	paramsCompressHttpMessage = defineBoolParam("c", "compress-http-message", "compress http message")
-	paramsSkipTlsVerification = defineBoolParam("s", "skip-tls-verification", "skip tls verification")
-	paramsDisableHttp2        = defineBoolParam("d", "disable-http2", "disable HTTP/2")
-	paramsHelp                = defineBoolParam("h", "help", "show help")
+	optionEnableCompressHttpMessage = defineBoolFlag("c", "compress-http-message", "compress http message")
+	optionSkipTlsVerification       = defineBoolFlag("s", "skip-tls-verification", "skip tls verification")
+	optionDisableHttp2              = defineBoolFlag("d", "disable-http2", "disable HTTP/2")
+	optionHelp                      = defineBoolFlag("h", "help", "show help")
 
 	// HTTP Header templates
 	createHttpHeaderEmpty = func() map[string]string {
@@ -65,25 +67,25 @@ func init() {
 func main() {
 
 	flag.Parse()
-	if *paramsHelp {
+	if *optionHelp {
 		flag.Usage()
 		os.Exit(0)
 	}
 
 	client := http.Client{
 		Transport: CreateCustomTransport(
-			&tls.Config{InsecureSkipVerify: *paramsSkipTlsVerification},
-			*paramsDisableHttp2,
+			&tls.Config{InsecureSkipVerify: *optionSkipTlsVerification},
+			*optionDisableHttp2,
 			"tcp4",
 		),
 	}
 
 	fmt.Println("#--------------------")
-	fmt.Println("# Command information")
+	fmt.Println("# Command options")
 	fmt.Println("#--------------------")
-	fmt.Printf("compress http message : %t\n", *paramsCompressHttpMessage)
-	fmt.Printf("skip tls Verification : %t\n", *paramsSkipTlsVerification)
-	fmt.Printf("disable HTTP/2        : %t\n\n\n", *paramsDisableHttp2)
+	fmt.Printf("compress http message : %t\n", *optionEnableCompressHttpMessage)
+	fmt.Printf("skip tls Verification : %t\n", *optionSkipTlsVerification)
+	fmt.Printf("disable HTTP/2        : %t\n\n\n", *optionDisableHttp2)
 
 	headers := createHttpHeaderContentTypeJson()
 
@@ -123,13 +125,29 @@ movie1,120,Horror movie
 movie2,240,Action movie
 movie3,5,Short movie
 `
-	f, err := os.CreateTemp("", "")
-	handleError(err, `os.CreateTemp("", "")`)
+	f, err := os.CreateTemp("", "*_api_testing.csv")
+	handleError(err, `os.CreateTemp()`)
+
+	// Successful handling
 	defer os.Remove(f.Name())
+	// Signal handling
+	go func() {
+		// 1. Create channel for os.Signal and Notify interrupt signal to channel.
+		signalChannel := make(chan os.Signal, 1)
+		signal.Notify(signalChannel, os.Interrupt, syscall.SIGTERM) // syscall.SIGINT, syscall.SIGTERM ( [!] Cannot handle os.Kill )
+
+		// 2. Wait signal
+		s := <-signalChannel
+		fmt.Printf("Signal is received: %v\n", s)
+		os.Remove(f.Name())
+		signalValue := int(s.(syscall.Signal))
+		os.Exit(signalValue)
+	}()
+
 	err = os.WriteFile(f.Name(), []byte(csvFileContents), 0655)
 	handleError(err, "os.WriteFile(f.Name(), []byte(csvFileContents), 0655)")
 	fmt.Printf("temp file: %s\n\n\n", f.Name())
-
+	
 	response = DoHttpRequestMultipartFormData(client, "POST", targetUrl, headers, map[string]map[string]io.Reader{
 		"request": {
 			"application/json": bytes.NewReader([]byte(`{"title":"movie_title"}`)),
@@ -158,7 +176,7 @@ func (s *CustomTransport) RoundTrip(r *http.Request) (*http.Response, error) {
 	handleError(err, "httputil.DumpRequestOut(r, true)")
 
 	adjustMessage := func(message string) string {
-		if *paramsCompressHttpMessage {
+		if *optionEnableCompressHttpMessage {
 			message = strings.Replace(message, "\r\n", ", ", -1)
 			message = strings.Replace(message, "\n", " ", -1)
 		}
@@ -270,7 +288,7 @@ func internalDoHttpRequest(client http.Client, method string, url string, header
 	var jsonString string
 	var jsonBytes []byte
 
-	if *paramsCompressHttpMessage {
+	if *optionEnableCompressHttpMessage {
 		jsonBytes, err = json.Marshal(responseBodyJsonObject)
 		handleError(err, `json.Marshal(responseBodyJsonObject)`)
 		jsonString = strings.Replace(string(jsonBytes), "\r\n", ", ", -1)
@@ -371,7 +389,7 @@ func GetEnvOrDefault(key string, defaultValue string) string {
 	return value
 }
 
-func defineBoolParam(short, long, description string) (v *bool) {
+func defineBoolFlag(short, long, description string) (v *bool) {
 	v = flag.Bool(short, false, UsageDummy)
 	flag.BoolVar(v, long, false, description)
 	return

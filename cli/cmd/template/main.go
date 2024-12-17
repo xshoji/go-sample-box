@@ -30,13 +30,13 @@ var (
 	srcBytes []byte
 
 	// Required parameters
-	paramsFilePath = defineStringParam("f", "file-path", UsageRequiredPrefix+"file path", "")
+	optionFilePath = defineStringFlag("f", "file-path", UsageRequiredPrefix+"file path", "")
 
 	// Optional parameters
-	paramsUrl       = defineStringParam("u", "url", "url", "https://httpbin.org/get")
-	paramsLineIndex = defineIntParam("l", "line-index", "index of line", 10)
-	paramsPrintSrc  = defineBoolParam("p", "print-src", "print source code")
-	paramsHelp      = defineBoolParam("h", "help", "help")
+	optionUrl       = defineStringFlag("u", "url", "url", "https://httpbin.org/get")
+	optionLineIndex = defineIntFlag("l", "line-index", "index of line", 10)
+	optionPrintSrc  = defineBoolFlag("p", "print-src", "print source code")
+	optionHelp      = defineBoolFlag("h", "help", "help")
 
 	// Set environment variable
 	environmentValueLoopCount, _ = strconv.Atoi(GetEnvOrDefault("LOOP_COUNT", "10"))
@@ -69,25 +69,25 @@ func init() {
 func main() {
 
 	flag.Parse()
-	if *paramsPrintSrc {
+	if *optionPrintSrc {
 		fmt.Printf("%s", srcBytes)
 		os.Exit(0)
 	}
-	if *paramsHelp || *paramsFilePath == "" {
+	if *optionHelp || *optionFilePath == "" {
 		flag.Usage()
 		os.Exit(0)
 	}
 
 	fmt.Printf("[ Environment variable ]\nLOOP_COUNT: %d\n\n", environmentValueLoopCount)
-	fmt.Printf("[ Options ]\nfile-path: %s\n", *paramsFilePath)
-	fmt.Printf("line-index: %d\n\n", *paramsLineIndex)
+	fmt.Printf("[ Options ]\nfile-path: %s\n", *optionFilePath)
+	fmt.Printf("line-index: %d\n\n", *optionLineIndex)
 
-	contents := ReadAllFileContents(paramsFilePath)
-	fmt.Println(strings.Split(contents, "\n")[*paramsLineIndex])
+	contents := ReadAllFileContents(optionFilePath)
+	fmt.Println(strings.Split(contents, "\n")[*optionLineIndex])
 
-	res := HttpGetJson(*paramsUrl + "?" + fmt.Sprintf("paramsLineIndex=%d", *paramsLineIndex))
+	res := HttpGetJson(*optionUrl + "?" + fmt.Sprintf("optionLineIndex=%d", *optionLineIndex))
 	fmt.Println(res)
-	fmt.Println(Get(res, "args.paramsLineIndex"))
+	fmt.Println(Get(res, "args.optionLineIndex"))
 
 }
 
@@ -177,7 +177,7 @@ func handleError(err error, prefixErrMessage string) {
 	}
 }
 
-func defineStringParam(short, long, description, defaultValue string) (v *string) {
+func defineStringFlag(short, long, description, defaultValue string) (v *string) {
 	// Define short parameters ( this default value and usage will be not used ).
 	v = flag.String(short, "", UsageDummy)
 	// Define long parameters and description ( set default value here if you need ).
@@ -185,13 +185,13 @@ func defineStringParam(short, long, description, defaultValue string) (v *string
 	return
 }
 
-func defineIntParam(short, long, description string, defaultValue int) (v *int) {
+func defineIntFlag(short, long, description string, defaultValue int) (v *int) {
 	v = flag.Int(short, 0, UsageDummy)
 	flag.IntVar(v, long, defaultValue, description)
 	return
 }
 
-func defineBoolParam(short, long, description string) (v *bool) {
+func defineBoolFlag(short, long, description string) (v *bool) {
 	v = flag.Bool(short, false, UsageDummy)
 	flag.BoolVar(v, long, false, description)
 	return
