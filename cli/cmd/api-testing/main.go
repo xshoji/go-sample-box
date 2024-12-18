@@ -147,7 +147,7 @@ movie3,5,Short movie
 	err = os.WriteFile(f.Name(), []byte(csvFileContents), 0655)
 	handleError(err, "os.WriteFile(f.Name(), []byte(csvFileContents), 0655)")
 	fmt.Printf("temp file: %s\n\n\n", f.Name())
-	
+
 	response = DoHttpRequestMultipartFormData(client, "POST", targetUrl, headers, map[string]map[string]io.Reader{
 		"request": {
 			"application/json": bytes.NewReader([]byte(`{"title":"movie_title"}`)),
@@ -159,6 +159,90 @@ movie3,5,Short movie
 	})
 	fmt.Println(response)
 
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	csvFileContents2 := `aaa,bbb,ccc
+aaa1,bbb2,ccc3
+aaa4,bbb5,ccc6
+aaa7,bbb8,ccc9
+`
+
+	response = DoHttpRequestMultipartFormData(client, "POST", targetUrl, headers, map[string]map[string]io.Reader{
+		"request": {
+			"application/json": bytes.NewReader([]byte(`{"title":"movie_title"}`)),
+		},
+		"file": {
+			"text/csv;charset=utf-8": &AnyContentNoBufferedReader{
+				content:        []byte(csvFileContents2),
+				byteArrayIndex: 0,
+			},
+		},
+	})
+	fmt.Println(response)
+
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	response = DoHttpRequestMultipartFormData(client, "POST", targetUrl, headers, map[string]map[string]io.Reader{
+		"request": {
+			"application/json": bytes.NewReader([]byte(`{"title":"movie_title"}`)),
+		},
+		"file": {
+			"text/csv;charset=utf-8": &ConstantContentNoBufferedReader{
+				kbSize:      5,
+				repetitions: 0,
+			},
+		},
+	})
+	fmt.Println(response)
+}
+
+// =======================================
+// io.Reader implementation
+// =======================================
+
+type ConstantContentNoBufferedReader struct {
+	kbSize      int
+	repetitions int
+}
+
+func (r *ConstantContentNoBufferedReader) Read(p []byte) (n int, err error) {
+	chunkSize := 1024 // 1kb
+	if r.repetitions >= r.kbSize {
+		return 0, io.EOF
+	}
+	copy(p, bytes.Repeat([]byte("0"), chunkSize))
+	r.repetitions++
+	return chunkSize, nil
+}
+
+type AnyContentNoBufferedReader struct {
+	content        []byte
+	byteArrayIndex int
+}
+
+func (r *AnyContentNoBufferedReader) Read(p []byte) (n int, err error) {
+	chunkSize := 1024 // 1kb
+	if r.byteArrayIndex == len(r.content) {
+		return 0, io.EOF
+	}
+	if diff := r.byteArrayIndex + chunkSize - len(r.content); diff > 0 {
+		chunkSize = chunkSize - diff
+	}
+	copy(p, r.content[r.byteArrayIndex:chunkSize])
+	r.byteArrayIndex = r.byteArrayIndex + chunkSize
+	return chunkSize, nil
 }
 
 // =======================================
@@ -251,6 +335,10 @@ func DoHttpRequestMultipartFormData(client http.Client, method string, url strin
 		if file, ok := ioReader.(*os.File); ok {
 			// Create the MIME headers for the new part
 			h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, fieldName, filepath.Base(file.Name())))
+		} else if _, ok := ioReader.(*ConstantContentNoBufferedReader); ok {
+			h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, fieldName, "dummyFileName"))
+		} else if _, ok := ioReader.(*AnyContentNoBufferedReader); ok {
+			h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, fieldName, "dummyFileName"))
 		} else {
 			h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"`, fieldName))
 		}
