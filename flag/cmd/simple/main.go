@@ -10,18 +10,18 @@ import (
 // https://stackoverflow.com/questions/19761963/flag-command-line-parsing-in-golang
 
 var (
-	// Define short parameters and description ( set default value here if you need ).
+	// Define short options and description ( set default value here if you need ).
 	//
-	paramsAdd         = flag.Int("a" /*    */, 0 /*       */, "[required] add")
-	paramsItemName    = flag.String("i" /* */, "" /*      */, "[required] item name")
-	paramsTitle       = flag.String("t" /* */, "" /*      */, "[required] title")
-	paramsFilesize    = flag.Int("f" /*    */, 10 /*      */, "[optional] filesize")
-	paramsCount       = flag.Int("c" /*    */, 1 /*       */, "[optional] count")
-	paramsBinary      = flag.String("b" /* */, "00101" /* */, "[optional] binary")
-	paramsEnvironment = flag.String("e" /* */, "DEV" /*   */, "[optional] environment")
-	paramsGlobal      = flag.Bool("g" /*   */, false /*   */, "\nglobal")
-	paramsHelp        = flag.Bool("h" /*   */, false /*   */, "\nhelp")
-	paramsDebug       = flag.Bool("d" /*   */, false /*   */, "\ndebug")
+	optionAdd         = flag.Int("a" /*    */, 0 /*       */, "[required] add")
+	optionItemName    = flag.String("i" /* */, "" /*      */, "[required] item name")
+	optionTitle       = flag.String("t" /* */, "" /*      */, "[required] title")
+	optionFilesize    = flag.Int("f" /*    */, 10 /*      */, "[optional] filesize")
+	optionCount       = flag.Int("c" /*    */, 1 /*       */, "[optional] count")
+	optionBinary      = flag.String("b" /* */, "00101" /* */, "[optional] binary")
+	optionEnvironment = flag.String("e" /* */, "DEV" /*   */, "[optional] environment")
+	optionGlobal      = flag.Bool("g" /*   */, false /*   */, "\nglobal")
+	optionHelp        = flag.Bool("h" /*   */, false /*   */, "\nhelp")
+	optionDebug       = flag.Bool("d" /*   */, false /*   */, "\ndebug")
 )
 
 // << Execution sample >>
@@ -65,18 +65,18 @@ func main() {
 	flag.Parse()
 	// Required parameter
 	// - [Can Go's `flag` package print usage? - Stack Overflow](https://stackoverflow.com/questions/23725924/can-gos-flag-package-print-usage)
-	if *paramsHelp || *paramsAdd == 0 || *paramsItemName == "" || *paramsTitle == "" {
+	if *optionHelp || *optionAdd == 0 || *optionItemName == "" || *optionTitle == "" {
 		flag.Usage()
 		os.Exit(0)
 	}
 
-	fmt.Println("add:", *paramsAdd)
-	fmt.Println("binary:", *paramsBinary)
-	fmt.Println("environment:", *paramsEnvironment)
-	fmt.Println("filesize:", *paramsFilesize)
-	fmt.Println("global:", *paramsGlobal)
-	fmt.Println("item-name:", *paramsItemName)
-	fmt.Println("title:", *paramsTitle)
-	fmt.Println("count:", *paramsCount)
-	fmt.Println("debug:", *paramsDebug)
+	fmt.Println("add:", *optionAdd)
+	fmt.Println("binary:", *optionBinary)
+	fmt.Println("environment:", *optionEnvironment)
+	fmt.Println("filesize:", *optionFilesize)
+	fmt.Println("global:", *optionGlobal)
+	fmt.Println("item-name:", *optionItemName)
+	fmt.Println("title:", *optionTitle)
+	fmt.Println("count:", *optionCount)
+	fmt.Println("debug:", *optionDebug)
 }

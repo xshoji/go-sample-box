@@ -14,34 +14,34 @@ const DummyUsage = "########"
 // https://stackoverflow.com/questions/19761963/flag-command-line-parsing-in-golang
 
 var (
-	// Define short parameters ( don't set default value ).
-	paramsAdd         = flag.Int("a", 0, DummyUsage)
-	paramsItemName    = flag.String("i", "", DummyUsage)
-	paramsTitle       = flag.String("t", "", DummyUsage)
-	paramsFilesize    = flag.Int("f", 0, DummyUsage)
-	paramsCount       = flag.Int("c", 0, DummyUsage)
-	paramsBinary      = flag.String("b", "", DummyUsage)
-	paramsEnvironment = flag.String("e", "", DummyUsage)
-	paramsGlobal      = flag.Bool("g", false, DummyUsage)
-	paramsHelp        = flag.Bool("h", false, DummyUsage)
-	paramsDebug       = flag.Bool("d", false, DummyUsage)
+	// Define short options ( don't set default value ).
+	optionAdd         = flag.Int("a", 0, DummyUsage)
+	optionItemName    = flag.String("i", "", DummyUsage)
+	optionTitle       = flag.String("t", "", DummyUsage)
+	optionFilesize    = flag.Int("f", 0, DummyUsage)
+	optionCount       = flag.Int("c", 0, DummyUsage)
+	optionBinary      = flag.String("b", "", DummyUsage)
+	optionEnvironment = flag.String("e", "", DummyUsage)
+	optionGlobal      = flag.Bool("g", false, DummyUsage)
+	optionHelp        = flag.Bool("h", false, DummyUsage)
+	optionDebug       = flag.Bool("d", false, DummyUsage)
 )
 
 func init() {
-	// Define long parameters and description ( set default value here if you need ).
+	// Define long options and description ( set default value here if you need ).
 	//
 	// Required parameters
-	flag.IntVar(paramsAdd /*            */, "add" /*         */, 0 /*          */, "[required] add")
-	flag.StringVar(paramsItemName /*    */, "item-name" /*   */, "" /*         */, "[required] item name")
-	flag.StringVar(paramsTitle /*       */, "title" /*       */, "" /*         */, "[required] title")
+	flag.IntVar(optionAdd /*            */, "add" /*         */, 0 /*          */, "[required] add")
+	flag.StringVar(optionItemName /*    */, "item-name" /*   */, "" /*         */, "[required] item name")
+	flag.StringVar(optionTitle /*       */, "title" /*       */, "" /*         */, "[required] title")
 	// Optional parameters
-	flag.IntVar(paramsFilesize /*       */, "filesize" /*    */, 10 /*         */, "[optional] filesize")
-	flag.IntVar(paramsCount /*          */, "count" /*       */, 1 /*          */, "[optional] count")
-	flag.StringVar(paramsBinary /*      */, "binary" /*      */, "00010101" /* */, "[optional] binary")
-	flag.StringVar(paramsEnvironment /* */, "environment" /* */, "DEV" /*      */, "[optional] environment")
-	flag.BoolVar(paramsGlobal /*        */, "global" /*      */, false /*      */, "global")
-	flag.BoolVar(paramsHelp /*          */, "help" /*        */, false /*      */, "help")
-	flag.BoolVar(paramsDebug /*         */, "debug" /*       */, false /*      */, "debug")
+	flag.IntVar(optionFilesize /*       */, "filesize" /*    */, 10 /*         */, "[optional] filesize")
+	flag.IntVar(optionCount /*          */, "count" /*       */, 1 /*          */, "[optional] count")
+	flag.StringVar(optionBinary /*      */, "binary" /*      */, "00010101" /* */, "[optional] binary")
+	flag.StringVar(optionEnvironment /* */, "environment" /* */, "DEV" /*      */, "[optional] environment")
+	flag.BoolVar(optionGlobal /*        */, "global" /*      */, false /*      */, "global")
+	flag.BoolVar(optionHelp /*          */, "help" /*        */, false /*      */, "help")
+	flag.BoolVar(optionDebug /*         */, "debug" /*       */, false /*      */, "debug")
 }
 
 // << Execution sample >>
@@ -105,18 +105,18 @@ func main() {
 	}
 
 	flag.Parse()
-	if *paramsHelp || *paramsAdd == 0 || *paramsItemName == "" || *paramsTitle == "" {
+	if *optionHelp || *optionAdd == 0 || *optionItemName == "" || *optionTitle == "" {
 		flag.Usage()
 		os.Exit(0)
 	}
 
-	fmt.Println("add:", *paramsAdd)
-	fmt.Println("binary:", *paramsBinary)
-	fmt.Println("environment:", *paramsEnvironment)
-	fmt.Println("filesize:", *paramsFilesize)
-	fmt.Println("global:", *paramsGlobal)
-	fmt.Println("item-name:", *paramsItemName)
-	fmt.Println("title:", *paramsTitle)
-	fmt.Println("count:", *paramsCount)
-	fmt.Println("debug:", *paramsDebug)
+	fmt.Println("add:", *optionAdd)
+	fmt.Println("binary:", *optionBinary)
+	fmt.Println("environment:", *optionEnvironment)
+	fmt.Println("filesize:", *optionFilesize)
+	fmt.Println("global:", *optionGlobal)
+	fmt.Println("item-name:", *optionItemName)
+	fmt.Println("title:", *optionTitle)
+	fmt.Println("count:", *optionCount)
+	fmt.Println("debug:", *optionDebug)
 }

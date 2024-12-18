@@ -19,24 +19,24 @@ const (
 )
 
 var (
-	// Define short parameters ( don't set default value ).
-	paramsAdd      = flag.Int("a", 0, UsageDummy)
-	paramsItemName = flag.String("i", "", UsageDummy)
-	paramsFilesize = flag.Int("f", 0, UsageDummy)
-	paramsCount    = flag.Int("c", 0, UsageDummy)
-	paramsHelp     = flag.Bool("h", false, UsageDummy)
+	// Define short options ( don't set default value ).
+	optionAdd      = flag.Int("a", 0, UsageDummy)
+	optionItemName = flag.String("i", "", UsageDummy)
+	optionFilesize = flag.Int("f", 0, UsageDummy)
+	optionCount    = flag.Int("c", 0, UsageDummy)
+	optionHelp     = flag.Bool("h", false, UsageDummy)
 )
 
 func init() {
 	// Define long parameters and description ( set default value here if you need ).
 	//
 	// Required parameters
-	flag.IntVar(paramsAdd /*         */, "add" /*       */, 0 /*     */, UsageRequiredPrefix+"add")
-	flag.StringVar(paramsItemName /* */, "item-name" /* */, "" /*    */, UsageRequiredPrefix+"item-name")
+	flag.IntVar(optionAdd /*         */, "add" /*       */, 0 /*     */, UsageRequiredPrefix+"add")
+	flag.StringVar(optionItemName /* */, "item-name" /* */, "" /*    */, UsageRequiredPrefix+"item-name")
 	// Optional parameters
-	flag.IntVar(paramsFilesize /*    */, "filesize" /*  */, 10 /*    */, "filesize")
-	flag.IntVar(paramsCount /*       */, "count" /*     */, 1 /*     */, "count")
-	flag.BoolVar(paramsHelp /*       */, "help" /*      */, false /* */, "help")
+	flag.IntVar(optionFilesize /*    */, "filesize" /*  */, 10 /*    */, "filesize")
+	flag.IntVar(optionCount /*       */, "count" /*     */, 1 /*     */, "count")
+	flag.BoolVar(optionHelp /*       */, "help" /*      */, false /* */, "help")
 
 	// Adjust Usage
 	adjustUsage()
@@ -66,15 +66,15 @@ func init() {
 func main() {
 
 	flag.Parse()
-	if *paramsHelp || *paramsAdd == 0 || *paramsItemName == "" {
+	if *optionHelp || *optionAdd == 0 || *optionItemName == "" {
 		flag.Usage()
 		os.Exit(0)
 	}
 
-	fmt.Println("add:", *paramsAdd)
-	fmt.Println("filesize:", *paramsFilesize)
-	fmt.Println("item-name:", *paramsItemName)
-	fmt.Println("count:", *paramsCount)
+	fmt.Println("add:", *optionAdd)
+	fmt.Println("filesize:", *optionFilesize)
+	fmt.Println("item-name:", *optionItemName)
+	fmt.Println("count:", *optionCount)
 }
 
 func adjustUsage() {
@@ -82,20 +82,20 @@ func adjustUsage() {
 	b := new(bytes.Buffer)
 	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
 	// Get default flags usage
-	re := regexp.MustCompile("(-\\S+)( *\\S*)+\n*\\s+" + UsageDummy + "\n*\\s+(-\\S+)( *\\S*)+\n\\s+(.+)")
-	usageParams := re.FindAllString(b.String(), -1)
-	maxLengthParam := 0.0
-	sort.Slice(usageParams, func(i, j int) bool {
-		maxLengthParam = math.Max(maxLengthParam, math.Max(float64(len(re.ReplaceAllString(usageParams[i], "$1, -$3$4"))), float64(len(re.ReplaceAllString(usageParams[j], "$1, -$3$4")))))
-		if len(strings.Split(usageParams[i]+usageParams[j], UsageRequiredPrefix))%2 == 1 {
-			return strings.Compare(usageParams[i], usageParams[j]) == -1
+	re := regexp.MustCompile("(-\\S+)( *\\S*)+\n*\\s+" + UsageDummy + ".*\n*\\s+(-\\S+)( *\\S*)+\n\\s+(.+)")
+	usageOptions := re.FindAllString(b.String(), -1)
+	maxLength := 0.0
+	sort.Slice(usageOptions, func(i, j int) bool {
+		maxLength = math.Max(maxLength, math.Max(float64(len(re.ReplaceAllString(usageOptions[i], "$1, -$3$4"))), float64(len(re.ReplaceAllString(usageOptions[j], "$1, -$3$4")))))
+		if len(strings.Split(usageOptions[i]+usageOptions[j], UsageRequiredPrefix))%2 == 1 {
+			return strings.Compare(usageOptions[i], usageOptions[j]) == -1
 		} else {
-			return strings.Index(usageParams[i], UsageRequiredPrefix) >= 0
+			return strings.Index(usageOptions[i], UsageRequiredPrefix) >= 0
 		}
 	})
-	usage := strings.Split(b.String(), "\n")[0] + "\n\nDescription:\n  " + CommandDescription + "\n\nOptions:\n"
-	for _, v := range usageParams {
-		usage += fmt.Sprintf("%-"+strconv.Itoa(int(maxLengthParam+4.0))+"s", re.ReplaceAllString(v, "  $1, -$3$4")) + re.ReplaceAllString(v, "$5\n")
+	usage := strings.Replace(strings.Replace(strings.Split(b.String(), "\n")[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + CommandDescription + "\n\nOptions:\n"
+	for _, v := range usageOptions {
+		usage += fmt.Sprintf("%-6s%-"+strconv.Itoa(int(maxLength))+"s", re.ReplaceAllString(v, "  $1,"), re.ReplaceAllString(v, "-$3$4")) + re.ReplaceAllString(v, "$5\n")
 	}
 	flag.Usage = func() { _, _ = fmt.Fprintf(flag.CommandLine.Output(), usage) }
 }
