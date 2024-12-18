@@ -29,10 +29,10 @@ var (
 	//go:embed main.go
 	srcBytes []byte
 
-	// Required parameters
+	// Required flag
 	optionFilePath = defineStringFlag("f", "file-path", UsageRequiredPrefix+"file path", "")
 
-	// Optional parameters
+	// Optional flag
 	optionUrl       = defineStringFlag("u", "url", "url", "https://httpbin.org/get")
 	optionLineIndex = defineIntFlag("l", "line-index", "index of line", 10)
 	optionPrintSrc  = defineBoolFlag("p", "print-src", "print source code")
