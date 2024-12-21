@@ -20,14 +20,33 @@ var (
 	optionDebug    = flag.Bool("d" /*    */, false /*   */, "\ndebug")
 )
 
+// Set formatted usage
+func init() {
+	description := "Command description is here."
+	b := new(bytes.Buffer)
+	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
+	usageLines := strings.Split(b.String(), "\n")
+	usage := strings.Replace(strings.Replace(usageLines[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + description + "\n\nOptions:\n"
+	re := regexp.MustCompile(" +(-\\S+)( *\\S*|\t)*\n(\\s+)(.*)\n")
+	usage += re.ReplaceAllStringFunc(strings.Join(usageLines[1:], "\n"), func(m string) string {
+		parts := re.FindStringSubmatch(m)
+		return fmt.Sprintf("  %-10s %s\n", parts[1]+" "+strings.TrimSpace(parts[2]), parts[4])
+	})
+	flag.Usage = func() {
+		_, _ = fmt.Fprintf(flag.CommandLine.Output(), usage)
+	}
+}
+
 // << Execution sample >>
 //
-// $ go run main.go -l 2 -n John
-// [req] Level :  2
-// [req] Name  :  John
-// Birthday    :
-// Weight      :  60
-// Debug       :  false
+// $ go run cmd/simpleformatusage/main.go -l 2 -n John -d
+// [ Command options ]
+// -b           birthday (format: 1900/01/02)
+// -d true      debug
+// -f 60        weight
+// -h false     help
+// -l 2         [req] level
+// -n John      [req] name
 //
 // $ go run cmd/simpleformatusage/main.go -h
 // Usage: /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build3001085942/b001/exe/main [OPTIONS]
@@ -45,21 +64,6 @@ var (
 
 func main() {
 
-	// Set formatted usage
-	description := "Command description is here."
-	b := new(bytes.Buffer)
-	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
-	usageLines := strings.Split(b.String(), "\n")
-	usage := strings.Replace(strings.Replace(usageLines[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + description + "\n\nOptions:\n"
-	re := regexp.MustCompile(" +(-\\S+)( *\\S*|\t)*\n(\\s+)(.*)\n")
-	usage += re.ReplaceAllStringFunc(strings.Join(usageLines[1:], "\n"), func(m string) string {
-		parts := re.FindStringSubmatch(m)
-		return fmt.Sprintf("  %-10s %s\n", parts[1]+" "+strings.TrimSpace(parts[2]), parts[4])
-	})
-	flag.Usage = func() {
-		_, _ = fmt.Fprintf(flag.CommandLine.Output(), usage)
-	}
-
 	flag.Parse()
 	// Required parameter
 	// - [Can Go's `flag` package print usage? - Stack Overflow](https://stackoverflow.com/questions/23725924/can-gos-flag-package-print-usage)
@@ -68,9 +72,9 @@ func main() {
 		os.Exit(0)
 	}
 
-	fmt.Println("[req] Level : ", *optionLevel)
-	fmt.Println("[req] Name  : ", *optionName)
-	fmt.Println("Birthday    : ", *optionBirthday)
-	fmt.Println("Weight      : ", *optionWeight)
-	fmt.Println("Debug       : ", *optionDebug)
+	// Print all options
+	fmt.Printf("[ Command options ]\n")
+	flag.VisitAll(func(a *flag.Flag) {
+		fmt.Printf("-%s %-7v   %s\n", a.Name, a.Value, strings.Trim(a.Usage, "\n"))
+	})
 }

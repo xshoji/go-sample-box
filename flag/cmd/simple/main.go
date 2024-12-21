@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 )
 
 // go - Flag command line parsing in golang - Stack Overflow
@@ -22,12 +23,14 @@ var (
 
 // << Execution sample >>
 //
-// $ go run main.go -l 2 -n John
-// [req] Level :  2
-// [req] Name  :  John
-// Birthday    :
-// Weight      :  60
-// Debug       :  false
+// $ go run cmd/simple/main.go -l 2 -n John -d
+// [ Command options ]
+// -b           birthday (format: 1900/01/02)
+// -d true      debug
+// -f 60        weight
+// -h false     help
+// -l 2         [req] level
+// -n John      [req] name
 //
 // $ go run cmd/simple/main.go -h
 // Usage of /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build3551952392/b001/exe/main:
@@ -54,9 +57,9 @@ func main() {
 		os.Exit(0)
 	}
 
-	fmt.Println("[req] Level : ", *optionLevel)
-	fmt.Println("[req] Name  : ", *optionName)
-	fmt.Println("Birthday    : ", *optionBirthday)
-	fmt.Println("Weight      : ", *optionWeight)
-	fmt.Println("Debug       : ", *optionDebug)
+	// Print all options
+	fmt.Printf("[ Command options ]\n")
+	flag.VisitAll(func(a *flag.Flag) {
+		fmt.Printf("-%s %-7v   %s\n", a.Name, a.Value, strings.Trim(a.Usage, "\n"))
+	})
 }
