@@ -39,7 +39,7 @@ func init() {
 	flag.BoolVar(optionHelp /*       */, "help" /*      */, false /* */, "help")
 
 	// Adjust Usage
-	adjustUsage()
+	formatUsage()
 }
 
 // << Execution sample >>
@@ -56,12 +56,17 @@ func init() {
 // count: 1
 //
 // $ go run cmd/adjustusagewithlong/main.go -h
-// Usage of /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build749980003/b001/exe/main:
-//   -a, --add int           [required] add
-//   -i, --item-name string  [required] item-name
-//   -c, --count int         count (default 1)
-//   -f, --filesize int      filesize (default 10)
-//   -h, --help              help
+//Usage: /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build3715934692/b001/exe/main [OPTIONS]
+//
+//Description:
+//  Command description is here.
+//
+//Options:
+//  -a, --add int             [required] add
+//  -i, --item-name string    [required] item-name
+//  -c, --count int           count (default 1)
+//  -f, --filesize int        filesize (default 10)
+//  -h, --help                help
 
 func main() {
 
@@ -77,7 +82,7 @@ func main() {
 	fmt.Println("count:", *optionCount)
 }
 
-func adjustUsage() {
+func formatUsage() {
 	// Get default flags usage
 	b := new(bytes.Buffer)
 	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()

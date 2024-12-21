@@ -28,29 +28,34 @@ var (
 
 func init() {
 	// Adjust Usage
-	adjustUsage()
+	formatUsage()
 }
 
 // << Execution sample >>
-// $ go run cmd/adjustusage/main.go -a 10 -i test
+// $ go run cmd/formatusage/main.go -a 10 -i test
 // add: 10
 // filesize: 10
 // item-name: test
 // count: 1
 //
-// $ go run cmd/adjustusage/main.go --add 12 --item-name test
+// $ go run cmd/formatusage/main.go --add 12 --item-name test
 // add: 12
 // filesize: 10
 // item-name: test
 // count: 1
 //
-// $ go run cmd/adjustusage/main.go -h
-// Usage of /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build3125881208/b001/exe/main:
-//   -a int       [required] add
-//   -i string    [required] item-name
-//   -c int       count (default 1)
-//   -f int       filesize (default 10)
-//   -h           help
+// $ go run cmd/formatusage/main.go -h
+//Usage of /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build3188841424/b001/exe/main:
+//
+//Description:
+//  Command description is here.
+//
+//Options:
+//  -a int      [required] add
+//  -i string   [required] item-name
+//  -c int      count (default 1)
+//  -f int      filesize (default 10)
+//  -h          help
 
 func main() {
 
@@ -66,7 +71,7 @@ func main() {
 	fmt.Println("count:", *optionCount)
 }
 
-func adjustUsage() {
+func formatUsage() {
 	// Get default flags usage
 	b := new(bytes.Buffer)
 	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()

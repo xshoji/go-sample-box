@@ -61,7 +61,7 @@ var (
 )
 
 func init() {
-	adjustUsage()
+	formatUsage()
 }
 
 func main() {
@@ -483,7 +483,7 @@ func defineBoolFlag(short, long, description string) (v *bool) {
 	return
 }
 
-func adjustUsage() {
+func formatUsage() {
 	b := new(bytes.Buffer)
 	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
 	re := regexp.MustCompile("(-\\S+)( *\\S*)+\n*\\s+" + UsageDummy + ".*\n*\\s+(-\\S+)( *\\S*)+\n\\s+(.+)")

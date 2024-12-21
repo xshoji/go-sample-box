@@ -62,7 +62,7 @@ var (
 )
 
 func init() {
-	adjustUsage()
+	formatUsage()
 }
 
 // # Build: APP="/tmp/tool"; MAIN="main.go"; GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o "${APP}" "${MAIN}"; chmod +x "${APP}"
@@ -197,7 +197,7 @@ func defineBoolFlag(short, long, description string) (v *bool) {
 	return
 }
 
-func adjustUsage() {
+func formatUsage() {
 	// Get default flags usage
 	b := new(bytes.Buffer)
 	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
