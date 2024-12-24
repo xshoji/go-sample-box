@@ -33,30 +33,27 @@ func init() {
 
 // << Execution sample >>
 // $ go run cmd/formatusage/main.go -a 10 -i test
-// add: 10
-// filesize: 10
-// item-name: test
-// count: 1
-//
-// $ go run cmd/formatusage/main.go --add 12 --item-name test
-// add: 12
-// filesize: 10
-// item-name: test
-// count: 1
+// [ Command options ]
+// -a 10        [required] add
+// -c 1         count
+// -f 10        filesize
+// -h false     help
+// -i test      [required] item-name
 //
 // $ go run cmd/formatusage/main.go -h
-//Usage of /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build3188841424/b001/exe/main:
+// Usage of /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build3188841424/b001/exe/main:
 //
-//Description:
-//  Command description is here.
+// Description:
 //
-//Options:
-//  -a int      [required] add
-//  -i string   [required] item-name
-//  -c int      count (default 1)
-//  -f int      filesize (default 10)
-//  -h          help
-
+//	Command description is here.
+//
+// Options:
+//
+//	-a int      [required] add
+//	-i string   [required] item-name
+//	-c int      count (default 1)
+//	-f int      filesize (default 10)
+//	-h          help
 func main() {
 
 	flag.Parse()
@@ -65,10 +62,11 @@ func main() {
 		os.Exit(0)
 	}
 
-	fmt.Println("add:", *optionAdd)
-	fmt.Println("filesize:", *optionFilesize)
-	fmt.Println("item-name:", *optionItemName)
-	fmt.Println("count:", *optionCount)
+	// Print all options
+	fmt.Printf("[ Command options ]\n")
+	flag.VisitAll(func(a *flag.Flag) {
+		fmt.Printf("-%s %-7v   %s\n", a.Name, a.Value, strings.Trim(a.Usage, "\n"))
+	})
 }
 
 func formatUsage() {

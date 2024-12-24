@@ -43,30 +43,44 @@ func init() {
 }
 
 // << Execution sample >>
-// $ go run cmd/adjustusagewithlong/main.go -a 12 -i test
-// add: 12
-// filesize: 10
-// item-name: test
-// count: 1
+// $ go run cmd/formatusagewithlong/main.go -a 12 -i test
+// [ Command options ]
+// -a 12                 ########
+// -add 12               [required] add
+// -c 1                  ########
+// -count 1              count
+// -f 10                 ########
+// -filesize 10          filesize
+// -h false              ########
+// -help false           help
+// -i test               ########
+// -item-name test       [required] item-name
 //
-// $ go run cmd/adjustusagewithlong/main.go --add 12 --item-name test
-// add: 12
-// filesize: 10
-// item-name: test
-// count: 1
+// $ go run cmd/formatusagewithlong/main.go --add 14 --item-name test2
+// [ Command options ]
+// -a 14                 ########
+// -add 14               [required] add
+// -c 1                  ########
+// -count 1              count
+// -f 10                 ########
+// -filesize 10          filesize
+// -h false              ########
+// -help false           help
+// -i test2              ########
+// -item-name test2      [required] item-name
 //
-// $ go run cmd/adjustusagewithlong/main.go -h
-//Usage: /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build3715934692/b001/exe/main [OPTIONS]
+// $ go run cmd/formatusagewithlong/main.go -h
+// Usage: /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build624316317/b001/exe/main [OPTIONS]
 //
-//Description:
-//  Command description is here.
+// Description:
+//   Command description is here.
 //
-//Options:
-//  -a, --add int             [required] add
-//  -i, --item-name string    [required] item-name
-//  -c, --count int           count (default 1)
-//  -f, --filesize int        filesize (default 10)
-//  -h, --help                help
+// Options:
+//   -a, --add int             [required] add
+//   -i, --item-name string    [required] item-name
+//   -c, --count int           count (default 1)
+//   -f, --filesize int        filesize (default 10)
+//   -h, --help                help
 
 func main() {
 
@@ -76,10 +90,11 @@ func main() {
 		os.Exit(0)
 	}
 
-	fmt.Println("add:", *optionAdd)
-	fmt.Println("filesize:", *optionFilesize)
-	fmt.Println("item-name:", *optionItemName)
-	fmt.Println("count:", *optionCount)
+	// Print all options
+	fmt.Printf("[ Command options ]\n")
+	flag.VisitAll(func(a *flag.Flag) {
+		fmt.Printf("-%-20s %s\n", fmt.Sprintf("%s %v", a.Name, a.Value), strings.Trim(a.Usage, "\n"))
+	})
 }
 
 func formatUsage() {

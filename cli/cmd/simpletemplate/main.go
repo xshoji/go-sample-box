@@ -7,12 +7,9 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"math"
 	"net/http"
 	"os"
 	"regexp"
-	"runtime"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -20,8 +17,7 @@ import (
 
 const (
 	CommandDescription  = "Command description is here."
-	UsageRequiredPrefix = "\u001B[33m[required]\u001B[0m "
-	UsageDummy          = "########"
+	UsageRequiredPrefix = "\u001B[33m[req]\u001B[0m "
 	TimeFormat          = "2006-01-02 15:04:05.9999 [MST]"
 )
 
@@ -30,35 +26,16 @@ var (
 	srcBytes []byte
 
 	// Required flag
-	optionFilePath = defineStringFlag("f", "file-path", UsageRequiredPrefix+"file path", "")
+	optionFilePath = flag.String("f" /*  */, "" /*      */, UsageRequiredPrefix+"file path")
 
 	// Optional flag
-	optionUrl       = defineStringFlag("u", "url", "url", "https://httpbin.org/get")
-	optionLineIndex = defineIntFlag("l", "line-index", "index of line", 10)
-	optionPrintSrc  = defineBoolFlag("p", "print-src", "print source code")
-	optionHelp      = defineBoolFlag("h", "help", "help")
+	optionUrl       = flag.String("u" /*  */, "https://httpbin.org/get" /*      */, "url")
+	optionLineIndex = flag.Int("l" /*     */, 10 /*                             */, "index of line")
+	optionPrintSrc  = flag.Bool("p" /*    */, false /*                          */, "\nprint main.go")
+	optionHelp      = flag.Bool("h" /*    */, false /*                          */, "\nhelp")
 
 	// Set environment variable
 	environmentValueLoopCount, _ = strconv.Atoi(GetEnvOrDefault("LOOP_COUNT", "10"))
-
-	// ColorPrinter colorize string
-	ColorPrinter = struct {
-		Red      string
-		Green    string
-		Yellow   string
-		Colorize func(string, string) string
-	}{
-		Red:    "\033[31m",
-		Green:  "\033[32m",
-		Yellow: "\033[33m",
-		Colorize: func(color string, text string) string {
-			if runtime.GOOS == "windows" {
-				return text
-			}
-			colorReset := "\033[0m"
-			return color + text + colorReset
-		},
-	}
 )
 
 func init() {
@@ -79,8 +56,12 @@ func main() {
 	}
 
 	fmt.Printf("[ Environment variable ]\nLOOP_COUNT: %d\n\n", environmentValueLoopCount)
-	fmt.Printf("[ Options ]\nfile-path: %s\n", *optionFilePath)
-	fmt.Printf("line-index: %d\n\n", *optionLineIndex)
+	// Print all options
+	fmt.Printf("[ Command options ]\n")
+	flag.VisitAll(func(a *flag.Flag) {
+		fmt.Printf("-%s %-25v   %s\n", a.Name, a.Value, strings.Trim(a.Usage, "\n"))
+	})
+	fmt.Printf("\n\n")
 
 	contents := ReadAllFileContents(optionFilePath)
 	fmt.Println(strings.Split(contents, "\n")[*optionLineIndex])
@@ -177,45 +158,17 @@ func handleError(err error, prefixErrMessage string) {
 	}
 }
 
-func defineStringFlag(short, long, description, defaultValue string) (v *string) {
-	// Define short parameters ( this default value and usage will be not used ).
-	v = flag.String(short, "", UsageDummy)
-	// Define long parameters and description ( set default value here if you need ).
-	flag.StringVar(v, long, defaultValue, description)
-	return
-}
-
-func defineIntFlag(short, long, description string, defaultValue int) (v *int) {
-	v = flag.Int(short, 0, UsageDummy)
-	flag.IntVar(v, long, defaultValue, description)
-	return
-}
-
-func defineBoolFlag(short, long, description string) (v *bool) {
-	v = flag.Bool(short, false, UsageDummy)
-	flag.BoolVar(v, long, false, description)
-	return
-}
-
 func formatUsage() {
-	// Get default flags usage
 	b := new(bytes.Buffer)
 	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
-	// Get default flags usage
-	re := regexp.MustCompile("(-\\S+)( *\\S*)+\n*\\s+" + UsageDummy + ".*\n*\\s+(-\\S+)( *\\S*)+\n\\s+(.+)")
-	usageOptions := re.FindAllString(b.String(), -1)
-	maxLength := 0.0
-	sort.Slice(usageOptions, func(i, j int) bool {
-		maxLength = math.Max(maxLength, math.Max(float64(len(re.ReplaceAllString(usageOptions[i], "$1, -$3$4"))), float64(len(re.ReplaceAllString(usageOptions[j], "$1, -$3$4")))))
-		if len(strings.Split(usageOptions[i]+usageOptions[j], UsageRequiredPrefix))%2 == 1 {
-			return strings.Compare(usageOptions[i], usageOptions[j]) == -1
-		} else {
-			return strings.Index(usageOptions[i], UsageRequiredPrefix) >= 0
-		}
+	usageLines := strings.Split(b.String(), "\n")
+	usage := strings.Replace(strings.Replace(usageLines[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + CommandDescription + "\n\nOptions:\n"
+	re := regexp.MustCompile(" +(-\\S+)( *\\S*|\t)*\n(\\s+)(.*)\n")
+	usage += re.ReplaceAllStringFunc(strings.Join(usageLines[1:], "\n"), func(m string) string {
+		parts := re.FindStringSubmatch(m)
+		return fmt.Sprintf("  %-10s %s\n", parts[1]+" "+strings.TrimSpace(parts[2]), parts[4])
 	})
-	usage := strings.Replace(strings.Replace(strings.Split(b.String(), "\n")[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + CommandDescription + "\n\nOptions:\n"
-	for _, v := range usageOptions {
-		usage += fmt.Sprintf("%-6s%-"+strconv.Itoa(int(maxLength))+"s", re.ReplaceAllString(v, "  $1,"), re.ReplaceAllString(v, "-$3$4")) + re.ReplaceAllString(v, "$5\n")
+	flag.Usage = func() {
+		_, _ = fmt.Fprintf(flag.CommandLine.Output(), usage)
 	}
-	flag.Usage = func() { _, _ = fmt.Fprintf(flag.CommandLine.Output(), usage) }
 }

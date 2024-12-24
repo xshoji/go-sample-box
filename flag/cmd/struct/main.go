@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 )
 
 var (
@@ -29,11 +30,13 @@ var (
 // << Execution sample >>
 //
 // $ go run cmd/struct/main.go -a 100 -i "itemName"
-// add: 100
-// item-name: itemName
-// filesize: 10
-// binary: 000101
-// debug: false
+// [ Command options ]
+// -a 100          [Required] add
+// -b 000101       [Optional] binary
+// -d false        debug
+// -f 10           [Optional] filesize
+// -h false        help
+// -i itemName     [Required] item-name
 //
 // $ go run cmd/struct/main.go -h
 // Usage of /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build46637023/b001/exe/struct:
@@ -60,9 +63,9 @@ func main() {
 		os.Exit(0)
 	}
 
-	fmt.Println("add:", *params.add)
-	fmt.Println("item-name:", *params.itemName)
-	fmt.Println("filesize:", *params.filesize)
-	fmt.Println("binary:", *params.binary)
-	fmt.Println("debug:", *params.debug)
+	// Print all options
+	fmt.Printf("[ Command options ]\n")
+	flag.VisitAll(func(a *flag.Flag) {
+		fmt.Printf("-%s %-10v   %s\n", a.Name, a.Value, strings.Trim(a.Usage, "\n"))
+	})
 }

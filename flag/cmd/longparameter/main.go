@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strings"
 )
 
 const DummyUsage = "########"
@@ -47,26 +48,50 @@ func init() {
 // << Execution sample >>
 //
 // $ go run cmd/longparameter/main.go -i "param1" -t "param2" -a 100
-// add: 100
-// binary: 00010101
-// environment: DEV
-// filesize: 10
-// global: false
-// item-name: param1
-// title: param2
-// count: 1
-// debug: false
+// [ Command options ]
+// -a 100                ########
+// -add 100              [required] add
+// -b 00010101           ########
+// -binary 00010101      [optional] binary
+// -c 1                  ########
+// -count 1              [optional] count
+// -d false              ########
+// -debug false          debug
+// -e DEV                ########
+// -environment DEV      [optional] environment
+// -f 10                 ########
+// -filesize 10          [optional] filesize
+// -g false              ########
+// -global false         global
+// -h false              ########
+// -help false           help
+// -i param1             ########
+// -item-name param1     [required] item name
+// -t param2             ########
+// -title param2         [required] title
 //
-// $ go run cmd/longparameter/main.go --item-name "param1" --title "param2" --add 100
-// add: 100
-// binary: 00010101
-// environment: DEV
-// filesize: 10
-// global: false
-// item-name: param1
-// title: param2
-// count: 1
-// debug: false
+// $ go run cmd/longparameter/main.go --item-name "param11" --title "param22" --add 200
+// [ Command options ]
+// -a 200                ########
+// -add 200              [required] add
+// -b 00010101           ########
+// -binary 00010101      [optional] binary
+// -c 1                  ########
+// -count 1              [optional] count
+// -d false              ########
+// -debug false          debug
+// -e DEV                ########
+// -environment DEV      [optional] environment
+// -f 10                 ########
+// -filesize 10          [optional] filesize
+// -g false              ########
+// -global false         global
+// -h false              ########
+// -help false           help
+// -i param11            ########
+// -item-name param11    [required] item name
+// -t param22            ########
+// -title param22        [required] title
 //
 // $ go run cmd/longparameter/main.go -h
 // Usage of /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build4248489645/b001/exe/main:
@@ -110,13 +135,9 @@ func main() {
 		os.Exit(0)
 	}
 
-	fmt.Println("add:", *optionAdd)
-	fmt.Println("binary:", *optionBinary)
-	fmt.Println("environment:", *optionEnvironment)
-	fmt.Println("filesize:", *optionFilesize)
-	fmt.Println("global:", *optionGlobal)
-	fmt.Println("item-name:", *optionItemName)
-	fmt.Println("title:", *optionTitle)
-	fmt.Println("count:", *optionCount)
-	fmt.Println("debug:", *optionDebug)
+	// Print all options
+	fmt.Printf("[ Command options ]\n")
+	flag.VisitAll(func(a *flag.Flag) {
+		fmt.Printf("-%-20s %s\n", fmt.Sprintf("%s %v", a.Name, a.Value), strings.Trim(a.Usage, "\n"))
+	})
 }
