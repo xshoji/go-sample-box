@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	CommandDescription  = "Command description is here."
+	CommandDescription  = "Here is the command description."
 	UsageRequiredPrefix = "\u001B[33m[req]\u001B[0m "
 	TimeFormat          = "2006-01-02 15:04:05.9999 [MST]"
 )

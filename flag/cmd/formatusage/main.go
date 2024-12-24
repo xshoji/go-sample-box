@@ -14,7 +14,7 @@ import (
 
 const (
 	UsageRequiredPrefix = "\u001B[33m[required]\u001B[0m "
-	CommandDescription  = "Command description is here."
+	CommandDescription  = "Here is the command description."
 )
 
 var (
@@ -45,7 +45,7 @@ func init() {
 //
 // Description:
 //
-//	Command description is here.
+//	Here is the command description.
 //
 // Options:
 //

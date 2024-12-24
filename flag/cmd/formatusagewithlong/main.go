@@ -15,7 +15,7 @@ import (
 const (
 	UsageRequiredPrefix = "\u001B[33m[required]\u001B[0m "
 	UsageDummy          = "########"
-	CommandDescription  = "Command description is here."
+	CommandDescription  = "Here is the command description."
 )
 
 var (
@@ -73,7 +73,7 @@ func init() {
 // Usage: /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build624316317/b001/exe/main [OPTIONS]
 //
 // Description:
-//   Command description is here.
+//   Here is the command description.
 //
 // Options:
 //   -a, --add int             [required] add
