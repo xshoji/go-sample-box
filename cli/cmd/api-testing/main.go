@@ -175,8 +175,8 @@ aaa7,bbb8,ccc9
 			"application/json": bytes.NewReader([]byte(`{"title":"movie_title"}`)),
 		},
 		"file": {
-			"text/csv;charset=utf-8": &AnyContentNoBufferedReader{
-				content:        []byte(csvFileContents2),
+			"text/csv;charset=utf-8": &AnyDataUnbufferedReader{
+				data:           []byte(csvFileContents2),
 				byteArrayIndex: 0,
 			},
 		},
@@ -196,7 +196,7 @@ aaa7,bbb8,ccc9
 			"application/json": bytes.NewReader([]byte(`{"title":"movie_title"}`)),
 		},
 		"file": {
-			"text/csv;charset=utf-8": &ConstantContentNoBufferedReader{
+			"text/csv;charset=utf-8": &ConstantDataUnbufferedReader{
 				kbSize:      1,
 				repetitions: 0,
 			},
@@ -209,12 +209,12 @@ aaa7,bbb8,ccc9
 // io.Reader implementation
 // =======================================
 
-type ConstantContentNoBufferedReader struct {
+type ConstantDataUnbufferedReader struct {
 	kbSize      int
 	repetitions int
 }
 
-func (r *ConstantContentNoBufferedReader) Read(p []byte) (n int, err error) {
+func (r *ConstantDataUnbufferedReader) Read(p []byte) (n int, err error) {
 	chunkSize := 1024 // 1kb
 	if r.repetitions >= r.kbSize {
 		return 0, io.EOF
@@ -224,20 +224,20 @@ func (r *ConstantContentNoBufferedReader) Read(p []byte) (n int, err error) {
 	return chunkSize, nil
 }
 
-type AnyContentNoBufferedReader struct {
-	content        []byte
+type AnyDataUnbufferedReader struct {
+	data           []byte
 	byteArrayIndex int
 }
 
-func (r *AnyContentNoBufferedReader) Read(p []byte) (n int, err error) {
+func (r *AnyDataUnbufferedReader) Read(p []byte) (n int, err error) {
 	chunkSize := 1024 // 1kb
-	if r.byteArrayIndex == len(r.content) {
+	if r.byteArrayIndex == len(r.data) {
 		return 0, io.EOF
 	}
-	if diff := r.byteArrayIndex + chunkSize - len(r.content); diff > 0 {
+	if diff := r.byteArrayIndex + chunkSize - len(r.data); diff > 0 {
 		chunkSize = chunkSize - diff
 	}
-	copy(p, r.content[r.byteArrayIndex:chunkSize])
+	copy(p, r.data[r.byteArrayIndex:chunkSize])
 	r.byteArrayIndex = r.byteArrayIndex + chunkSize
 	return chunkSize, nil
 }
@@ -332,9 +332,9 @@ func DoHttpRequestMultipartFormData(client http.Client, method string, url strin
 		if file, ok := ioReader.(*os.File); ok {
 			// Create the MIME headers for the new part
 			h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, fieldName, filepath.Base(file.Name())))
-		} else if _, ok := ioReader.(*ConstantContentNoBufferedReader); ok {
+		} else if _, ok := ioReader.(*ConstantDataUnbufferedReader); ok {
 			h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, fieldName, "dummyFileName"))
-		} else if _, ok := ioReader.(*AnyContentNoBufferedReader); ok {
+		} else if _, ok := ioReader.(*AnyDataUnbufferedReader); ok {
 			h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, fieldName, "dummyFileName"))
 		} else {
 			h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"`, fieldName))
