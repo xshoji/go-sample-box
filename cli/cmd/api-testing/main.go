@@ -175,7 +175,7 @@ aaa7,bbb8,ccc9
 			"application/json": bytes.NewReader([]byte(`{"title":"movie_title"}`)),
 		},
 		"file": {
-			"text/csv;charset=utf-8": &AnyDataUnbufferedReader{
+			"text/csv;charset=utf-8": &AnyDataBufferedReader{
 				data:           []byte(csvFileContents2),
 				byteArrayIndex: 0,
 			},
@@ -224,12 +224,12 @@ func (r *ConstantDataUnbufferedReader) Read(p []byte) (n int, err error) {
 	return chunkSize, nil
 }
 
-type AnyDataUnbufferedReader struct {
+type AnyDataBufferedReader struct {
 	data           []byte
 	byteArrayIndex int
 }
 
-func (r *AnyDataUnbufferedReader) Read(p []byte) (n int, err error) {
+func (r *AnyDataBufferedReader) Read(p []byte) (n int, err error) {
 	chunkSize := 1024 // 1kb
 	if r.byteArrayIndex == len(r.data) {
 		return 0, io.EOF
@@ -334,7 +334,7 @@ func DoHttpRequestMultipartFormData(client http.Client, method string, url strin
 			h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, fieldName, filepath.Base(file.Name())))
 		} else if _, ok := ioReader.(*ConstantDataUnbufferedReader); ok {
 			h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, fieldName, "dummyFileName"))
-		} else if _, ok := ioReader.(*AnyDataUnbufferedReader); ok {
+		} else if _, ok := ioReader.(*AnyDataBufferedReader); ok {
 			h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, fieldName, "dummyFileName"))
 		} else {
 			h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"`, fieldName))
