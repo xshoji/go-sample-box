@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"io"
 	"maps"
-	"math"
 	"mime/multipart"
 	"net"
 	"net/http"
@@ -23,7 +22,6 @@ import (
 	"os/signal"
 	"path/filepath"
 	"regexp"
-	"sort"
 	"strconv"
 	"strings"
 	"syscall"
@@ -32,7 +30,6 @@ import (
 
 const (
 	UsageRequiredPrefix   = "\u001B[33m[required]\u001B[0m "
-	UsageDummy            = "########"
 	CommandDescription    = "Web API testing tool."
 	HttpContentTypeHeader = "content-type"
 	TimeFormat            = "2006-01-02 15:04:05.9999 [MST]"
@@ -40,10 +37,10 @@ const (
 
 var (
 	// Define options
-	optionEnableCompressHttpMessage = defineBoolFlag("c", "compress-http-message", "compress http message")
-	optionSkipTlsVerification       = defineBoolFlag("s", "skip-tls-verification", "skip tls verification")
-	optionDisableHttp2              = defineBoolFlag("d", "disable-http2", "disable HTTP/2")
-	optionHelp                      = defineBoolFlag("h", "help", "show help")
+	optionEnableCompressHttpMessage = flag.Bool("c" /* */, false /* */, "\ncompress http message")
+	optionSkipTlsVerification       = flag.Bool("s" /* */, false /* */, "\nskip tls verification")
+	optionDisableHttp2              = flag.Bool("d" /* */, false /* */, "\ndisable HTTP/2")
+	optionHelp                      = flag.Bool("h" /* */, false /* */, "\nhelp")
 
 	// HTTP Header templates
 	createHttpHeaderEmpty = func() map[string]string {
@@ -80,12 +77,12 @@ func main() {
 		),
 	}
 
-	fmt.Println("#--------------------")
-	fmt.Println("# Command options")
-	fmt.Println("#--------------------")
-	fmt.Printf("compress http message : %t\n", *optionEnableCompressHttpMessage)
-	fmt.Printf("skip tls Verification : %t\n", *optionSkipTlsVerification)
-	fmt.Printf("disable HTTP/2        : %t\n\n\n", *optionDisableHttp2)
+	// Print all options
+	fmt.Printf("[ Command options ]\n")
+	flag.VisitAll(func(a *flag.Flag) {
+		fmt.Printf("-%s %-25v   %s\n", a.Name, a.Value, strings.Trim(a.Usage, "\n"))
+	})
+	fmt.Printf("\n\n")
 
 	headers := createHttpHeaderContentTypeJson()
 
@@ -200,7 +197,7 @@ aaa7,bbb8,ccc9
 		},
 		"file": {
 			"text/csv;charset=utf-8": &ConstantContentNoBufferedReader{
-				kbSize:      5,
+				kbSize:      1,
 				repetitions: 0,
 			},
 		},
@@ -477,29 +474,17 @@ func GetEnvOrDefault(key string, defaultValue string) string {
 	return value
 }
 
-func defineBoolFlag(short, long, description string) (v *bool) {
-	v = flag.Bool(short, false, UsageDummy)
-	flag.BoolVar(v, long, false, description)
-	return
-}
-
 func formatUsage() {
 	b := new(bytes.Buffer)
 	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
-	re := regexp.MustCompile("(-\\S+)( *\\S*)+\n*\\s+" + UsageDummy + ".*\n*\\s+(-\\S+)( *\\S*)+\n\\s+(.+)")
-	usageOptions := re.FindAllString(b.String(), -1)
-	maxLength := 0.0
-	sort.Slice(usageOptions, func(i, j int) bool {
-		maxLength = math.Max(maxLength, math.Max(float64(len(re.ReplaceAllString(usageOptions[i], "$1, -$3$4"))), float64(len(re.ReplaceAllString(usageOptions[j], "$1, -$3$4")))))
-		if len(strings.Split(usageOptions[i]+usageOptions[j], UsageRequiredPrefix))%2 == 1 {
-			return strings.Compare(usageOptions[i], usageOptions[j]) == -1
-		} else {
-			return strings.Index(usageOptions[i], UsageRequiredPrefix) >= 0
-		}
+	usageLines := strings.Split(b.String(), "\n")
+	usage := strings.Replace(strings.Replace(usageLines[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + CommandDescription + "\n\nOptions:\n"
+	re := regexp.MustCompile(" +(-\\S+)( *\\S*|\t)*\n(\\s+)(.*)\n")
+	usage += re.ReplaceAllStringFunc(strings.Join(usageLines[1:], "\n"), func(m string) string {
+		parts := re.FindStringSubmatch(m)
+		return fmt.Sprintf("  %-5s %s\n", parts[1]+" "+strings.TrimSpace(parts[2]), parts[4])
 	})
-	usage := strings.Replace(strings.Replace(strings.Split(b.String(), "\n")[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + CommandDescription + "\n\nOptions:\n"
-	for _, v := range usageOptions {
-		usage += fmt.Sprintf("%-6s%-"+strconv.Itoa(int(maxLength))+"s", re.ReplaceAllString(v, "  $1,"), re.ReplaceAllString(v, "-$3$4")) + re.ReplaceAllString(v, "$5\n")
+	flag.Usage = func() {
+		_, _ = fmt.Fprintf(flag.CommandLine.Output(), usage)
 	}
-	flag.Usage = func() { _, _ = fmt.Fprintf(flag.CommandLine.Output(), usage) }
 }

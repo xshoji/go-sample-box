@@ -166,7 +166,7 @@ func formatUsage() {
 	re := regexp.MustCompile(" +(-\\S+)( *\\S*|\t)*\n(\\s+)(.*)\n")
 	usage += re.ReplaceAllStringFunc(strings.Join(usageLines[1:], "\n"), func(m string) string {
 		parts := re.FindStringSubmatch(m)
-		return fmt.Sprintf("  %-10s %s\n", parts[1]+" "+strings.TrimSpace(parts[2]), parts[4])
+		return fmt.Sprintf("  %-12s %s\n", parts[1]+" "+strings.TrimSpace(parts[2]), parts[4])
 	})
 	flag.Usage = func() {
 		_, _ = fmt.Fprintf(flag.CommandLine.Output(), usage)
