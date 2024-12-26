@@ -37,7 +37,7 @@ const (
 
 var (
 	// Define options
-	optionUseChunkedTransferEncoding = flag.Bool("c" /* */, false /* */, "\nUse \"Transfer-Encoding: chunked\".")
+	optionUseChunkedTransferEncoding = flag.Bool("c" /* */, false /* */, "\nUse \"Transfer-Encoding: chunked\" ( only for HTTP1/1 ).")
 	optionTrimDownHttpMessages       = flag.Bool("t" /* */, false /* */, "\nTrim down HTTP messages in stdout.")
 	optionSkipTlsVerification        = flag.Bool("s" /* */, false /* */, "\nSkip TLS verification.")
 	optionDisableHttp2               = flag.Bool("d" /* */, false /* */, "\nDisable HTTP/2.")
@@ -363,10 +363,10 @@ func DoHttpRequest(client http.Client, method string, url string, headers map[st
 
 func internalDoHttpRequest(client http.Client, method string, url string, headers map[string]string, body io.Reader) interface{} {
 	req, err := http.NewRequest(method, url, body)
+	handleError(err, "http.NewRequest(method, url, body)")
 	if *optionUseChunkedTransferEncoding {
 		req.TransferEncoding = []string{"chunked"}
 	}
-	handleError(err, "http.NewRequest(method, url, body)")
 	for key, value := range headers {
 		req.Header.Set(key, value)
 	}
