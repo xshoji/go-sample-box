@@ -93,7 +93,7 @@ func main() {
 	// Print all options
 	fmt.Printf("[ Command options ]\n")
 	flag.VisitAll(func(a *flag.Flag) {
-		fmt.Printf("-%-20s %s\n", fmt.Sprintf("%s %v", a.Name, a.Value), strings.Trim(a.Usage, "\n"))
+		fmt.Printf("  -%-18s %s\n", fmt.Sprintf("%s %v", a.Name, a.Value), strings.Trim(a.Usage, "\n"))
 	})
 }
 

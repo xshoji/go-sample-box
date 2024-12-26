@@ -37,10 +37,11 @@ const (
 
 var (
 	// Define options
-	optionEnableCompressHttpMessage = flag.Bool("c" /* */, false /* */, "\ncompress http message")
-	optionSkipTlsVerification       = flag.Bool("s" /* */, false /* */, "\nskip tls verification")
-	optionDisableHttp2              = flag.Bool("d" /* */, false /* */, "\ndisable HTTP/2")
-	optionHelp                      = flag.Bool("h" /* */, false /* */, "\nhelp")
+	optionUseChunkedTransferEncoding = flag.Bool("c" /* */, false /* */, "\nUse \"Transfer-Encoding: chunked\".")
+	optionTrimDownHttpMessages       = flag.Bool("t" /* */, false /* */, "\nTrim down HTTP messages in stdout.")
+	optionSkipTlsVerification        = flag.Bool("s" /* */, false /* */, "\nSkip TLS verification.")
+	optionDisableHttp2               = flag.Bool("d" /* */, false /* */, "\nDisable HTTP/2.")
+	optionHelp                       = flag.Bool("h" /* */, false /* */, "\nShow help information.")
 
 	// HTTP Header templates
 	createHttpHeaderEmpty = func() map[string]string {
@@ -80,7 +81,7 @@ func main() {
 	// Print all options
 	fmt.Printf("[ Command options ]\n")
 	flag.VisitAll(func(a *flag.Flag) {
-		fmt.Printf("-%s %-7v   %s\n", a.Name, a.Value, strings.Trim(a.Usage, "\n"))
+		fmt.Printf("  -%-10s %s\n", fmt.Sprintf("%s %v", a.Name, a.Value), strings.Trim(a.Usage, "\n"))
 	})
 	fmt.Printf("\n\n")
 
@@ -155,6 +156,7 @@ movie3,5,Short movie
 		},
 	})
 	fmt.Println(response)
+	fmt.Printf("\n\n\n\n")
 
 	//
 	//
@@ -182,6 +184,7 @@ aaa7,bbb8,ccc9
 		},
 	})
 	fmt.Println(response)
+	fmt.Printf("\n\n\n\n")
 
 	//
 	//
@@ -257,7 +260,7 @@ func (s *CustomTransport) RoundTrip(r *http.Request) (*http.Response, error) {
 	handleError(err, "httputil.DumpRequestOut(r, true)")
 
 	adjustMessage := func(message string) string {
-		if *optionEnableCompressHttpMessage {
+		if *optionTrimDownHttpMessages {
 			message = strings.Replace(message, "\r\n", ", ", -1)
 			message = strings.Replace(message, "\n", " ", -1)
 		}
@@ -360,6 +363,9 @@ func DoHttpRequest(client http.Client, method string, url string, headers map[st
 
 func internalDoHttpRequest(client http.Client, method string, url string, headers map[string]string, body io.Reader) interface{} {
 	req, err := http.NewRequest(method, url, body)
+	if *optionUseChunkedTransferEncoding {
+		req.TransferEncoding = []string{"chunked"}
+	}
 	handleError(err, "http.NewRequest(method, url, body)")
 	for key, value := range headers {
 		req.Header.Set(key, value)
@@ -373,7 +379,7 @@ func internalDoHttpRequest(client http.Client, method string, url string, header
 	var jsonString string
 	var jsonBytes []byte
 
-	if *optionEnableCompressHttpMessage {
+	if *optionTrimDownHttpMessages {
 		jsonBytes, err = json.Marshal(responseBodyJsonObject)
 		handleError(err, `json.Marshal(responseBodyJsonObject)`)
 		jsonString = strings.Replace(string(jsonBytes), "\r\n", ", ", -1)
