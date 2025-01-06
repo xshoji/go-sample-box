@@ -67,7 +67,7 @@ func main() {
 
 	res := HttpGetJson(*optionUrl + "?" + fmt.Sprintf("optionLineIndex=%d", *optionLineIndex))
 	fmt.Println(res)
-	fmt.Println(Get(res, "args.optionLineIndex"))
+	fmt.Println(res.(map[string]any)["args"].(map[string]any)["optionLineIndex"])
 
 }
 
@@ -93,35 +93,6 @@ func ToJsonObject(body []byte) interface{} {
 	err := json.Unmarshal(body, &jsonObject)
 	handleError(err, "json.Unmarshal")
 	return jsonObject
-}
-
-// Get get value in interface{} object [ example : object["aaa"][0]["bbb"] -> keyChain: "aaa.0.bbb" ]
-func Get(object interface{}, keyChain string) interface{} {
-	var result interface{}
-	var exists bool
-	for _, key := range strings.Split(keyChain, ".") {
-		exists = false
-		if _, ok := object.(map[string]interface{}); ok {
-			exists = true
-			object = object.(map[string]interface{})[key]
-			result = object
-			continue
-		}
-		if values, ok := object.([]interface{}); ok {
-			for i, v := range values {
-				if strconv.FormatInt(int64(i), 10) == key {
-					exists = true
-					object = v
-					result = object
-					continue
-				}
-			}
-		}
-	}
-	if exists {
-		return result
-	}
-	return nil
 }
 
 // =======================================

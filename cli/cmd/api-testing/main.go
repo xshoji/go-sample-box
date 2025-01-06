@@ -108,6 +108,8 @@ func main() {
 }
 `
 	response := DoHttpRequest(client, "POST", targetUrl, headers, body)
+	fmt.Println()
+	fmt.Printf("\"obj.list.0.key1\": %s\n\n\n\n", response.(map[string]any)["json"].(map[string]any)["obj"].(map[string]any)["list"].([]any)[0].(map[string]any)["key1"].(string))
 	fmt.Printf("\"obj.list.0.key1\": %s\n\n\n\n", Get(response, "json.obj.list.0.key1").(string))
 
 	//
