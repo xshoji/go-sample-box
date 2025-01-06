@@ -28,17 +28,13 @@ var (
 	//go:embed main.go
 	srcBytes []byte
 
-	// Command description
+	// Command options
 	commandDescription = "Here is the command description."
-
-	// Required flag
-	optionFilePath = defineStringFlag("f", "file-path", UsageRequiredPrefix+"file path", "")
-
-	// Optional flag
-	optionUrl       = defineStringFlag("u", "url", "url", "https://httpbin.org/get")
-	optionLineIndex = defineIntFlag("l", "line-index", "index of line", 10)
-	optionPrintSrc  = defineBoolFlag("p", "print-src", "print source code")
-	optionHelp      = defineBoolFlag("h", "help", "help")
+	optionFilePath     = defineStringFlag("f", "file-path", UsageRequiredPrefix+"file path", "")
+	optionUrl          = defineStringFlag("u", "url", "url", "https://httpbin.org/get")
+	optionLineIndex    = defineIntFlag("l", "line-index", "index of line", 10)
+	optionPrintSrc     = defineBoolFlag("p", "print-src", "print source code")
+	optionHelp         = defineBoolFlag("h", "help", "help")
 
 	// Set environment variable
 	environmentValueLoopCount, _ = strconv.Atoi(GetEnvOrDefault("LOOP_COUNT", "10"))

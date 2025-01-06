@@ -24,18 +24,14 @@ var (
 	//go:embed main.go
 	srcBytes []byte
 
-	// Command description
+	// Command options
 	commandDescription      = "Here is the command description."
 	commandOptionFieldWidth = 12
-
-	// Required flag
-	optionFilePath = flag.String("f" /*  */, "" /*      */, UsageRequiredPrefix+"file path")
-
-	// Optional flag
-	optionUrl       = flag.String("u" /*  */, "https://httpbin.org/get" /*      */, "url")
-	optionLineIndex = flag.Int("l" /*     */, 10 /*                             */, "index of line")
-	optionPrintSrc  = flag.Bool("p" /*    */, false /*                          */, "\nprint main.go")
-	optionHelp      = flag.Bool("h" /*    */, false /*                          */, "\nhelp")
+	optionFilePath          = flag.String("f" /*  */, "" /*                         */, UsageRequiredPrefix+"file path")
+	optionUrl               = flag.String("u" /*  */, "https://httpbin.org/get" /*  */, "url")
+	optionLineIndex         = flag.Int("l" /*     */, 10 /*                         */, "index of line")
+	optionPrintSrc          = flag.Bool("p" /*    */, false /*                      */, "\nprint main.go")
+	optionHelp              = flag.Bool("h" /*    */, false /*                      */, "\nhelp")
 
 	// Set environment variable
 	environmentValueLoopCount, _ = strconv.Atoi(GetEnvOrDefault("LOOP_COUNT", "10"))

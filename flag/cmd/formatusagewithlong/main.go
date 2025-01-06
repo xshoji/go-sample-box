@@ -20,11 +20,12 @@ const (
 
 var (
 	// Define short options ( don't set default value ).
-	optionAdd      = flag.Int("a", 0, UsageDummy)
-	optionItemName = flag.String("i", "", UsageDummy)
-	optionFilesize = flag.Int("f", 0, UsageDummy)
-	optionCount    = flag.Int("c", 0, UsageDummy)
-	optionHelp     = flag.Bool("h", false, UsageDummy)
+	commandDescription = "Here is the command description."
+	optionAdd          = flag.Int("a", 0, UsageDummy)
+	optionItemName     = flag.String("i", "", UsageDummy)
+	optionFilesize     = flag.Int("f", 0, UsageDummy)
+	optionCount        = flag.Int("c", 0, UsageDummy)
+	optionHelp         = flag.Bool("h", false, UsageDummy)
 )
 
 func init() {
@@ -39,7 +40,7 @@ func init() {
 	flag.BoolVar(optionHelp /*       */, "help" /*      */, false /* */, "help")
 
 	// Adjust Usage
-	formatUsage()
+	formatUsage(commandDescription)
 }
 
 // << Execution sample >>
@@ -97,7 +98,7 @@ func main() {
 	})
 }
 
-func formatUsage() {
+func formatUsage(description string) {
 	// Get default flags usage
 	b := new(bytes.Buffer)
 	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
@@ -113,7 +114,7 @@ func formatUsage() {
 			return strings.Index(usageOptions[i], UsageRequiredPrefix) >= 0
 		}
 	})
-	usage := strings.Replace(strings.Replace(strings.Split(b.String(), "\n")[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + CommandDescription + "\n\nOptions:\n"
+	usage := strings.Replace(strings.Replace(strings.Split(b.String(), "\n")[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + description + "\n\nOptions:\n"
 	for _, v := range usageOptions {
 		usage += fmt.Sprintf("%-6s%-"+strconv.Itoa(int(maxLength))+"s", re.ReplaceAllString(v, "  $1,"), re.ReplaceAllString(v, "-$3$4")) + re.ReplaceAllString(v, "$5\n")
 	}
