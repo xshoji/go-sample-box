@@ -54,7 +54,8 @@ func main() {
 		os.Exit(0)
 	}
 
-	fmt.Printf("[ Environment variable ]\nLOOP_COUNT: %d\n\n", environmentValueLoopCount)
+	fmt.Printf("[ Environment variable ]\n")
+	fmt.Printf("  LOOP_COUNT: %d\n\n", environmentValueLoopCount)
 	// Print all options
 	fmt.Printf("[ Command options ]\n")
 	flag.VisitAll(func(a *flag.Flag) {
