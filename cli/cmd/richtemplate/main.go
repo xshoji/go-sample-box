@@ -19,7 +19,6 @@ import (
 )
 
 const (
-	CommandDescription  = "Here is the command description."
 	UsageRequiredPrefix = "\u001B[33m[required]\u001B[0m "
 	UsageDummy          = "########"
 	TimeFormat          = "2006-01-02 15:04:05.9999 [MST]"
@@ -28,6 +27,9 @@ const (
 var (
 	//go:embed main.go
 	srcBytes []byte
+
+	// Command description
+	commandDescription = "Here is the command description."
 
 	// Required flag
 	optionFilePath = defineStringFlag("f", "file-path", UsageRequiredPrefix+"file path", "")
@@ -62,7 +64,7 @@ var (
 )
 
 func init() {
-	formatUsage()
+	formatUsage(commandDescription)
 }
 
 // # Build: APP="/tmp/tool"; MAIN="main.go"; GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o "${APP}" "${MAIN}"; chmod +x "${APP}"
@@ -200,7 +202,7 @@ func defineBoolFlag(short, long, description string) (v *bool) {
 	return
 }
 
-func formatUsage() {
+func formatUsage(description string) {
 	// Get default flags usage
 	b := new(bytes.Buffer)
 	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
@@ -216,7 +218,7 @@ func formatUsage() {
 			return strings.Index(usageOptions[i], UsageRequiredPrefix) >= 0
 		}
 	})
-	usage := strings.Replace(strings.Replace(strings.Split(b.String(), "\n")[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + CommandDescription + "\n\nOptions:\n"
+	usage := strings.Replace(strings.Replace(strings.Split(b.String(), "\n")[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + description + "\n\nOptions:\n"
 	for _, v := range usageOptions {
 		usage += fmt.Sprintf("%-6s%-"+strconv.Itoa(int(maxLength))+"s", re.ReplaceAllString(v, "  $1,"), re.ReplaceAllString(v, "-$3$4")) + re.ReplaceAllString(v, "$5\n")
 	}
