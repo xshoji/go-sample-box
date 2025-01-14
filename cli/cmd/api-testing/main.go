@@ -37,7 +37,7 @@ var (
 	// Command options
 	commandDescription               = "Web API testing tool."
 	commandOptionFieldWidth          = 5
-	optionUseChunkedTransferEncoding = flag.Bool("c" /* */, false /* */, "\nUse \"Transfer-Encoding: chunked\" ( only for HTTP1/1 ).")
+	optionUseChunkedTransferEncoding = flag.Bool("c" /* */, false /* */, "\nUse \"Transfer-Encoding: chunked\" ( only for HTTP/1.1 ).")
 	optionTrimDownHttpMessages       = flag.Bool("t" /* */, false /* */, "\nTrim down HTTP messages in stdout.")
 	optionSkipTlsVerification        = flag.Bool("s" /* */, false /* */, "\nSkip TLS verification.")
 	optionDisableHttp2               = flag.Bool("d" /* */, false /* */, "\nDisable HTTP/2.")
