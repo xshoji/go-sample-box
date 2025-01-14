@@ -53,6 +53,9 @@ var (
 	createHttpHeaderContentTypeJson = func() map[string]string {
 		return maps.Clone(map[string]string{HttpContentTypeHeader: "application/json"})
 	}
+	createHttpHeaderContentTypeOctetStream = func() map[string]string {
+		return maps.Clone(map[string]string{HttpContentTypeHeader: "application/octet-stream"})
+	}
 
 	// Masking console log
 	muskingRegex = regexp.MustCompile(`(Accept-Encoding:|Etag:|"key1":)(.*)`)
@@ -107,7 +110,7 @@ func main() {
   }
 }
 `
-	response := DoHttpRequest(client, "POST", targetUrl, headers, body)
+	response := HttpRequest(client, "POST", targetUrl, headers, body)
 	fmt.Println()
 	fmt.Printf("\"obj.list.0.key1\": %s\n\n\n\n", response.(map[string]any)["json"].(map[string]any)["obj"].(map[string]any)["list"].([]any)[0].(map[string]any)["key1"].(string))
 	fmt.Printf("\"obj.list.0.key1\": %s\n\n\n\n", Get(response, "json.obj.list.0.key1").(string))
@@ -148,7 +151,7 @@ movie3,5,Short movie
 	handleError(err, "os.WriteFile(f.Name(), []byte(csvFileContents), 0655)")
 	fmt.Printf("temp file: %s\n\n\n", f.Name())
 
-	response = DoHttpRequestMultipartFormData(client, "POST", targetUrl, headers, map[string]map[string]io.Reader{
+	response = HttpRequestMultipartFormData(client, "POST", targetUrl, headers, map[string]map[string]io.Reader{
 		"request": {
 			"application/json": bytes.NewReader([]byte(`{"title":"movie_title"}`)),
 		},
@@ -174,15 +177,12 @@ aaa4,bbb5,ccc6
 aaa7,bbb8,ccc9
 `
 
-	response = DoHttpRequestMultipartFormData(client, "POST", targetUrl, headers, map[string]map[string]io.Reader{
+	response = HttpRequestMultipartFormData(client, "POST", targetUrl, headers, map[string]map[string]io.Reader{
 		"request": {
 			"application/json": bytes.NewReader([]byte(`{"title":"movie_title"}`)),
 		},
 		"file": {
-			"text/csv;charset=utf-8": &AnyDataBufferedReader{
-				data:           []byte(csvFileContents2),
-				byteArrayIndex: 0,
-			},
+			"text/csv;charset=utf-8": bytes.NewBufferString(csvFileContents2),
 		},
 	})
 	fmt.Println(response)
@@ -196,7 +196,7 @@ aaa7,bbb8,ccc9
 	//
 	//
 	//
-	response = DoHttpRequestMultipartFormData(client, "POST", targetUrl, headers, map[string]map[string]io.Reader{
+	response = HttpRequestMultipartFormData(client, "POST", targetUrl, headers, map[string]map[string]io.Reader{
 		"request": {
 			"application/json": bytes.NewReader([]byte(`{"title":"movie_title"}`)),
 		},
@@ -207,6 +207,24 @@ aaa7,bbb8,ccc9
 			},
 		},
 	})
+	fmt.Println(response)
+
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	headers = createHttpHeaderContentTypeOctetStream()
+	csvFileContents3 := `ddd,eee,fff
+aaa8,bbb11,ccc14
+aaa9,bbb12,ccc15
+aaa10,bbb13,ccc16
+`
+	targetUrl = "https://httpbin.org/put"
+	response = DoHttpRequest(client, "PUT", targetUrl, headers, bytes.NewBufferString(csvFileContents3))
 	fmt.Println(response)
 }
 
@@ -226,24 +244,6 @@ func (r *ConstantDataUnbufferedReader) Read(p []byte) (n int, err error) {
 	}
 	copy(p, bytes.Repeat([]byte("0"), chunkSize))
 	r.repetitions++
-	return chunkSize, nil
-}
-
-type AnyDataBufferedReader struct {
-	data           []byte
-	byteArrayIndex int
-}
-
-func (r *AnyDataBufferedReader) Read(p []byte) (n int, err error) {
-	chunkSize := 1024 // 1kb
-	if r.byteArrayIndex == len(r.data) {
-		return 0, io.EOF
-	}
-	if diff := r.byteArrayIndex + chunkSize - len(r.data); diff > 0 {
-		chunkSize = chunkSize - diff
-	}
-	copy(p, r.data[r.byteArrayIndex:chunkSize])
-	r.byteArrayIndex = r.byteArrayIndex + chunkSize
 	return chunkSize, nil
 }
 
@@ -315,7 +315,7 @@ func CreateCustomTransport(tlsConfig *tls.Config, disableHttp2 bool, networkType
 	return customTr
 }
 
-func DoHttpRequestMultipartFormData(client http.Client, method string, url string, headers map[string]string, multipartValues map[string]map[string]io.Reader) interface{} {
+func HttpRequestMultipartFormData(client http.Client, method string, url string, headers map[string]string, multipartValues map[string]map[string]io.Reader) interface{} {
 	body := &bytes.Buffer{}
 	multipartWriter := multipart.NewWriter(body)
 	for fieldName, contentTypeAndIoReader := range multipartValues {
@@ -339,7 +339,7 @@ func DoHttpRequestMultipartFormData(client http.Client, method string, url strin
 			h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, fieldName, filepath.Base(file.Name())))
 		} else if _, ok := ioReader.(*ConstantDataUnbufferedReader); ok {
 			h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, fieldName, "dummyFileName"))
-		} else if _, ok := ioReader.(*AnyDataBufferedReader); ok {
+		} else if _, ok := ioReader.(*bytes.Reader); ok {
 			h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, fieldName, "dummyFileName"))
 		} else {
 			h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"`, fieldName))
@@ -352,18 +352,18 @@ func DoHttpRequestMultipartFormData(client http.Client, method string, url strin
 	}
 	multipartWriter.Close()
 	headers["content-type"] = multipartWriter.FormDataContentType()
-	return internalDoHttpRequest(client, method, url, headers, body)
+	return DoHttpRequest(client, method, url, headers, body)
 }
 
-func DoHttpRequestFormUrlencoded(client http.Client, method string, url string, headers map[string]string, values url.Values) interface{} {
-	return internalDoHttpRequest(client, method, url, headers, strings.NewReader(values.Encode()))
+func HttpRequestFormUrlencoded(client http.Client, method string, url string, headers map[string]string, values url.Values) interface{} {
+	return DoHttpRequest(client, method, url, headers, strings.NewReader(values.Encode()))
 }
 
-func DoHttpRequest(client http.Client, method string, url string, headers map[string]string, body string) interface{} {
-	return internalDoHttpRequest(client, method, url, headers, strings.NewReader(body))
+func HttpRequest(client http.Client, method string, url string, headers map[string]string, body string) interface{} {
+	return DoHttpRequest(client, method, url, headers, strings.NewReader(body))
 }
 
-func internalDoHttpRequest(client http.Client, method string, url string, headers map[string]string, body io.Reader) interface{} {
+func DoHttpRequest(client http.Client, method string, url string, headers map[string]string, body io.Reader) interface{} {
 	req, err := http.NewRequest(method, url, body)
 	handleError(err, "http.NewRequest(method, url, body)")
 	if *optionUseChunkedTransferEncoding {
