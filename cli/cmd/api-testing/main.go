@@ -110,7 +110,7 @@ func main() {
   }
 }
 `
-	response := HttpRequest(client, "POST", targetUrl, headers, body)
+	response := HttpRequest(client, "POST", targetUrl, headers, strings.NewReader(body))
 	fmt.Println()
 	fmt.Printf("\"obj.list.0.key1\": %s\n", response.(map[string]any)["json"].(map[string]any)["obj"].(map[string]any)["list"].([]any)[0].(map[string]any)["key1"].(string))
 	fmt.Printf("\"obj.list.0.key1\": %s\n\n\n\n", Get(response, "json.obj.list.0.key1").(string))
@@ -224,7 +224,7 @@ aaa9,bbb12,ccc15
 aaa10,bbb13,ccc16
 `
 	targetUrl = "https://httpbin.org/put"
-	response = DoHttpRequest(client, "PUT", targetUrl, headers, bytes.NewBufferString(csvFileContents3))
+	response = HttpRequest(client, "PUT", targetUrl, headers, bytes.NewBufferString(csvFileContents3))
 	fmt.Println(response)
 }
 
@@ -352,18 +352,14 @@ func HttpRequestMultipartFormData(client http.Client, method string, url string,
 	}
 	multipartWriter.Close()
 	headers["content-type"] = multipartWriter.FormDataContentType()
-	return DoHttpRequest(client, method, url, headers, body)
+	return HttpRequest(client, method, url, headers, body)
 }
 
 func HttpRequestFormUrlencoded(client http.Client, method string, url string, headers map[string]string, values url.Values) interface{} {
-	return DoHttpRequest(client, method, url, headers, strings.NewReader(values.Encode()))
+	return HttpRequest(client, method, url, headers, strings.NewReader(values.Encode()))
 }
 
-func HttpRequest(client http.Client, method string, url string, headers map[string]string, body string) interface{} {
-	return DoHttpRequest(client, method, url, headers, strings.NewReader(body))
-}
-
-func DoHttpRequest(client http.Client, method string, url string, headers map[string]string, body io.Reader) interface{} {
+func HttpRequest(client http.Client, method string, url string, headers map[string]string, body io.Reader) interface{} {
 	req, err := http.NewRequest(method, url, body)
 	handleError(err, "http.NewRequest(method, url, body)")
 	if *optionUseChunkedTransferEncoding {
