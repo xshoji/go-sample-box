@@ -13,8 +13,8 @@ import (
 var (
 	// Define options and description
 	//
-	optionLevel    = flag.Int("l" /*     */, 0 /*       */, "[req] level")
-	optionName     = flag.String("n" /*  */, "" /*      */, "[req] name")
+	optionLevel    = flag.Int("l" /*     */, 0 /*       */, "[RQD] level")
+	optionName     = flag.String("n" /*  */, "" /*      */, "[RQD] name")
 	optionBirthday = flag.String("b" /*  */, "" /*      */, "birthday (format: 1900/01/02)")
 	optionWeight   = flag.Float64("f" /* */, 60.0 /*    */, "weight")
 	optionHelp     = flag.Bool("h" /*    */, false /*   */, "\nhelp")

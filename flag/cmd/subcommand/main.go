@@ -1,4 +1,4 @@
-package main
+çpackage main
 
 import (
 	"flag"

@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	UsageRequiredPrefix = "\u001B[33m[required]\u001B[0m "
+	UsageRequiredPrefix = "\u001B[33m[RQD]\u001B[0m "
 	UsageDummy          = "########"
 	CommandDescription  = "Here is the command description."
 )

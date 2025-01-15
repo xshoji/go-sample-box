@@ -112,7 +112,7 @@ func main() {
 `
 	response := HttpRequest(client, "POST", targetUrl, headers, body)
 	fmt.Println()
-	fmt.Printf("\"obj.list.0.key1\": %s\n\n\n\n", response.(map[string]any)["json"].(map[string]any)["obj"].(map[string]any)["list"].([]any)[0].(map[string]any)["key1"].(string))
+	fmt.Printf("\"obj.list.0.key1\": %s\n", response.(map[string]any)["json"].(map[string]any)["obj"].(map[string]any)["list"].([]any)[0].(map[string]any)["key1"].(string))
 	fmt.Printf("\"obj.list.0.key1\": %s\n\n\n\n", Get(response, "json.obj.list.0.key1").(string))
 
 	//
@@ -368,6 +368,7 @@ func DoHttpRequest(client http.Client, method string, url string, headers map[st
 	handleError(err, "http.NewRequest(method, url, body)")
 	if *optionUseChunkedTransferEncoding {
 		req.TransferEncoding = []string{"chunked"}
+		req.ContentLength = -1
 	}
 	for key, value := range headers {
 		req.Header.Set(key, value)
