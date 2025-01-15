@@ -315,7 +315,7 @@ func CreateCustomTransport(tlsConfig *tls.Config, disableHttp2 bool, networkType
 	return customTr
 }
 
-func HttpRequestMultipartFormData(client http.Client, method string, url string, headers map[string]string, multipartValues map[string]map[string]io.Reader) interface{} {
+func HttpRequestMultipartFormData(client http.Client, method string, url string, headers map[string]string, multipartValues map[string]map[string]io.Reader) any {
 	body := &bytes.Buffer{}
 	multipartWriter := multipart.NewWriter(body)
 	for fieldName, contentTypeAndIoReader := range multipartValues {
@@ -355,11 +355,11 @@ func HttpRequestMultipartFormData(client http.Client, method string, url string,
 	return HttpRequest(client, method, url, headers, body)
 }
 
-func HttpRequestFormUrlencoded(client http.Client, method string, url string, headers map[string]string, values url.Values) interface{} {
+func HttpRequestFormUrlencoded(client http.Client, method string, url string, headers map[string]string, values url.Values) any {
 	return HttpRequest(client, method, url, headers, strings.NewReader(values.Encode()))
 }
 
-func HttpRequest(client http.Client, method string, url string, headers map[string]string, body io.Reader) interface{} {
+func HttpRequest(client http.Client, method string, url string, headers map[string]string, body io.Reader) any {
 	req, err := http.NewRequest(method, url, body)
 	handleError(err, "http.NewRequest(method, url, body)")
 	if *optionUseChunkedTransferEncoding {
@@ -399,27 +399,27 @@ func HttpRequest(client http.Client, method string, url string, headers map[stri
 // Json Utils
 // =======================================
 
-// ToJsonObject json bytes to interface{} object
-func ToJsonObject(body []byte) interface{} {
-	var jsonObject interface{}
+// ToJsonObject json bytes to any object
+func ToJsonObject(body []byte) any {
+	var jsonObject any
 	err := json.Unmarshal(body, &jsonObject)
 	handleError(err, "json.Unmarshal")
 	return jsonObject
 }
 
-// Get get value in interface{} object [ example : object["aaa"][0]["bbb"] -> keyChain: "aaa.0.bbb" ]
-func Get(object interface{}, keyChain string) interface{} {
-	var result interface{}
+// Get get value in any object [ example : object["aaa"][0]["bbb"] -> keyChain: "aaa.0.bbb" ]
+func Get(object any, keyChain string) any {
+	var result any
 	var exists bool
 	for _, key := range strings.Split(keyChain, ".") {
 		exists = false
-		if _, ok := object.(map[string]interface{}); ok {
+		if _, ok := object.(map[string]any); ok {
 			exists = true
-			object = object.(map[string]interface{})[key]
+			object = object.(map[string]any)[key]
 			result = object
 			continue
 		}
-		if values, ok := object.([]interface{}); ok {
+		if values, ok := object.([]any); ok {
 			for i, v := range values {
 				if strconv.FormatInt(int64(i), 10) == key {
 					exists = true
@@ -437,8 +437,8 @@ func Get(object interface{}, keyChain string) interface{} {
 }
 
 // ToMap to map
-func ToMap(v interface{}, keys []string) map[string]interface{} {
-	resultMap := make(map[string]interface{}, len(keys))
+func ToMap(v any, keys []string) map[string]any {
+	resultMap := make(map[string]any, len(keys))
 	for _, key := range keys {
 		resultMap[key] = Get(v, key)
 	}
@@ -446,7 +446,7 @@ func ToMap(v interface{}, keys []string) map[string]interface{} {
 }
 
 // ToJsonString to json string
-func ToJsonString(v interface{}) string {
+func ToJsonString(v any) string {
 	result, _ := json.Marshal(v)
 	return string(result)
 }
