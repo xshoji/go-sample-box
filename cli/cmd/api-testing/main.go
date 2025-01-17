@@ -334,12 +334,6 @@ func HttpRequestMultipartFormData(client http.Client, method string, url string,
 		}
 		h := make(textproto.MIMEHeader)
 		h.Set("Content-Type", contentType)
-
-		fmt.Println(fieldName)
-		fmt.Println(func() bool { _, ok := ioReader.(*os.File); return ok }())
-		fmt.Println(func() bool { _, ok := ioReader.(*ConstantDataUnbufferedReader); return ok }())
-		fmt.Println(func() bool { _, ok := ioReader.(*bytes.Reader); return ok }())
-
 		if file, ok := ioReader.(*os.File); ok {
 			// Create the MIME headers for the new part
 			h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, fieldName, filepath.Base(file.Name())))
