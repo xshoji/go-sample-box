@@ -153,7 +153,7 @@ movie3,5,Short movie
 
 	response = HttpRequestMultipartFormData(client, "POST", targetUrl, headers, map[string]map[string]io.Reader{
 		"request": {
-			"application/json": bytes.NewReader([]byte(`{"title":"movie_title"}`)),
+			"application/json": strings.NewReader(`{"title":"movie_title"}`),
 		},
 		"file": {
 			//"text/csv; charset=utf-8": func() (f *os.File) { f, _ = os.Open("/tmp/aaa.csv"); return }(),
@@ -179,10 +179,10 @@ aaa7,bbb8,ccc9
 
 	response = HttpRequestMultipartFormData(client, "POST", targetUrl, headers, map[string]map[string]io.Reader{
 		"request": {
-			"application/json": bytes.NewReader([]byte(`{"title":"movie_title"}`)),
+			"application/json": strings.NewReader(`{"title":"movie_title"}`),
 		},
 		"file": {
-			"text/csv;charset=utf-8": bytes.NewBufferString(csvFileContents2),
+			"text/csv;charset=utf-8": bytes.NewReader([]byte(csvFileContents2)),
 		},
 	})
 	fmt.Println(response)
@@ -198,7 +198,7 @@ aaa7,bbb8,ccc9
 	//
 	response = HttpRequestMultipartFormData(client, "POST", targetUrl, headers, map[string]map[string]io.Reader{
 		"request": {
-			"application/json": bytes.NewReader([]byte(`{"title":"movie_title"}`)),
+			"application/json": strings.NewReader(`{"title":"movie_title"}`),
 		},
 		"file": {
 			"text/csv;charset=utf-8": &ConstantDataUnbufferedReader{
@@ -334,6 +334,12 @@ func HttpRequestMultipartFormData(client http.Client, method string, url string,
 		}
 		h := make(textproto.MIMEHeader)
 		h.Set("Content-Type", contentType)
+
+		fmt.Println(fieldName)
+		fmt.Println(func() bool { _, ok := ioReader.(*os.File); return ok }())
+		fmt.Println(func() bool { _, ok := ioReader.(*ConstantDataUnbufferedReader); return ok }())
+		fmt.Println(func() bool { _, ok := ioReader.(*bytes.Reader); return ok }())
+
 		if file, ok := ioReader.(*os.File); ok {
 			// Create the MIME headers for the new part
 			h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, fieldName, filepath.Base(file.Name())))
