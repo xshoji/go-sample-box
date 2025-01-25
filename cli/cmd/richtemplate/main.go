@@ -19,9 +19,9 @@ import (
 )
 
 const (
-	UsageRequiredPrefix = "\u001B[33m[RQD]\u001B[0m "
-	UsageDummy          = "########"
-	TimeFormat          = "2006-01-02 15:04:05.9999 [MST]"
+	UsageRqdPrefix = "\u001B[33m[RQD]\u001B[0m "
+	UsageDummy     = "########"
+	TimeFormat     = "2006-01-02 15:04:05.9999 [MST]"
 )
 
 var (
@@ -30,11 +30,11 @@ var (
 
 	// Command options
 	commandDescription = "Here is the command description."
-	optionFilePath     = defineStringFlag("f", "file-path", UsageRequiredPrefix+"file path", "")
-	optionUrl          = defineStringFlag("u", "url", "url", "https://httpbin.org/get")
-	optionLineIndex    = defineIntFlag("l", "line-index", "index of line", 10)
-	optionPrintSrc     = defineBoolFlag("p", "print-src", "print source code")
-	optionHelp         = defineBoolFlag("h", "help", "help")
+	optionFilePath     = defineFlagValue("f", "file-path" /*  */, UsageRqdPrefix+"file path" /* */, "").(*string)
+	optionUrl          = defineFlagValue("u", "url" /*        */, "url" /*                      */, "https://httpbin.org/get").(*string)
+	optionLineIndex    = defineFlagValue("l", "line-index" /* */, "index of line" /*            */, 10).(*int)
+	optionPrintSrc     = defineFlagValue("p", "print-src" /*  */, "print source code" /*        */, false).(*bool)
+	optionHelp         = defineFlagValue("h", "help" /*       */, "help" /*                     */, false).(*bool)
 
 	// Set environment variable
 	environmentValueLoopCount, _ = strconv.Atoi(GetEnvOrDefault("LOOP_COUNT", "10"))
@@ -79,7 +79,10 @@ func main() {
 	fmt.Printf("[ Environment variable ]\nLOOP_COUNT: %d\n\n", environmentValueLoopCount)
 	fmt.Printf("[ Command options ]\n")
 	flag.VisitAll(func(a *flag.Flag) {
-		fmt.Printf("-%-35s %s\n", fmt.Sprintf("%s %v", a.Name, a.Value), strings.Trim(a.Usage, "\n"))
+		if a.Usage == UsageDummy {
+			return
+		}
+		fmt.Printf("-%-30s %s\n", fmt.Sprintf("%s %v", a.Name, a.Value), strings.Trim(a.Usage, "\n"))
 	})
 	fmt.Printf("\n\n")
 
@@ -178,23 +181,21 @@ func handleError(err error, prefixErrMessage string) {
 	}
 }
 
-func defineStringFlag(short, long, description, defaultValue string) (v *string) {
-	// Define short parameters ( this default value and usage will be not used ).
-	v = flag.String(short, "", UsageDummy)
-	// Define long parameters and description ( set default value here if you need ).
-	flag.StringVar(v, long, defaultValue, description)
-	return
-}
-
-func defineIntFlag(short, long, description string, defaultValue int) (v *int) {
-	v = flag.Int(short, 0, UsageDummy)
-	flag.IntVar(v, long, defaultValue, description)
-	return
-}
-
-func defineBoolFlag(short, long, description string) (v *bool) {
-	v = flag.Bool(short, false, UsageDummy)
-	flag.BoolVar(v, long, false, description)
+// Helper function for flag
+func defineFlagValue(short, long, description string, defaultValue any) (f any) {
+	switch defaultValue.(type) {
+	case string:
+		f = flag.String(short, "", UsageDummy)
+		flag.StringVar(f.(*string), long, defaultValue.(string), description)
+	case int:
+		f = flag.Int(short, 0, UsageDummy)
+		flag.IntVar(f.(*int), long, defaultValue.(int), description)
+	case bool:
+		f = flag.Bool(short, false, UsageDummy)
+		flag.BoolVar(f.(*bool), long, defaultValue.(bool), description)
+	default:
+		panic("unsupported flag type")
+	}
 	return
 }
 
@@ -208,10 +209,10 @@ func formatUsage(description string) {
 	maxLength := 0.0
 	sort.Slice(usageOptions, func(i, j int) bool {
 		maxLength = math.Max(maxLength, math.Max(float64(len(re.ReplaceAllString(usageOptions[i], "$1, -$3$4"))), float64(len(re.ReplaceAllString(usageOptions[j], "$1, -$3$4")))))
-		if len(strings.Split(usageOptions[i]+usageOptions[j], UsageRequiredPrefix))%2 == 1 {
+		if len(strings.Split(usageOptions[i]+usageOptions[j], UsageRqdPrefix))%2 == 1 {
 			return strings.Compare(usageOptions[i], usageOptions[j]) == -1
 		} else {
-			return strings.Index(usageOptions[i], UsageRequiredPrefix) >= 0
+			return strings.Index(usageOptions[i], UsageRqdPrefix) >= 0
 		}
 	})
 	usage := strings.Replace(strings.Replace(strings.Split(b.String(), "\n")[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + description + "\n\nOptions:\n"
