@@ -37,11 +37,11 @@ var (
 	// Command options
 	commandDescription               = "Web API testing tool."
 	commandOptionFieldWidth          = 5
-	optionUseChunkedTransferEncoding = flag.Bool("c" /* */, false /* */, "\nUse \"Transfer-Encoding: chunked\" ( only for HTTP/1.1 ).")
-	optionTrimDownHttpMessages       = flag.Bool("t" /* */, false /* */, "\nTrim down HTTP messages in stdout.")
-	optionSkipTlsVerification        = flag.Bool("s" /* */, false /* */, "\nSkip TLS verification.")
-	optionDisableHttp2               = flag.Bool("d" /* */, false /* */, "\nDisable HTTP/2.")
-	optionHelp                       = flag.Bool("h" /* */, false /* */, "\nShow help information.")
+	optionUseChunkedTransferEncoding = flag.Bool("c" /* */, false /* */, "Use \"Transfer-Encoding: chunked\" ( only for HTTP/1.1 ).")
+	optionTrimDownHttpMessages       = flag.Bool("t" /* */, false /* */, "Trim down HTTP messages in stdout.")
+	optionSkipTlsVerification        = flag.Bool("s" /* */, false /* */, "Skip TLS verification.")
+	optionDisableHttp2               = flag.Bool("d" /* */, false /* */, "Disable HTTP/2.")
+	optionHelp                       = flag.Bool("h" /* */, false /* */, "Show help information.")
 
 	// HTTP Header templates
 	createHttpHeaderEmpty = func() map[string]string {
@@ -485,7 +485,7 @@ func formatUsage(description string, optionFieldWidth int) {
 	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
 	usageLines := strings.Split(b.String(), "\n")
 	usage := strings.Replace(strings.Replace(usageLines[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + description + "\n\nOptions:\n"
-	re := regexp.MustCompile(" +(-\\S+)( *\\S*|\t)*\n(\\s+)(.*)\n")
+	re := regexp.MustCompile(` +(-\S+)(?: (\S+))?\n*(\s+)(.*)\n`)
 	usage += re.ReplaceAllStringFunc(strings.Join(usageLines[1:], "\n"), func(m string) string {
 		parts := re.FindStringSubmatch(m)
 		return fmt.Sprintf("  %-"+strconv.Itoa(optionFieldWidth)+"s %s\n", parts[1]+" "+strings.TrimSpace(parts[2]), parts[4])
