@@ -36,7 +36,8 @@ const (
 var (
 	// Command options
 	commandDescription               = "Web API testing tool."
-	commandOptionFieldWidth          = 5
+	commandOptionFieldWidth          = 7
+	optionByteSizePostData           = flag.Int("b" /*  */, 1024 /*  */, "Byte size for post data")
 	optionUseChunkedTransferEncoding = flag.Bool("c" /* */, false /* */, "Use \"Transfer-Encoding: chunked\" ( only for HTTP/1.1 ).")
 	optionTrimDownHttpMessages       = flag.Bool("t" /* */, false /* */, "Trim down HTTP messages in stdout.")
 	optionSkipTlsVerification        = flag.Bool("s" /* */, false /* */, "Skip TLS verification.")
@@ -201,10 +202,7 @@ aaa7,bbb8,ccc9
 			"application/json": strings.NewReader(`{"title":"movie_title"}`),
 		},
 		"file": {
-			"text/csv;charset=utf-8": &ConstantDataUnbufferedReader{
-				kbSize:      1,
-				repetitions: 0,
-			},
+			"text/csv;charset=utf-8": NewConstantDataUnbufferedReader(*optionByteSizePostData),
 		},
 	})
 	fmt.Println(response)
@@ -233,17 +231,33 @@ aaa10,bbb13,ccc16
 // =======================================
 
 type ConstantDataUnbufferedReader struct {
-	kbSize      int
-	repetitions int
+	chunkSize          int
+	repetitionsCurrent int
+	repetitionsMax     int
+	remainingByteSize  int
 }
 
+func NewConstantDataUnbufferedReader(byteSize int) *ConstantDataUnbufferedReader {
+	chunkByteSize := 1024
+	return &ConstantDataUnbufferedReader{
+		chunkSize:          chunkByteSize,
+		repetitionsCurrent: 0,
+		repetitionsMax:     byteSize/chunkByteSize + 1,
+		remainingByteSize:  byteSize % chunkByteSize,
+	}
+}
 func (r *ConstantDataUnbufferedReader) Read(p []byte) (n int, err error) {
-	chunkSize := 1024 // 1kb
-	if r.repetitions >= r.kbSize {
+	if r.repetitionsCurrent >= r.repetitionsMax {
 		return 0, io.EOF
 	}
-	copy(p, bytes.Repeat([]byte("0"), chunkSize))
-	r.repetitions++
+	chunkSize := r.chunkSize
+	if r.repetitionsCurrent == r.repetitionsMax-1 {
+		chunkSize = r.remainingByteSize
+	}
+	if chunkSize != 0 {
+		copy(p, bytes.Repeat([]byte("0"), chunkSize))
+	}
+	r.repetitionsCurrent++
 	return chunkSize, nil
 }
 
