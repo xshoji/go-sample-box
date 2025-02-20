@@ -32,11 +32,11 @@ const (
 
 var (
 	// Command options
-	commandDescription               = "Web API testing tool."
-	commandOptionFieldWidth          = 7
-	optionByteSizePostData           = flag.Int("b" /*  */, 1024 /*  */, "Byte size for post data")
-	optionByteSizePerSecForRateLimit = flag.Int("r" /*  */, 1024 /*  */, "Rate limit byte size ( per second )")
-	optionHelp                       = flag.Bool("h" /* */, false /* */, "Show help information.")
+	commandDescription      = "Web API testing tool."
+	commandOptionFieldWidth = 7
+	optionByteSizePostData  = flag.Int("b" /*  */, 1024 /*  */, "Byte size for post data")
+	optionRateLimitKbPerSec = flag.Int("r" /*  */, 1 /*     */, "Rate limit KB per second [ e.g. 1 = 1KB, 0 = No limit ]")
+	optionHelp              = flag.Bool("h" /* */, false /* */, "Show help information.")
 
 	// HTTP Header templates
 	createHttpHeaderContentTypeJson = func() map[string]string {
@@ -90,7 +90,7 @@ func main() {
 			"application/json": strings.NewReader(`{"title":"movie_title"}`),
 		},
 		"file": {
-			"text/csv;charset=utf-8": NewConstantDataUnbufferedReader(*optionByteSizePostData, *optionByteSizePerSecForRateLimit),
+			"text/csv;charset=utf-8": NewConstantDataUnbufferedReader(*optionByteSizePostData, *optionRateLimitKbPerSec),
 		},
 	})
 	fmt.Println(response)
@@ -101,21 +101,23 @@ func main() {
 // =======================================
 
 type ConstantDataUnbufferedReader struct {
-	chunkSize                  int
-	repetitionsCurrent         int
-	repetitionsMax             int
-	remainingByteSize          int
-	byteSizePerSecForRateLimit int
+	totalByteSize      int
+	chunkSize          int
+	repetitionsCurrent int
+	repetitionsMax     int
+	remainingByteSize  int
+	rateLimitKbPerSec  int
 }
 
 func NewConstantDataUnbufferedReader(byteSize, byteSizePerSecForRateLimit int) *ConstantDataUnbufferedReader {
 	chunkByteSize := 1024
 	return &ConstantDataUnbufferedReader{
-		chunkSize:                  chunkByteSize,
-		repetitionsCurrent:         0,
-		repetitionsMax:             byteSize/chunkByteSize + 1,
-		remainingByteSize:          byteSize % chunkByteSize,
-		byteSizePerSecForRateLimit: byteSizePerSecForRateLimit,
+		totalByteSize:      byteSize,
+		chunkSize:          chunkByteSize,
+		repetitionsCurrent: 0,
+		repetitionsMax:     byteSize/chunkByteSize + 1,
+		remainingByteSize:  byteSize % chunkByteSize,
+		rateLimitKbPerSec:  byteSizePerSecForRateLimit,
 	}
 }
 func (r *ConstantDataUnbufferedReader) Read(p []byte) (n int, err error) {
@@ -127,25 +129,26 @@ func (r *ConstantDataUnbufferedReader) Read(p []byte) (n int, err error) {
 		chunkSize = r.remainingByteSize
 	}
 
-	tokenBucket := make(chan int, r.byteSizePerSecForRateLimit)
-
-	go func() {
-		ticker := time.NewTicker(time.Second / time.Duration(r.byteSizePerSecForRateLimit))
-		defer ticker.Stop()
-		for range ticker.C {
-			select {
-			case tokenBucket <- 0: /* // 適当な値をトークンとしてを補填 */
-			default: /*               // バケットが満帆なら捨てる（上限を超えないようにする） */
+	kbTokenBucket := make(chan int, r.rateLimitKbPerSec)
+	if r.rateLimitKbPerSec != 0 {
+		go func() {
+			ticker := time.NewTicker(time.Second / time.Duration(r.rateLimitKbPerSec))
+			defer ticker.Stop()
+			for range ticker.C {
+				select {
+				case kbTokenBucket <- 0: /* // 適当な値をトークン（ 1 token => 1024 byte 相当 ) としてを補填 */
+				default: /*                 // バケットが満帆なら捨てる（上限を超えないようにする） */
+				}
 			}
-		}
-	}()
+		}()
+	}
 
 	if chunkSize != 0 {
-		// 指定したバイト数分のトークンを取得する（トークンが足りなければ待機）
-		for i := 0; i < chunkSize; i++ {
-			<-tokenBucket
+		if r.rateLimitKbPerSec != 0 {
+			// トークン（ 1 token => 1024 byte 相当 ) を取得する。トークンが足りなければ待機する。
+			<-kbTokenBucket
+			fmt.Printf("[Progress] Sending request body... | %s, %d%%, totalByteSize:%d, currentByteSize:%d\r", time.Now().Format(TimeFormat), r.chunkSize*r.repetitionsCurrent*100/r.totalByteSize, r.totalByteSize, r.chunkSize*r.repetitionsCurrent)
 		}
-		fmt.Printf("[Progress] Sending request body... %s, chunkSize:%d\n", time.Now().Format(TimeFormat), chunkSize)
 		copy(p, bytes.Repeat([]byte("0"), chunkSize))
 	}
 	r.repetitionsCurrent++
