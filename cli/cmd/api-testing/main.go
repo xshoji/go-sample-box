@@ -291,8 +291,7 @@ func (s *CustomTransport) RoundTrip(r *http.Request) (*http.Response, error) {
 	}))
 
 	// mask request header and body
-	httpMessageString := string(httpMessageBytes)
-	httpMessageString = muskingRegex.ReplaceAllString(httpMessageString, "$1 ****")
+	httpMessageString := muskingRegex.ReplaceAllString(string(httpMessageBytes), "$1 ****")
 	fmt.Printf("Req. %s%s", time.Now().Format(TimeFormat), adjustMessage("\n"+httpMessageString+"\n"))
 
 	resp, err := s.Transport.RoundTrip(r)
@@ -302,8 +301,7 @@ func (s *CustomTransport) RoundTrip(r *http.Request) (*http.Response, error) {
 	handleError(err, "httputil.DumpResponse(resp, true)")
 
 	// mask response header
-	respString := string(respBytes)
-	respString = muskingRegex.ReplaceAllString(respString, "$1 ****")
+	respString := muskingRegex.ReplaceAllString(string(respBytes), "$1 ****")
 	fmt.Printf("Res. %s%s", time.Now().Format(TimeFormat), adjustMessage("\n"+respString))
 
 	return resp, err
