@@ -21,7 +21,7 @@ import (
 const (
 	UsageRqdPrefix = "\u001B[33m[RQD]\u001B[0m "
 	UsageDummy     = "########"
-	TimeFormat     = "2006-01-02 15:04:05.9999 [MST]"
+	TimeFormat     = "2006-01-02 15:04:05.0000 [MST]"
 )
 
 var (

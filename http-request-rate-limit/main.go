@@ -27,7 +27,7 @@ import (
 
 const (
 	HttpContentTypeHeader = "content-type"
-	TimeFormat            = "2006-01-02 15:04:05.9999 [MST]"
+	TimeFormat            = "2006-01-02 15:04:05.0000 [MST]"
 )
 
 var (
@@ -127,16 +127,15 @@ func (r *ConstantDataUnbufferedReader) Read(p []byte) (n int, err error) {
 		chunkSize = r.remainingByteSize
 	}
 
-	rate := r.byteSizePerSecForRateLimit
-	tokenBucket := make(chan struct{}, rate)
+	tokenBucket := make(chan int, r.byteSizePerSecForRateLimit)
 
 	go func() {
-		ticker := time.NewTicker(time.Second / time.Duration(rate))
+		ticker := time.NewTicker(time.Second / time.Duration(r.byteSizePerSecForRateLimit))
 		defer ticker.Stop()
 		for range ticker.C {
 			select {
-			case tokenBucket <- struct{}{}: /* // トークンを補填 */
-			default: /*                        // バケットが満帆なら捨てる（上限を超えないようにする） */
+			case tokenBucket <- 0: /* // 適当な値をトークンとしてを補填 */
+			default: /*               // バケットが満帆なら捨てる（上限を超えないようにする） */
 			}
 		}
 	}()
