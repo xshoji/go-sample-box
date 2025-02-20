@@ -32,7 +32,7 @@ const (
 
 var (
 	// Command options
-	commandDescription      = "Web API testing tool."
+	commandDescription      = "Rate-limited HTTP request sample."
 	commandOptionFieldWidth = 7
 	optionByteSizePostData  = flag.Int("b" /*  */, 1024 /*  */, "Byte size for post data")
 	optionRateLimitKbPerSec = flag.Int("r" /*  */, 1 /*     */, "Rate limit KB per second [ e.g. 1 = 1KB, 0 = No limit ]")
