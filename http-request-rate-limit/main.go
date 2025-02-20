@@ -136,8 +136,8 @@ func (r *ConstantDataUnbufferedReader) Read(p []byte) (n int, err error) {
 			defer ticker.Stop()
 			for range ticker.C {
 				select {
-				case kbTokenBucket <- 0: /* // 適当な値をトークン（ 1 token => 1024 byte 相当 ) としてを補填 */
-				default: /*                 // バケットが満帆なら捨てる（上限を超えないようにする） */
+				case kbTokenBucket <- 0: /* // 適当な値をトークン（ 1 token => 1024 byte 相当 ) としてバケットへ補填する */
+				default: /*                 // バケットが満タンの場合に待機してしまうことを防ぐため default: で何もしない */
 				}
 			}
 		}()
