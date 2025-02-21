@@ -4,8 +4,10 @@ import (
 	"archive/zip"
 	"bytes"
 	_ "embed"
+	"encoding/binary"
 	"flag"
 	"fmt"
+	"hash/crc32"
 	"io"
 	"os"
 	"regexp"
@@ -15,8 +17,9 @@ import (
 )
 
 const (
-	UsageRequiredPrefix = "\u001B[33m[RQD]\u001B[0m "
-	TimeFormat          = "2006-01-02 15:04:05.0000 [MST]"
+	UsageRequiredPrefix   = "\u001B[33m[RQD]\u001B[0m "
+	TimeFormat            = "2006-01-02 15:04:05.0000 [MST]"
+	ContentsFileNameInZip = "dummy.tsv"
 )
 
 var (
@@ -53,11 +56,17 @@ func main() {
 
 	zipFileDummy := CreateZipFileOnMemory(*optionByteSize)
 	fmt.Printf("CreateZipFileOnMemory:\n")
-	fmt.Printf("%v\n\n", zipFileDummy.Bytes())
+	fmt.Printf("%v\n", zipFileDummy.Bytes())
 
-	CreateZipFileConcrete(*optionOutputPath, *optionByteSize)
-	fmt.Printf("CreateZipFileConcrete:\n")
-	fmt.Printf("Path: %s\n", *optionOutputPath)
+	path := *optionOutputPath + "_CreateZipFileConcrete.zip"
+	CreateZipFileConcrete(path, *optionByteSize)
+	fmt.Printf("\nCreateZipFileConcrete:\n")
+	fmt.Printf("Path: %s\n", path)
+
+	path = *optionOutputPath + "_CreateZipFileConcreteStatic.zip"
+	CreateZipFileConcreteStatic(path, *optionByteSize)
+	fmt.Printf("\nCreateZipFileConcreteStatic:\n")
+	fmt.Printf("Path: %s\n", path)
 }
 
 type ConstantDataUnbufferedReader struct {
@@ -106,10 +115,76 @@ func CreateZipFileConcrete(optionOutputPath string, optionByteSize int) {
 	createZipFile(dummyZipFile, optionByteSize)
 }
 
+func CreateZipFileConcreteStatic(optionOutputPath string, optionByteSize int) {
+	// 固定値の設定
+	filename := "2_" + ContentsFileNameInZip
+	content := make([]byte, optionByteSize) // 0埋めされた1024バイト
+	crc := crc32.ChecksumIEEE(content)      // 正しいCRC32を計算
+	fileSize := uint32(len(content))
+
+	// ファイル作成
+	f, err := os.Create(optionOutputPath)
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	// **ローカルファイルヘッダの書き込み**
+	localHeaderOffset, _ := f.Seek(0, io.SeekCurrent)           // ファイルの最初から開始
+	f.Write([]byte("PK\x03\x04"))                               // シグネチャ
+	f.Write([]byte{0x14, 0x00})                                 // バージョン
+	f.Write([]byte{0x00, 0x00})                                 // フラグ
+	f.Write([]byte{0x00, 0x00})                                 // 圧縮方式 (0=ストア)
+	f.Write([]byte{0x00, 0x00, 0x00, 0x00})                     // タイムスタンプ (0に固定)
+	binary.Write(f, binary.LittleEndian, crc)                   // CRC32
+	binary.Write(f, binary.LittleEndian, fileSize)              // 圧縮サイズ
+	binary.Write(f, binary.LittleEndian, fileSize)              // 元サイズ
+	binary.Write(f, binary.LittleEndian, uint16(len(filename))) // ファイル名長
+	binary.Write(f, binary.LittleEndian, uint16(0))             // 拡張フィールド長
+	f.Write([]byte(filename))                                   // ファイル名
+	f.Write(content)                                            // ファイルデータ
+
+	// **セントラルディレクトリの書き込み**
+	centralDirectoryOffset, _ := f.Seek(0, io.SeekCurrent)      // 現在の位置
+	f.Write([]byte("PK\x01\x02"))                               // シグネチャ
+	f.Write([]byte{0x14, 0x00})                                 // バージョン
+	f.Write([]byte{0x14, 0x00})                                 // 必要バージョン
+	f.Write([]byte{0x00, 0x00})                                 // フラグ
+	f.Write([]byte{0x00, 0x00})                                 // 圧縮方式
+	f.Write([]byte{0x00, 0x00, 0x00, 0x00})                     // タイムスタンプ
+	binary.Write(f, binary.LittleEndian, crc)                   // CRC32
+	binary.Write(f, binary.LittleEndian, fileSize)              // 圧縮サイズ
+	binary.Write(f, binary.LittleEndian, fileSize)              // 元サイズ
+	binary.Write(f, binary.LittleEndian, uint16(len(filename))) // ファイル名長
+	binary.Write(f, binary.LittleEndian, uint16(0))             // 拡張フィールド長
+	binary.Write(f, binary.LittleEndian, uint16(0))             // ファイルコメント長
+	binary.Write(f, binary.LittleEndian, uint16(0))             // ディスク番号
+	binary.Write(f, binary.LittleEndian, uint16(0))             // 内部ファイル属性
+	binary.Write(f, binary.LittleEndian, uint32(0))             // 外部ファイル属性
+	binary.Write(f, binary.LittleEndian, localHeaderOffset)     // ローカルヘッダのオフセット
+	f.Write([]byte(filename))                                   // ファイル名
+
+	// **終端ヘッダ (EOCD) の書き込み**
+	f.Write([]byte("PK\x05\x06"))                                        // シグネチャ
+	f.Write([]byte{0x00, 0x00})                                          // ディスク番号
+	f.Write([]byte{0x00, 0x00})                                          // セントラルディレクトリ開始ディスク
+	f.Write([]byte{0x01, 0x00})                                          // セントラルディレクトリのエントリ数 (1)
+	f.Write([]byte{0x01, 0x00})                                          // セントラルディレクトリの総エントリ数 (1)
+	centralDirectorySize, _ := f.Seek(0, io.SeekCurrent)                 // aaa
+	centralDirectorySize -= centralDirectoryOffset                       //
+	binary.Write(f, binary.LittleEndian, uint32(centralDirectorySize))   // セントラルディレクトリサイズ
+	binary.Write(f, binary.LittleEndian, uint32(centralDirectoryOffset)) // セントラルディレクトリのオフセット
+	binary.Write(f, binary.LittleEndian, uint16(0))                      // コメント長
+
+	f.Sync()
+
+}
+
 func createZipFile(dummyZipFile io.Writer, optionByteSize int) {
 	zipWriter := zip.NewWriter(dummyZipFile)
-	w1, err := zipWriter.Create("dummy.tsv")
-	handleError(err, `zipWriter.Create("dir1/dummy.tsv")`)
+	filename := "1_" + ContentsFileNameInZip
+	w1, err := zipWriter.Create(filename)
+	handleError(err, `zipWriter.Create(ContentsFileNameInZip)`)
 	constantDataUnbufferedReader := NewConstantDataUnbufferedReader(optionByteSize)
 	_, err = io.Copy(w1, constantDataUnbufferedReader)
 	handleError(err, `io.Copy(w1, constantDataUnbufferedReader)`)
