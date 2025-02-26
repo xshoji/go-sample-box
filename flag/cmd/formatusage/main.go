@@ -85,7 +85,7 @@ func formatUsage(description string) {
 			return strings.Index(usageOptions[i], UsageRequiredPrefix) >= 0
 		}
 	})
-	usage := strings.Split(b.String(), "\n")[0] + "\n\nDescription:\n  " + description + "\n\nOptions:\n"
+	usage := strings.Replace(strings.Replace(strings.Split(b.String(), "\n")[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + description + "\n\nOptions:\n"
 	for _, v := range usageOptions {
 		usage += fmt.Sprintf("%-"+strconv.Itoa(int(maxLength+2.0))+"s", re.ReplaceAllString(v, "  $1")) + re.ReplaceAllString(v, "$2\n")
 	}
