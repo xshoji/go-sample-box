@@ -19,6 +19,7 @@ const (
 var (
 	// Define short options ( don't set default value ).
 	commandDescription = "Here is the command description."
+	optionMaxLength    = 0
 	optionAdd          = flag.Int("a", 0, UsageDummy)
 	optionItemName     = flag.String("i", "", UsageDummy)
 	optionFilesize     = flag.Int("f", 0, UsageDummy)
@@ -38,35 +39,25 @@ func init() {
 	flag.BoolVar(optionHelp /*       */, "help" /*      */, false /* */, "help")
 
 	// Adjust Usage
-	formatUsage(commandDescription, 0, new(bytes.Buffer))
+	formatUsage(commandDescription, &optionMaxLength, new(bytes.Buffer))
 }
 
 // << Execution sample >>
 // $ go run cmd/formatusagewithlong/main.go -a 12 -i test
 // [ Command options ]
-// -a 12                 ########
-// -add 12               [required] add
-// -c 1                  ########
-// -count 1              count
-// -f 10                 ########
-// -filesize 10          filesize
-// -h false              ########
-// -help false           help
-// -i test               ########
-// -item-name test       [required] item-name
+//  --add 12                 [RQD] add
+//  --count 1                count
+//  --filesize 10            filesize
+//  --help false             help
+//  --item-name test         [RQD] item-name
 //
 // $ go run cmd/formatusagewithlong/main.go --add 14 --item-name test2
 // [ Command options ]
-// -a 14                 ########
-// -add 14               [required] add
-// -c 1                  ########
-// -count 1              count
-// -f 10                 ########
-// -filesize 10          filesize
-// -h false              ########
-// -help false           help
-// -i test2              ########
-// -item-name test2      [required] item-name
+//  --add 14                 [RQD] add
+//  --count 1                count
+//  --filesize 10            filesize
+//  --help false             help
+//  --item-name test2        [RQD] item-name
 //
 // $ go run cmd/formatusagewithlong/main.go -h
 // Usage: /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build624316317/b001/exe/main [OPTIONS]
@@ -92,17 +83,20 @@ func main() {
 	// Print all options
 	fmt.Printf("[ Command options ]\n")
 	flag.VisitAll(func(a *flag.Flag) {
-		fmt.Printf("  -%-18s %s\n", fmt.Sprintf("%s %v", a.Name, a.Value), strings.Trim(a.Usage, "\n"))
+		if a.Usage == UsageDummy {
+			return
+		}
+		fmt.Printf("  --%-"+fmt.Sprintf("%d", optionMaxLength)+"s %s\n", fmt.Sprintf("%s %v", a.Name, a.Value), strings.Trim(a.Usage, "\n"))
 	})
 }
 
-func formatUsage(description string, maxLength int, buffer *bytes.Buffer) {
+func formatUsage(description string, maxLength *int, buffer *bytes.Buffer) {
 	// Get default flags usage
 	func() { flag.CommandLine.SetOutput(buffer); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
 	re := regexp.MustCompile("(-\\S+)( *\\S*)+\n*\\s+" + UsageDummy + ".*\n*\\s+(-\\S+)( *\\S*)+\n\\s+(.+)")
 	usageOptions := re.FindAllString(buffer.String(), -1)
 	sort.Slice(usageOptions, func(i, j int) bool {
-		maxLength = max(maxLength, len(re.ReplaceAllString(usageOptions[i], "$1, -$3$4")), len(re.ReplaceAllString(usageOptions[j], "$1, -$3$4")))
+		*maxLength = max(*maxLength, len(re.ReplaceAllString(usageOptions[i], "$1, -$3$4")), len(re.ReplaceAllString(usageOptions[j], "$1, -$3$4")))
 		if len(strings.Split(usageOptions[i]+usageOptions[j], UsageRequiredPrefix))%2 == 1 {
 			return strings.Compare(usageOptions[i], usageOptions[j]) == -1
 		} else {
@@ -111,7 +105,7 @@ func formatUsage(description string, maxLength int, buffer *bytes.Buffer) {
 	})
 	usage := strings.Replace(strings.Replace(strings.Split(buffer.String(), "\n")[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + description + "\n\nOptions:\n"
 	for _, v := range usageOptions {
-		usage += fmt.Sprintf("%-6s%-"+strconv.Itoa(maxLength)+"s", re.ReplaceAllString(v, "  $1,"), re.ReplaceAllString(v, "-$3$4")) + re.ReplaceAllString(v, "$5\n")
+		usage += fmt.Sprintf("%-6s%-"+strconv.Itoa(*maxLength)+"s", re.ReplaceAllString(v, "  $1,"), re.ReplaceAllString(v, "-$3$4")) + re.ReplaceAllString(v, "$5\n")
 	}
 	flag.Usage = func() { _, _ = fmt.Fprintf(flag.CommandLine.Output(), usage) }
 }

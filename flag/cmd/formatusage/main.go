@@ -18,6 +18,7 @@ const (
 var (
 	// Command options
 	commandDescription = "Here is the command description."
+	optionMaxLength    = 0
 	optionAdd          = flag.Int("a" /*    */, 0 /*     */, UsageRequiredPrefix+"add")
 	optionItemName     = flag.String("i" /* */, "" /*    */, UsageRequiredPrefix+"item-name")
 	optionFilesize     = flag.Int("f" /*    */, 10 /*    */, "filesize")
@@ -27,7 +28,7 @@ var (
 
 func init() {
 	// Format usage
-	formatUsage(commandDescription, 0, new(bytes.Buffer))
+	formatUsage(commandDescription, &optionMaxLength, new(bytes.Buffer))
 }
 
 // << Execution sample >>
@@ -63,17 +64,17 @@ func main() {
 	// Print all options
 	fmt.Printf("[ Command options ]\n")
 	flag.VisitAll(func(a *flag.Flag) {
-		fmt.Printf("  -%-10s %s\n", fmt.Sprintf("%s %v", a.Name, a.Value), strings.Trim(a.Usage, "\n"))
+		fmt.Printf("  -%-"+fmt.Sprintf("%d", optionMaxLength)+"s %s\n", fmt.Sprintf("%s %v", a.Name, a.Value), strings.Trim(a.Usage, "\n"))
 	})
 }
 
-func formatUsage(description string, maxLength int, buffer *bytes.Buffer) {
+func formatUsage(description string, maxLength *int, buffer *bytes.Buffer) {
 	// Get default flags usage
 	func() { flag.CommandLine.SetOutput(buffer); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
 	re := regexp.MustCompile("\\s+(-\\S+ *\\S*)+\n*\\s+(.+)")
 	usageOptions := re.FindAllString(buffer.String(), -1)
 	sort.Slice(usageOptions, func(i, j int) bool {
-		maxLength = max(maxLength, len(re.ReplaceAllString(usageOptions[i], "  $1")), len(re.ReplaceAllString(usageOptions[j], "  $1")))
+		*maxLength = max(*maxLength, len(re.ReplaceAllString(usageOptions[i], "  $1")), len(re.ReplaceAllString(usageOptions[j], "  $1")))
 		if len(strings.Split(usageOptions[i]+usageOptions[j], UsageRequiredPrefix))%2 == 1 {
 			return strings.Compare(usageOptions[i], usageOptions[j]) == -1
 		} else {
@@ -82,7 +83,7 @@ func formatUsage(description string, maxLength int, buffer *bytes.Buffer) {
 	})
 	usage := strings.Replace(strings.Replace(strings.Split(buffer.String(), "\n")[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + description + "\n\nOptions:\n"
 	for _, v := range usageOptions {
-		usage += fmt.Sprintf("%-"+strconv.Itoa(maxLength+2)+"s", re.ReplaceAllString(v, "  $1")) + re.ReplaceAllString(v, "$2\n")
+		usage += fmt.Sprintf("%-"+strconv.Itoa(*maxLength+2)+"s", re.ReplaceAllString(v, "  $1")) + re.ReplaceAllString(v, "$2\n")
 	}
 	flag.Usage = func() { _, _ = fmt.Fprintf(flag.CommandLine.Output(), usage) }
 }
