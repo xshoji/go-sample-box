@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -43,7 +44,7 @@ func init() {
 
 // # Build: APP="/tmp/tool"; MAIN="main.go"; GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o "${APP}" "${MAIN}"; chmod +x "${APP}"
 func main() {
-	
+
 	flag.Parse()
 	if *optionPrintSrc {
 		fmt.Printf("%s", srcBytes)
@@ -134,10 +135,13 @@ func formatUsage(description string, optionFieldWidth int) {
 	b := new(bytes.Buffer)
 	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
 	usageLines := strings.Split(b.String(), "\n")
-	usage := strings.Replace(strings.Replace(usageLines[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + description + "\n\nOptions:\n"
+	usageFirst := strings.Replace(strings.Replace(usageLines[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + description + "\n\nOptions:\n"
 	re := regexp.MustCompile(` +(-\S+)(?: (\S+))?\n*(\s+)(.*)\n`)
-	usage += re.ReplaceAllStringFunc(strings.Join(usageLines[1:], "\n"), func(m string) string {
+	usageOptions := strings.Split(re.ReplaceAllStringFunc(strings.Join(usageLines[1:], "\n"), func(m string) string {
 		return fmt.Sprintf("  %-"+strconv.Itoa(optionFieldWidth)+"s %s\n", re.FindStringSubmatch(m)[1]+" "+strings.TrimSpace(re.FindStringSubmatch(m)[2]), re.FindStringSubmatch(m)[4])
+	}), "\n")
+	sort.SliceStable(usageOptions, func(i, j int) bool {
+		return strings.Count(usageOptions[i], UsageRequiredPrefix) > strings.Count(usageOptions[j], UsageRequiredPrefix)
 	})
-	flag.Usage = func() { _, _ = fmt.Fprintf(flag.CommandLine.Output(), usage) }
+	flag.Usage = func() { _, _ = fmt.Fprintf(flag.CommandLine.Output(), usageFirst+strings.Join(usageOptions, "\n")) }
 }
