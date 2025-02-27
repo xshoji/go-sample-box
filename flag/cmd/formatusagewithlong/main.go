@@ -18,13 +18,13 @@ const (
 
 var (
 	// Define short options ( don't set default value ).
-	commandDescription = "Here is the command description."
-	optionMaxLength    = 0
-	optionAdd          = flag.Int("a", 0, UsageDummy)
-	optionItemName     = flag.String("i", "", UsageDummy)
-	optionFilesize     = flag.Int("f", 0, UsageDummy)
-	optionCount        = flag.Int("c", 0, UsageDummy)
-	optionHelp         = flag.Bool("h", false, UsageDummy)
+	commandDescription     = "Here is the command description."
+	commandOptionMaxLength = 0
+	optionAdd              = flag.Int("a", 0, UsageDummy)
+	optionItemName         = flag.String("i", "", UsageDummy)
+	optionFilesize         = flag.Int("f", 0, UsageDummy)
+	optionCount            = flag.Int("c", 0, UsageDummy)
+	optionHelp             = flag.Bool("h", false, UsageDummy)
 )
 
 func init() {
@@ -39,7 +39,7 @@ func init() {
 	flag.BoolVar(optionHelp /*       */, "help" /*      */, false /* */, "help")
 
 	// Adjust Usage
-	formatUsage(commandDescription, &optionMaxLength, new(bytes.Buffer))
+	formatUsage(commandDescription, &commandOptionMaxLength, new(bytes.Buffer))
 }
 
 // << Execution sample >>
@@ -86,7 +86,7 @@ func main() {
 		if a.Usage == UsageDummy {
 			return
 		}
-		fmt.Printf("  --%-"+fmt.Sprintf("%d", optionMaxLength)+"s %s\n", fmt.Sprintf("%s %v", a.Name, a.Value), strings.Trim(a.Usage, "\n"))
+		fmt.Printf("  --%-"+strconv.Itoa(commandOptionMaxLength)+"s %s\n", fmt.Sprintf("%s %v", a.Name, a.Value), strings.Trim(a.Usage, "\n"))
 	})
 }
 

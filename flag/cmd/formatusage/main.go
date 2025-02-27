@@ -17,18 +17,18 @@ const (
 
 var (
 	// Command options
-	commandDescription = "Here is the command description."
-	optionMaxLength    = 0
-	optionAdd          = flag.Int("a" /*    */, 0 /*     */, UsageRequiredPrefix+"add")
-	optionItemName     = flag.String("i" /* */, "" /*    */, UsageRequiredPrefix+"item-name")
-	optionFilesize     = flag.Int("f" /*    */, 10 /*    */, "filesize")
-	optionCount        = flag.Int("c" /*    */, 1 /*     */, "count")
-	optionHelp         = flag.Bool("h" /*   */, false /* */, "help")
+	commandDescription     = "Here is the command description."
+	commandOptionMaxLength = 0
+	optionAdd              = flag.Int("a" /*    */, 0 /*     */, UsageRequiredPrefix+"add")
+	optionItemName         = flag.String("i" /* */, "" /*    */, UsageRequiredPrefix+"item-name")
+	optionFilesize         = flag.Int("f" /*    */, 10 /*    */, "filesize")
+	optionCount            = flag.Int("c" /*    */, 1 /*     */, "count")
+	optionHelp             = flag.Bool("h" /*   */, false /* */, "help")
 )
 
 func init() {
 	// Format usage
-	formatUsage(commandDescription, &optionMaxLength, new(bytes.Buffer))
+	formatUsage(commandDescription, &commandOptionMaxLength, new(bytes.Buffer))
 }
 
 // << Execution sample >>
@@ -64,7 +64,7 @@ func main() {
 	// Print all options
 	fmt.Printf("[ Command options ]\n")
 	flag.VisitAll(func(a *flag.Flag) {
-		fmt.Printf("  -%-"+fmt.Sprintf("%d", optionMaxLength)+"s %s\n", fmt.Sprintf("%s %v", a.Name, a.Value), strings.Trim(a.Usage, "\n"))
+		fmt.Printf("  -%-"+strconv.Itoa(commandOptionMaxLength)+"s %s\n", fmt.Sprintf("%s %v", a.Name, a.Value), strings.Trim(a.Usage, "\n"))
 	})
 }
 

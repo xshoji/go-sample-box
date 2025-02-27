@@ -43,10 +43,7 @@ func init() {
 
 // # Build: APP="/tmp/tool"; MAIN="main.go"; GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o "${APP}" "${MAIN}"; chmod +x "${APP}"
 func main() {
-
-	// stdout, err := exec.Command("go", "build", "-ldflags", "-s -w", "-trimpath", "-o", "/tmp/tool", "main.go").Output()
-	// fmt.Println(stdout, err)
-
+	
 	flag.Parse()
 	if *optionPrintSrc {
 		fmt.Printf("%s", srcBytes)
@@ -140,8 +137,7 @@ func formatUsage(description string, optionFieldWidth int) {
 	usage := strings.Replace(strings.Replace(usageLines[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + description + "\n\nOptions:\n"
 	re := regexp.MustCompile(` +(-\S+)(?: (\S+))?\n*(\s+)(.*)\n`)
 	usage += re.ReplaceAllStringFunc(strings.Join(usageLines[1:], "\n"), func(m string) string {
-		parts := re.FindStringSubmatch(m)
-		return fmt.Sprintf("  %-"+strconv.Itoa(optionFieldWidth)+"s %s\n", parts[1]+" "+strings.TrimSpace(parts[2]), parts[4])
+		return fmt.Sprintf("  %-"+strconv.Itoa(optionFieldWidth)+"s %s\n", re.FindStringSubmatch(m)[1]+" "+strings.TrimSpace(re.FindStringSubmatch(m)[2]), re.FindStringSubmatch(m)[4])
 	})
 	flag.Usage = func() { _, _ = fmt.Fprintf(flag.CommandLine.Output(), usage) }
 }

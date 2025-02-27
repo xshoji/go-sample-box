@@ -7,7 +7,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"math"
 	"net/http"
 	"os"
 	"regexp"
@@ -19,9 +18,9 @@ import (
 )
 
 const (
-	UsageRqdPrefix = "\u001B[33m[RQD]\u001B[0m "
-	UsageDummy     = "########"
-	TimeFormat     = "2006-01-02 15:04:05.0000 [MST]"
+	UsageRequiredPrefix = "\u001B[33m[RQD]\u001B[0m "
+	UsageDummy          = "########"
+	TimeFormat          = "2006-01-02 15:04:05.0000 [MST]"
 )
 
 var (
@@ -29,12 +28,13 @@ var (
 	srcBytes []byte
 
 	// Command options
-	commandDescription = "Here is the command description."
-	optionFilePath     = defineFlagValue("f", "file-path" /*  */, UsageRqdPrefix+"file path" /* */, "").(*string)
-	optionUrl          = defineFlagValue("u", "url" /*        */, "url" /*                      */, "https://httpbin.org/get").(*string)
-	optionLineIndex    = defineFlagValue("l", "line-index" /* */, "index of line" /*            */, 10).(*int)
-	optionPrintSrc     = defineFlagValue("p", "print-src" /*  */, "print source code" /*        */, false).(*bool)
-	optionHelp         = defineFlagValue("h", "help" /*       */, "help" /*                     */, false).(*bool)
+	commandDescription     = "Here is the command description."
+	commandOptionMaxLength = 0
+	optionFilePath         = defineFlagValue("f", "file-path" /*  */, UsageRequiredPrefix+"file path" /* */, "").(*string)
+	optionUrl              = defineFlagValue("u", "url" /*        */, "url" /*                      */, "https://httpbin.org/get").(*string)
+	optionLineIndex        = defineFlagValue("l", "line-index" /* */, "index of line" /*            */, 10).(*int)
+	optionPrintSrc         = defineFlagValue("p", "print-src" /*  */, "print source code" /*        */, false).(*bool)
+	optionHelp             = defineFlagValue("h", "help" /*       */, "help" /*                     */, false).(*bool)
 
 	// Set environment variable
 	environmentValueLoopCount, _ = strconv.Atoi(GetEnvOrDefault("LOOP_COUNT", "10"))
@@ -60,7 +60,7 @@ var (
 )
 
 func init() {
-	formatUsage(commandDescription)
+	formatUsage(commandDescription, &commandOptionMaxLength, new(bytes.Buffer))
 }
 
 // # Build: APP="/tmp/tool"; MAIN="main.go"; GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o "${APP}" "${MAIN}"; chmod +x "${APP}"
@@ -82,7 +82,7 @@ func main() {
 		if a.Usage == UsageDummy {
 			return
 		}
-		fmt.Printf("-%-30s %s\n", fmt.Sprintf("%s %v", a.Name, a.Value), strings.Trim(a.Usage, "\n"))
+		fmt.Printf("-%-"+strconv.Itoa(commandOptionMaxLength)+"s %s\n", fmt.Sprintf("%s %v", a.Name, a.Value), strings.Trim(a.Usage, "\n"))
 	})
 	fmt.Printf("\n\n")
 
@@ -199,25 +199,22 @@ func defineFlagValue(short, long, description string, defaultValue any) (f any) 
 	return
 }
 
-func formatUsage(description string) {
+func formatUsage(description string, maxLength *int, buffer *bytes.Buffer) {
 	// Get default flags usage
-	b := new(bytes.Buffer)
-	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
-	// Get default flags usage
+	func() { flag.CommandLine.SetOutput(buffer); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
 	re := regexp.MustCompile("(-\\S+)( *\\S*)+\n*\\s+" + UsageDummy + ".*\n*\\s+(-\\S+)( *\\S*)+\n\\s+(.+)")
-	usageOptions := re.FindAllString(b.String(), -1)
-	maxLength := 0.0
+	usageOptions := re.FindAllString(buffer.String(), -1)
 	sort.Slice(usageOptions, func(i, j int) bool {
-		maxLength = math.Max(maxLength, math.Max(float64(len(re.ReplaceAllString(usageOptions[i], "$1, -$3$4"))), float64(len(re.ReplaceAllString(usageOptions[j], "$1, -$3$4")))))
-		if len(strings.Split(usageOptions[i]+usageOptions[j], UsageRqdPrefix))%2 == 1 {
+		*maxLength = max(*maxLength, len(re.ReplaceAllString(usageOptions[i], "$1, -$3$4")), len(re.ReplaceAllString(usageOptions[j], "$1, -$3$4")))
+		if len(strings.Split(usageOptions[i]+usageOptions[j], UsageRequiredPrefix))%2 == 1 {
 			return strings.Compare(usageOptions[i], usageOptions[j]) == -1
 		} else {
-			return strings.Index(usageOptions[i], UsageRqdPrefix) >= 0
+			return strings.Index(usageOptions[i], UsageRequiredPrefix) >= 0
 		}
 	})
-	usage := strings.Replace(strings.Replace(strings.Split(b.String(), "\n")[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + description + "\n\nOptions:\n"
+	usage := strings.Replace(strings.Replace(strings.Split(buffer.String(), "\n")[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + description + "\n\nOptions:\n"
 	for _, v := range usageOptions {
-		usage += fmt.Sprintf("%-6s%-"+strconv.Itoa(int(maxLength))+"s", re.ReplaceAllString(v, "  $1,"), re.ReplaceAllString(v, "-$3$4")) + re.ReplaceAllString(v, "$5\n")
+		usage += fmt.Sprintf("%-6s%-"+strconv.Itoa(*maxLength)+"s", re.ReplaceAllString(v, "  $1,"), re.ReplaceAllString(v, "-$3$4")) + re.ReplaceAllString(v, "$5\n")
 	}
 	flag.Usage = func() { _, _ = fmt.Fprintf(flag.CommandLine.Output(), usage) }
 }
