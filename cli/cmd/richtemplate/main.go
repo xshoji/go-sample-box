@@ -200,21 +200,19 @@ func defineFlagValue(short, long, description string, defaultValue any) (f any) 
 }
 
 func formatUsage(description string, maxLength *int, buffer *bytes.Buffer) {
-	// Get default flags usage
 	func() { flag.CommandLine.SetOutput(buffer); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
 	re := regexp.MustCompile("(-\\S+)( *\\S*)+\n*\\s+" + UsageDummy + ".*\n*\\s+(-\\S+)( *\\S*)+\n\\s+(.+)")
+	usageFirst := strings.Replace(strings.Replace(strings.Split(buffer.String(), "\n")[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + description + "\n\nOptions:\n"
 	usageOptions := re.FindAllString(buffer.String(), -1)
-	sort.Slice(usageOptions, func(i, j int) bool {
-		*maxLength = max(*maxLength, len(re.ReplaceAllString(usageOptions[i], "$1, -$3$4")), len(re.ReplaceAllString(usageOptions[j], "$1, -$3$4")))
-		if len(strings.Split(usageOptions[i]+usageOptions[j], UsageRequiredPrefix))%2 == 1 {
-			return strings.Compare(usageOptions[i], usageOptions[j]) == -1
-		} else {
-			return strings.Index(usageOptions[i], UsageRequiredPrefix) >= 0
-		}
-	})
-	usage := strings.Replace(strings.Replace(strings.Split(buffer.String(), "\n")[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + description + "\n\nOptions:\n"
 	for _, v := range usageOptions {
-		usage += fmt.Sprintf("%-6s%-"+strconv.Itoa(*maxLength)+"s", re.ReplaceAllString(v, "  $1,"), re.ReplaceAllString(v, "-$3$4")) + re.ReplaceAllString(v, "$5\n")
+		*maxLength = max(*maxLength, len(re.ReplaceAllString(v, "$1, -$3$4")))
 	}
-	flag.Usage = func() { _, _ = fmt.Fprintf(flag.CommandLine.Output(), usage) }
+	usageOptionsRep := make([]string, 0)
+	for _, v := range usageOptions {
+		usageOptionsRep = append(usageOptionsRep, fmt.Sprintf("%-6s%-"+strconv.Itoa(*maxLength)+"s", re.ReplaceAllString(v, "  $1,"), re.ReplaceAllString(v, "-$3$4"))+re.ReplaceAllString(v, "$5\n"))
+	}
+	sort.SliceStable(usageOptionsRep, func(i, j int) bool {
+		return strings.Count(usageOptionsRep[i], UsageRequiredPrefix) > strings.Count(usageOptionsRep[j], UsageRequiredPrefix)
+	})
+	flag.Usage = func() { _, _ = fmt.Fprintf(flag.CommandLine.Output(), usageFirst+strings.Join(usageOptionsRep, "")) }
 }
