@@ -22,16 +22,12 @@ const (
 )
 
 var (
-	//go:embed main.go
-	srcBytes []byte
-
 	// Command options
 	commandDescription      = "Here is the command description."
 	commandOptionFieldWidth = 12
 	optionFilePath          = flag.String("f" /*  */, "" /*                         */, UsageRequiredPrefix+"File path")
 	optionUrl               = flag.String("u" /*  */, "https://httpbin.org/get" /*  */, "URL")
 	optionLineIndex         = flag.Int("l" /*     */, 10 /*                         */, "Index of line")
-	optionPrintSrc          = flag.Bool("p" /*    */, false /*                      */, "Print main.go")
 	optionHelp              = flag.Bool("h" /*    */, false /*                      */, "Help")
 
 	// Set environment variable
@@ -46,10 +42,6 @@ func init() {
 func main() {
 
 	flag.Parse()
-	if *optionPrintSrc {
-		fmt.Printf("%s", srcBytes)
-		os.Exit(0)
-	}
 	if *optionHelp || *optionFilePath == "" {
 		flag.Usage()
 		os.Exit(0)

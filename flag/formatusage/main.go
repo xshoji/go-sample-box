@@ -34,11 +34,11 @@ func init() {
 // << Execution sample >>
 // $ go run cmd/formatusage/main.go -a 10 -i test
 // [ Command options ]
-// -a 10        [required] add
-// -c 1         count
-// -f 10        filesize
-// -h false     help
-// -i test      [required] item-name
+//   -a 10        [required] add
+//   -c 1         count
+//   -f 10        filesize
+//   -h false     help
+//   -i test      [required] item-name
 //
 // $ go run main.go
 // Usage: main [OPTIONS]

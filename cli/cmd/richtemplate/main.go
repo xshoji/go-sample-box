@@ -30,11 +30,11 @@ var (
 	// Command options
 	commandDescription     = "Here is the command description."
 	commandOptionMaxLength = 0
-	optionFilePath         = defineFlagValue("f", "file-path" /*  */, UsageRequiredPrefix+"file path" /* */, "").(*string)
-	optionUrl              = defineFlagValue("u", "url" /*        */, "url" /*                      */, "https://httpbin.org/get").(*string)
-	optionLineIndex        = defineFlagValue("l", "line-index" /* */, "index of line" /*            */, 10).(*int)
-	optionPrintSrc         = defineFlagValue("p", "print-src" /*  */, "print source code" /*        */, false).(*bool)
-	optionHelp             = defineFlagValue("h", "help" /*       */, "help" /*                     */, false).(*bool)
+	optionFilePath         = defineFlagValue("f", "file-path" /*  */, UsageRequiredPrefix+"File path" /* */, "").(*string)
+	optionUrl              = defineFlagValue("u", "url" /*        */, "URL" /*                           */, "https://httpbin.org/get").(*string)
+	optionLineIndex        = defineFlagValue("l", "line-index" /* */, "Index of line" /*                 */, 10).(*int)
+	optionPrintSrc         = defineFlagValue("p", "print-src" /*  */, "Print source code" /*             */, false).(*bool)
+	optionHelp             = defineFlagValue("h", "help" /*       */, "Show help" /*                     */, false).(*bool)
 
 	// Set environment variable
 	environmentValueLoopCount, _ = strconv.Atoi(GetEnvOrDefault("LOOP_COUNT", "10"))
@@ -200,6 +200,7 @@ func defineFlagValue(short, long, description string, defaultValue any) (f any) 
 }
 
 func formatUsage(description string, maxLength *int, buffer *bytes.Buffer) {
+	// Get default flags usage
 	func() { flag.CommandLine.SetOutput(buffer); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
 	re := regexp.MustCompile("(-\\S+)( *\\S*)+\n*\\s+" + UsageDummy + ".*\n*\\s+(-\\S+)( *\\S*)+\n\\s+(.+)")
 	usageFirst := strings.Replace(strings.Replace(strings.Split(buffer.String(), "\n")[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + description + "\n\nOptions:\n"
