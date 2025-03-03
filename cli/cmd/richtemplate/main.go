@@ -82,7 +82,7 @@ func main() {
 		if a.Usage == UsageDummy {
 			return
 		}
-		fmt.Printf("-%-"+strconv.Itoa(commandOptionMaxLength)+"s %s\n", fmt.Sprintf("%s %v", a.Name, a.Value), strings.Trim(a.Usage, "\n"))
+		fmt.Printf("--%-"+strconv.Itoa(commandOptionMaxLength)+"s %s\n", fmt.Sprintf("%s %v", a.Name, a.Value), strings.Trim(a.Usage, "\n"))
 	})
 	fmt.Printf("\n\n")
 
