@@ -22,13 +22,12 @@ const (
 )
 
 var (
-	// Command options
+	// Command options ( the -h, --help option is defined by default in the flag package )
 	commandDescription      = "Here is the command description."
 	commandOptionFieldWidth = 12
 	optionFilePath          = flag.String("f" /*  */, "" /*                         */, UsageRequiredPrefix+"File path")
 	optionUrl               = flag.String("u" /*  */, "https://httpbin.org/get" /*  */, "URL")
 	optionLineIndex         = flag.Int("l" /*     */, 10 /*                         */, "Index of line")
-	optionHelp              = flag.Bool("h" /*    */, false /*                      */, "Help")
 
 	// Set environment variable
 	environmentValueLoopCount, _ = strconv.Atoi(GetEnvOrDefault("LOOP_COUNT", "10"))
@@ -42,9 +41,10 @@ func init() {
 func main() {
 
 	flag.Parse()
-	if *optionHelp || *optionFilePath == "" {
+	if *optionFilePath == "" {
+		fmt.Printf("\n[ERROR] Missing required option\n\n")
 		flag.Usage()
-		os.Exit(0)
+		os.Exit(1)
 	}
 
 	fmt.Printf("[ Environment variable ]\n")
@@ -127,7 +127,7 @@ func formatUsage(description string, optionFieldWidth int) {
 	b := new(bytes.Buffer)
 	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
 	usageLines := strings.Split(b.String(), "\n")
-	usageFirst := strings.Replace(strings.Replace(usageLines[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + description + "\n\nOptions:\n"
+	usageFirst := strings.Replace(strings.Replace(usageLines[0], ":", " [OPTIONS] [-h, --help]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + description + "\n\nOptions:\n"
 	re := regexp.MustCompile(` +(-\S+)(?: (\S+))?\n*(\s+)(.*)\n`)
 	usageOptions := strings.Split(re.ReplaceAllStringFunc(strings.Join(usageLines[1:], "\n"), func(m string) string {
 		return fmt.Sprintf("  %-"+strconv.Itoa(optionFieldWidth)+"s %s\n", re.FindStringSubmatch(m)[1]+" "+strings.TrimSpace(re.FindStringSubmatch(m)[2]), re.FindStringSubmatch(m)[4])

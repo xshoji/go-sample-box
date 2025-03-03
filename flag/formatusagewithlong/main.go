@@ -24,11 +24,11 @@ var (
 	optionItemName         = flag.String("i", "", UsageDummy)
 	optionFilesize         = flag.Int("f", 0, UsageDummy)
 	optionCount            = flag.Int("c", 0, UsageDummy)
-	optionHelp             = flag.Bool("h", false, UsageDummy)
 )
 
 func init() {
 	// Define long parameters and description ( set default value here if you need ).
+	// ( the -h, --help option is defined by default in the flag package )
 	//
 	// Required parameters
 	flag.IntVar(optionAdd /*         */, "add" /*       */, 0 /*     */, UsageRequiredPrefix+"add")
@@ -36,7 +36,6 @@ func init() {
 	// Optional parameters
 	flag.IntVar(optionFilesize /*    */, "filesize" /*  */, 10 /*    */, "filesize")
 	flag.IntVar(optionCount /*       */, "count" /*     */, 1 /*     */, "count")
-	flag.BoolVar(optionHelp /*       */, "help" /*      */, false /* */, "help")
 
 	// Adjust Usage
 	formatUsage(commandDescription, &commandOptionMaxLength, new(bytes.Buffer))
@@ -48,7 +47,6 @@ func init() {
 //  --add 12                 [RQD] add
 //  --count 1                count
 //  --filesize 10            filesize
-//  --help false             help
 //  --item-name test         [RQD] item-name
 //
 // $ go run cmd/formatusagewithlong/main.go --add 14 --item-name test2
@@ -56,28 +54,27 @@ func init() {
 //  --add 14                 [RQD] add
 //  --count 1                count
 //  --filesize 10            filesize
-//  --help false             help
 //  --item-name test2        [RQD] item-name
 //
 // $ go run cmd/formatusagewithlong/main.go -h
-// Usage: /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build624316317/b001/exe/main [OPTIONS]
+// Usage: /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build624316317/b001/exe/main [OPTIONS] [-h, --help]
 //
 // Description:
 //   Here is the command description.
 //
 // Options:
-//   -a, --add int             [required] add
-//   -i, --item-name string    [required] item-name
+//   -a, --add int             [RQD] add
+//   -i, --item-name string    [RQD] item-name
 //   -c, --count int           count (default 1)
 //   -f, --filesize int        filesize (default 10)
-//   -h, --help                help
 
 func main() {
 
 	flag.Parse()
-	if *optionHelp || *optionAdd == 0 || *optionItemName == "" {
+	if *optionAdd == 0 || *optionItemName == "" {
+		fmt.Printf("\n[ERROR] Missing required option\n\n")
 		flag.Usage()
-		os.Exit(0)
+		os.Exit(1)
 	}
 
 	// Print all options
@@ -94,7 +91,7 @@ func formatUsage(description string, maxLength *int, buffer *bytes.Buffer) {
 	// Get default flags usage
 	func() { flag.CommandLine.SetOutput(buffer); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
 	re := regexp.MustCompile("(-\\S+)( *\\S*)+\n*\\s+" + UsageDummy + ".*\n*\\s+(-\\S+)( *\\S*)+\n\\s+(.+)")
-	usageFirst := strings.Replace(strings.Replace(strings.Split(buffer.String(), "\n")[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + description + "\n\nOptions:\n"
+	usageFirst := strings.Replace(strings.Replace(strings.Split(buffer.String(), "\n")[0], ":", " [OPTIONS] [-h, --help]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + description + "\n\nOptions:\n"
 	usageOptions := re.FindAllString(buffer.String(), -1)
 	for _, v := range usageOptions {
 		*maxLength = max(*maxLength, len(re.ReplaceAllString(v, "$1, -$3$4")))

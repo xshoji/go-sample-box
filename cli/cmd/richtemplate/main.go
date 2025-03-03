@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	UsageRequiredPrefix = "\u001B[33m[RQD]\u001B[0m "
+	UsageRequiredPrefix = "\u001B[33m" + "[RQD]" + "\u001B[0m "
 	UsageDummy          = "########"
 	TimeFormat          = "2006-01-02 15:04:05.0000 [MST]"
 )
@@ -27,14 +27,13 @@ var (
 	//go:embed main.go
 	srcBytes []byte
 
-	// Command options
+	// Command options ( the -h, --help option is defined by default in the flag package )
 	commandDescription     = "Here is the command description."
 	commandOptionMaxLength = 0
 	optionFilePath         = defineFlagValue("f", "file-path" /*  */, UsageRequiredPrefix+"File path" /* */, "").(*string)
 	optionUrl              = defineFlagValue("u", "url" /*        */, "URL" /*                           */, "https://httpbin.org/get").(*string)
 	optionLineIndex        = defineFlagValue("l", "line-index" /* */, "Index of line" /*                 */, 10).(*int)
 	optionPrintSrc         = defineFlagValue("p", "print-src" /*  */, "Print source code" /*             */, false).(*bool)
-	optionHelp             = defineFlagValue("h", "help" /*       */, "Show help" /*                     */, false).(*bool)
 
 	// Set environment variable
 	environmentValueLoopCount, _ = strconv.Atoi(GetEnvOrDefault("LOOP_COUNT", "10"))
@@ -71,9 +70,10 @@ func main() {
 		fmt.Printf("%s", srcBytes)
 		os.Exit(0)
 	}
-	if *optionHelp || *optionFilePath == "" {
+	if *optionFilePath == "" {
+		fmt.Printf("\n[ERROR] Missing required option\n\n")
 		flag.Usage()
-		os.Exit(0)
+		os.Exit(1)
 	}
 
 	fmt.Printf("[ Environment variable ]\nLOOP_COUNT: %d\n\n", environmentValueLoopCount)
@@ -203,7 +203,7 @@ func formatUsage(description string, maxLength *int, buffer *bytes.Buffer) {
 	// Get default flags usage
 	func() { flag.CommandLine.SetOutput(buffer); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
 	re := regexp.MustCompile("(-\\S+)( *\\S*)+\n*\\s+" + UsageDummy + ".*\n*\\s+(-\\S+)( *\\S*)+\n\\s+(.+)")
-	usageFirst := strings.Replace(strings.Replace(strings.Split(buffer.String(), "\n")[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + description + "\n\nOptions:\n"
+	usageFirst := strings.Replace(strings.Replace(strings.Split(buffer.String(), "\n")[0], ":", " [OPTIONS] [-h, --help]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + description + "\n\nOptions:\n"
 	usageOptions := re.FindAllString(buffer.String(), -1)
 	for _, v := range usageOptions {
 		*maxLength = max(*maxLength, len(re.ReplaceAllString(v, "$1, -$3$4")))

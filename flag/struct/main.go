@@ -16,14 +16,12 @@ var (
 		filesize *int
 		binary   *string
 		debug    *bool
-		help     *bool
 	}{
 		flag.Int("a", 0 /*           */, "[Required] add"),
 		flag.String("i", "" /*       */, "[Required] item-name"),
 		flag.Int("f", 10 /*          */, "[Optional] filesize"),
 		flag.String("b", "000101" /* */, "[Optional] binary"),
 		flag.Bool("d", false /*      */, "\ndebug"),
-		flag.Bool("h", false /*      */, "\nhelp"),
 	}
 )
 
@@ -58,9 +56,10 @@ func main() {
 	flag.Parse()
 	// Required parameter
 	// - [Can Go's `flag` package print usage? - Stack Overflow](https://stackoverflow.com/questions/23725924/can-gos-flag-package-print-usage)
-	if *params.help || *params.add == 0 || *params.itemName == "" {
+	if *params.add == 0 || *params.itemName == "" {
+		fmt.Printf("\n[ERROR] Missing required option\n\n")
 		flag.Usage()
-		os.Exit(0)
+		os.Exit(1)
 	}
 
 	// Print all options

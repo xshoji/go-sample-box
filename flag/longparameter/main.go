@@ -24,12 +24,12 @@ var (
 	optionBinary      = flag.String("b", "", DummyUsage)
 	optionEnvironment = flag.String("e", "", DummyUsage)
 	optionGlobal      = flag.Bool("g", false, DummyUsage)
-	optionHelp        = flag.Bool("h", false, DummyUsage)
 	optionDebug       = flag.Bool("d", false, DummyUsage)
 )
 
 func init() {
 	// Define long options and description ( set default value here if you need ).
+	// ( the -h, --help option is defined by default in the flag package )
 	//
 	// Required parameters
 	flag.IntVar(optionAdd /*            */, "add" /*         */, 0 /*          */, "[required] add")
@@ -41,7 +41,6 @@ func init() {
 	flag.StringVar(optionBinary /*      */, "binary" /*      */, "00010101" /* */, "[optional] binary")
 	flag.StringVar(optionEnvironment /* */, "environment" /* */, "DEV" /*      */, "[optional] environment")
 	flag.BoolVar(optionGlobal /*        */, "global" /*      */, false /*      */, "global")
-	flag.BoolVar(optionHelp /*          */, "help" /*        */, false /*      */, "help")
 	flag.BoolVar(optionDebug /*         */, "debug" /*       */, false /*      */, "debug")
 }
 
@@ -63,8 +62,6 @@ func init() {
 // -filesize 10          [optional] filesize
 // -g false              ########
 // -global false         global
-// -h false              ########
-// -help false           help
 // -i param1             ########
 // -item-name param1     [required] item name
 // -t param2             ########
@@ -86,8 +83,6 @@ func init() {
 // -filesize 10          [optional] filesize
 // -g false              ########
 // -global false         global
-// -h false              ########
-// -help false           help
 // -i param11            ########
 // -item-name param11    [required] item name
 // -t param22            ########
@@ -109,8 +104,6 @@ func init() {
 //     	[optional] filesize (default 10)
 //     -g, --global
 //     	global
-//     -h, --help
-//     	help
 //     -i, --item-name string
 //     	[required] item name
 //     -t, --title string
@@ -130,14 +123,18 @@ func main() {
 	}
 
 	flag.Parse()
-	if *optionHelp || *optionAdd == 0 || *optionItemName == "" || *optionTitle == "" {
+	if *optionAdd == 0 || *optionItemName == "" || *optionTitle == "" {
+		fmt.Printf("\n[ERROR] Missing required option\n\n")
 		flag.Usage()
-		os.Exit(0)
+		os.Exit(1)
 	}
 
 	// Print all options
 	fmt.Printf("[ Command options ]\n")
 	flag.VisitAll(func(a *flag.Flag) {
-		fmt.Printf("-%-20s %s\n", fmt.Sprintf("%s %v", a.Name, a.Value), strings.Trim(a.Usage, "\n"))
+		if a.Usage == DummyUsage {
+			return
+		}
+		fmt.Printf("--%-20s %s\n", fmt.Sprintf("%s %v", a.Name, a.Value), strings.Trim(a.Usage, "\n"))
 	})
 }

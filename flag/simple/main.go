@@ -12,12 +12,12 @@ import (
 
 var (
 	// Define options and description
+	// ( the -h, --help option is defined by default in the flag package )
 	//
 	optionLevel    = flag.Int("l" /*     */, 0 /*       */, "[RQD] level")
 	optionName     = flag.String("n" /*  */, "" /*      */, "[RQD] name")
 	optionBirthday = flag.String("b" /*  */, "" /*      */, "birthday (format: 1900/01/02)")
 	optionWeight   = flag.Float64("f" /* */, 60.0 /*    */, "weight")
-	optionHelp     = flag.Bool("h" /*    */, false /*   */, "\nhelp")
 	optionDebug    = flag.Bool("d" /*    */, false /*   */, "\ndebug")
 )
 
@@ -28,7 +28,6 @@ var (
 // -b           birthday (format: 1900/01/02)
 // -d true      debug
 // -f 60        weight
-// -h false     help
 // -l 2         [req] level
 // -n John      [req] name
 //
@@ -41,8 +40,6 @@ var (
 //	  	debug
 //	-f float
 //	  	weight (default 60)
-//	-h
-//	  	help
 //	-l int
 //	  	[req] level
 //	-n string
@@ -52,9 +49,10 @@ func main() {
 	flag.Parse()
 	// Required parameter
 	// - [Can Go's `flag` package print usage? - Stack Overflow](https://stackoverflow.com/questions/23725924/can-gos-flag-package-print-usage)
-	if *optionHelp || *optionLevel == 0 || *optionName == "" {
+	if *optionLevel == 0 || *optionName == "" {
+		fmt.Printf("\n[ERROR] Missing required option\n\n")
 		flag.Usage()
-		os.Exit(0)
+		os.Exit(1)
 	}
 
 	// Print all options

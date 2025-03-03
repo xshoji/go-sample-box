@@ -34,7 +34,7 @@ const (
 )
 
 var (
-	// Command options
+	// Command options ( the -h, --help option is defined by default in the flag package )
 	commandDescription               = "Web API testing tool."
 	commandOptionFieldWidth          = 7
 	optionByteSizePostData           = flag.Int("b" /*  */, 1024 /*  */, "Byte size for post data")
@@ -42,7 +42,6 @@ var (
 	optionTrimDownHttpMessages       = flag.Bool("t" /* */, false /* */, "Trim down HTTP messages in stdout.")
 	optionSkipTlsVerification        = flag.Bool("s" /* */, false /* */, "Skip TLS verification.")
 	optionDisableHttp2               = flag.Bool("d" /* */, false /* */, "Disable HTTP/2.")
-	optionHelp                       = flag.Bool("h" /* */, false /* */, "Show help information.")
 
 	// HTTP Header templates
 	createHttpHeaderEmpty = func() map[string]string {
@@ -69,11 +68,6 @@ func init() {
 func main() {
 
 	flag.Parse()
-	if *optionHelp {
-		flag.Usage()
-		os.Exit(0)
-	}
-
 	client := http.Client{
 		Transport: CreateCustomTransport(
 			&tls.Config{InsecureSkipVerify: *optionSkipTlsVerification},
