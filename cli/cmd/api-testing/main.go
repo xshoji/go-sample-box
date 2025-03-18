@@ -496,5 +496,5 @@ func formatUsage(description string, optionFieldWidth int) {
 		parts := re.FindStringSubmatch(m)
 		return fmt.Sprintf("  %-"+strconv.Itoa(optionFieldWidth)+"s %s\n", parts[1]+" "+strings.TrimSpace(parts[2]), parts[4])
 	})
-	flag.Usage = func() { _, _ = fmt.Fprintf(flag.CommandLine.Output(), usage) }
+	flag.Usage = func() { _, _ = fmt.Fprint(flag.CommandLine.Output(), usage) }
 }

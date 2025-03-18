@@ -85,5 +85,5 @@ func formatUsage(description string, optionFieldWidth int) {
 	sort.SliceStable(usageOptions, func(i, j int) bool {
 		return strings.Count(usageOptions[i], UsageRequiredPrefix) > strings.Count(usageOptions[j], UsageRequiredPrefix)
 	})
-	flag.Usage = func() { _, _ = fmt.Fprintf(flag.CommandLine.Output(), usageFirst+strings.Join(usageOptions, "\n")) }
+	flag.Usage = func() { _, _ = fmt.Fprint(flag.CommandLine.Output(), usageFirst+strings.Join(usageOptions, "\n")) }
 }

@@ -103,5 +103,5 @@ func formatUsage(description string, maxLength *int, buffer *bytes.Buffer) {
 	sort.SliceStable(usageOptionsRep, func(i, j int) bool {
 		return strings.Count(usageOptionsRep[i], UsageRequiredPrefix) > strings.Count(usageOptionsRep[j], UsageRequiredPrefix)
 	})
-	flag.Usage = func() { _, _ = fmt.Fprintf(flag.CommandLine.Output(), usageFirst+strings.Join(usageOptionsRep, "")) }
+	flag.Usage = func() { _, _ = fmt.Fprint(flag.CommandLine.Output(), usageFirst+strings.Join(usageOptionsRep, "")) }
 }
