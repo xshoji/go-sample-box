@@ -46,49 +46,31 @@ func init() {
 
 // << Execution sample >>
 //
-// $ go run cmd/longparameter/main.go -i "param1" -t "param2" -a 100
+// $ go run flag/longparameter/main.go -i "param1" -t "param2" -a 100
 // [ Command options ]
-// -a 100                ########
-// -add 100              [required] add
-// -b 00010101           ########
-// -binary 00010101      [optional] binary
-// -c 1                  ########
-// -count 1              [optional] count
-// -d false              ########
-// -debug false          debug
-// -e DEV                ########
-// -environment DEV      [optional] environment
-// -f 10                 ########
-// -filesize 10          [optional] filesize
-// -g false              ########
-// -global false         global
-// -i param1             ########
-// -item-name param1     [required] item name
-// -t param2             ########
-// -title param2         [required] title
+// --add 100              [required] add
+// --binary 00010101      [optional] binary
+// --count 1              [optional] count
+// --debug false          debug
+// --environment DEV      [optional] environment
+// --filesize 10          [optional] filesize
+// --global false         global
+// --item-name param1     [required] item name
+// --title param2         [required] title
 //
-// $ go run cmd/longparameter/main.go --item-name "param11" --title "param22" --add 200
+// $ go run flag/longparameter/main.go --item-name "param11" --title "param22" --add 200
 // [ Command options ]
-// -a 200                ########
-// -add 200              [required] add
-// -b 00010101           ########
-// -binary 00010101      [optional] binary
-// -c 1                  ########
-// -count 1              [optional] count
-// -d false              ########
-// -debug false          debug
-// -e DEV                ########
-// -environment DEV      [optional] environment
-// -f 10                 ########
-// -filesize 10          [optional] filesize
-// -g false              ########
-// -global false         global
-// -i param11            ########
-// -item-name param11    [required] item name
-// -t param22            ########
-// -title param22        [required] title
+// --add 200              [required] add
+// --binary 00010101      [optional] binary
+// --count 1              [optional] count
+// --debug false          debug
+// --environment DEV      [optional] environment
+// --filesize 10          [optional] filesize
+// --global false         global
+// --item-name param11    [required] item name
+// --title param22        [required] title
 //
-// $ go run cmd/longparameter/main.go -h
+// $ go run flag/longparameter/main.go -h
 // Usage of /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build4248489645/b001/exe/main:
 //     -a, --add int
 //     	[required] add
