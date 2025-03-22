@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	UsageRequiredPrefix = "\u001B[33m[RQD]\u001B[0m "
+	UsageRequiredPrefix = "\u001B[33m(REQ)\u001B[0m "
 )
 
 var (
@@ -45,8 +45,8 @@ func init() {
 //	Here is the command description.
 //
 // Options:
-//	-a int     [RQD] add
-//	-i string  [RQD] item-name
+//	-a int     (REQ) add
+//	-i string  (REQ) item-name
 //	-c int     count (default 1)
 //	-f int     filesize (default 10)
 

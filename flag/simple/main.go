@@ -14,8 +14,8 @@ var (
 	// Define options and description
 	// ( the -h, --help option is defined by default in the flag package )
 	//
-	optionLevel    = flag.Int("l" /*     */, 0 /*       */, "[RQD] level")
-	optionName     = flag.String("n" /*  */, "" /*      */, "[RQD] name")
+	optionLevel    = flag.Int("l" /*     */, 0 /*       */, "(REQ) level")
+	optionName     = flag.String("n" /*  */, "" /*      */, "(REQ) name")
 	optionBirthday = flag.String("b" /*  */, "" /*      */, "birthday (format: 1900/01/02)")
 	optionWeight   = flag.Float64("f" /* */, 60.0 /*    */, "weight")
 	optionDebug    = flag.Bool("d" /*    */, false /*   */, "\ndebug")

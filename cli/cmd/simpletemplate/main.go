@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	UsageRequiredPrefix = "\u001B[33m[RQD]\u001B[0m "
+	UsageRequiredPrefix = "\u001B[33m(REQ)\u001B[0m "
 	TimeFormat          = "2006-01-02 15:04:05.0000 [MST]"
 )
 

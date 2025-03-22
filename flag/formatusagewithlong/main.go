@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	UsageRequiredPrefix = "\u001B[33m[RQD]\u001B[0m "
+	UsageRequiredPrefix = "\u001B[33m(REQ)\u001B[0m "
 	UsageDummy          = "########"
 )
 
@@ -44,17 +44,17 @@ func init() {
 // << Execution sample >>
 // $ go run cmd/formatusagewithlong/main.go -a 12 -i test
 // [ Command options ]
-//  --add 12                 [RQD] add
+//  --add 12                 (REQ) add
 //  --count 1                count
 //  --filesize 10            filesize
-//  --item-name test         [RQD] item-name
+//  --item-name test         (REQ) item-name
 //
 // $ go run cmd/formatusagewithlong/main.go --add 14 --item-name test2
 // [ Command options ]
-//  --add 14                 [RQD] add
+//  --add 14                 (REQ) add
 //  --count 1                count
 //  --filesize 10            filesize
-//  --item-name test2        [RQD] item-name
+//  --item-name test2        (REQ) item-name
 //
 // $ go run cmd/formatusagewithlong/main.go -h
 // Usage: /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build624316317/b001/exe/main [OPTIONS] [-h, --help]
@@ -63,8 +63,8 @@ func init() {
 //   Here is the command description.
 //
 // Options:
-//   -a, --add int             [RQD] add
-//   -i, --item-name string    [RQD] item-name
+//   -a, --add int             (REQ) add
+//   -i, --item-name string    (REQ) item-name
 //   -c, --count int           count (default 1)
 //   -f, --filesize int        filesize (default 10)
 

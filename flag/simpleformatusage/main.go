@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	UsageRequiredPrefix = "\u001B[33m[RQD]\u001B[0m "
+	UsageRequiredPrefix = "\u001B[33m(REQ)\u001B[0m "
 )
 
 var (
@@ -36,16 +36,16 @@ var (
 //   -b string    Birthday (format: 1900/01/02)
 //   -d           Debug
 //   -f float     Weight (default 60)
-//   -l int       [RQD] Level
-//   -n string    [RQD] Name
+//   -l int       (REQ) Level
+//   -n string    (REQ) Name
 //
 // $ $ go run flag/simpleformatusage/main.go -l 10 -n John
 // [ Command options ]
 //   -b         Birthday (format: 1900/01/02)
 //   -d false   Debug
 //   -f 60      Weight
-//   -l 10      [RQD] Level
-//   -n John    [RQD] Name
+//   -l 10      (REQ) Level
+//   -n John    (REQ) Name
 //
 
 func main() {
