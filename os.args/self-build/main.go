@@ -27,13 +27,10 @@ var (
 // $ go run os.args/self-build/main.go build linux /tmp/tool
 func main() {
 
-	// コマンドの種類を取得
+	// Build mode
 	command := os.Args[1]
 	if command == "build" {
-		targetOs := os.Args[2]
-		outputPath := os.Args[3]
-		runBuild(targetOs, outputPath)
-		os.Exit(0)
+		buildAndExit()
 	}
 
 	// Format usage
@@ -62,7 +59,9 @@ func main() {
 	})
 }
 
-func runBuild(targetOs, outputPath string) {
+func buildAndExit() {
+	targetOs := os.Args[2]
+	outputPath := os.Args[3]
 	_, sourcePath, _, _ := runtime.Caller(1)
 	fmt.Println(sourcePath)
 	cmd := exec.Command("go", "build", `-ldflags=-s -w`, "-trimpath", "-o", outputPath, sourcePath)
@@ -88,4 +87,5 @@ func runBuild(targetOs, outputPath string) {
 		os.Exit(1)
 	}
 	fmt.Println("Build completed successfully!")
+	os.Exit(0)
 }
