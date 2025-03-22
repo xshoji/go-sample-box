@@ -23,15 +23,12 @@ var (
 	optionWeight            = flag.Float64("f" /* */, 60.0 /*    */, "Weight")
 )
 
-// # Build command [ targetOs = linux, macos, windows ]
-// $ go run os.args/self-build/main.go build linux /tmp/tool
+// Build command [ OS = linux, darwin, windows ]
+// $ go run main.go build linux /tmp/tool
 func main() {
 
 	// Build mode
-	command := os.Args[1]
-	if command == "build" {
-		buildAndExit()
-	}
+	handleBuildMode()
 
 	// Format usage
 	b := new(bytes.Buffer)
@@ -59,24 +56,21 @@ func main() {
 	})
 }
 
-func buildAndExit() {
+// =======================================
+// Dev tools
+// =======================================
+
+func handleBuildMode() {
+	if len(os.Args) < 2 || os.Args[1] != "build" {
+		return
+	}
 	targetOs := os.Args[2]
 	outputPath := os.Args[3]
 	_, sourcePath, _, _ := runtime.Caller(1)
 	fmt.Println(sourcePath)
 	cmd := exec.Command("go", "build", `-ldflags=-s -w`, "-trimpath", "-o", outputPath, sourcePath)
 	env := os.Environ()
-	switch targetOs {
-	case "linux":
-		env = append(env, "GOOS=linux", "GOARCH=amd64")
-	case "macos":
-		env = append(env, "GOOS=darwin", "GOARCH=amd64")
-	case "windows":
-		env = append(env, "GOOS=windows", "GOARCH=amd64")
-	default:
-		fmt.Println("[ERROR] Unsupported OS = ", targetOs)
-		os.Exit(1)
-	}
+	env = append(env, "GOOS="+targetOs, "GOARCH=amd64")
 	cmd.Env = env
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
