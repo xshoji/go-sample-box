@@ -24,7 +24,7 @@ var (
 )
 
 // Build command [ OS = linux, darwin, windows ]
-// $ go run main.go build linux /tmp/tool
+// $ go run main.go build linux /tmp/main
 func main() {
 
 	// Build mode
@@ -68,6 +68,10 @@ func handleBuildMode() {
 	outputPath := os.Args[3]
 	_, sourcePath, _, _ := runtime.Caller(1)
 	fmt.Println(sourcePath)
+	if sourcePath == "./main.go" {
+		fmt.Printf("Error: Build mode cannot be specified for an executable binary.\n")
+		os.Exit(1)
+	}
 	cmd := exec.Command("go", "build", `-ldflags=-s -w`, "-trimpath", "-o", outputPath, sourcePath)
 	env := os.Environ()
 	env = append(env, "GOOS="+targetOs, "GOARCH=amd64")
