@@ -62,7 +62,7 @@ func init() {
 	formatUsage(commandDescription, &commandOptionMaxLength, new(bytes.Buffer))
 }
 
-// # Build: APP="/tmp/tool"; MAIN="main.go"; GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o "${APP}" "${MAIN}"; chmod +x "${APP}"
+// # Build: GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o /tmp/main main.go
 func main() {
 
 	flag.Parse()

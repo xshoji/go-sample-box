@@ -65,6 +65,7 @@ func init() {
 	formatUsage(commandDescription, commandOptionFieldWidth)
 }
 
+// # Build: GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o /tmp/main main.go
 func main() {
 
 	flag.Parse()
