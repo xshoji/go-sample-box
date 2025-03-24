@@ -23,7 +23,7 @@ const (
 var (
 	// Command options ( the -h, --help option is defined by default in the flag package )
 	commandDescription      = "Here is the command description."
-	commandOptionFieldWidth = "12"
+	commandOptionFieldWidth = "12" // recommended width = general: 12, bool only: 5
 	optionFilePath          = flag.String("f" /*  */, "" /*                         */, UsageRequiredPrefix+"File path")
 	optionUrl               = flag.String("u" /*  */, "https://httpbin.org/get" /*  */, "URL")
 	optionLineIndex         = flag.Int("l" /*     */, 10 /*                         */, "Index of line")
@@ -32,9 +32,7 @@ var (
 	environmentValueLoopCount, _ = strconv.Atoi(GetEnvOrDefault("LOOP_COUNT", "10"))
 )
 
-// # Build: GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o /tmp/main main.go
-func main() {
-
+func init() {
 	// Format usage
 	b := new(bytes.Buffer)
 	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
@@ -45,6 +43,10 @@ func main() {
 			return fmt.Sprintf("  %-"+commandOptionFieldWidth+"s %s\n", re.FindStringSubmatch(m)[1]+" "+strings.TrimSpace(re.FindStringSubmatch(m)[2]), re.FindStringSubmatch(m)[4])
 		}))
 	}
+}
+
+// # Build: GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o /tmp/main main.go
+func main() {
 
 	flag.Parse()
 	if *optionFilePath == "" {
