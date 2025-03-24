@@ -27,8 +27,8 @@ var (
 // $ go run main.go build linux /tmp/main
 func main() {
 
-	// Build mode
-	handleBuildMode()
+	// Parse args and build if needed.
+	parseArgsAndBuild()
 
 	// Format usage
 	b := new(bytes.Buffer)
@@ -60,7 +60,7 @@ func main() {
 // Dev tools
 // =======================================
 
-func handleBuildMode() {
+func parseArgsAndBuild() {
 	if len(os.Args) < 2 || os.Args[1] != "build" {
 		return
 	}
