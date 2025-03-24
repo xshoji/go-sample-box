@@ -62,7 +62,8 @@ func init() {
 	formatUsage(commandDescription, &commandOptionMaxLength, new(bytes.Buffer))
 }
 
-// # Build: GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o /tmp/main main.go
+// Build:
+// $ GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o /tmp/tool main.go
 func main() {
 
 	flag.Parse()
