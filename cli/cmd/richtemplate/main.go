@@ -83,7 +83,9 @@ func main() {
 		if a.Usage == UsageDummy {
 			return
 		}
-		fmt.Printf("--%-"+strconv.Itoa(commandOptionMaxLength)+"s %s\n", fmt.Sprintf("%s %v", a.Name, a.Value), strings.Trim(a.Usage, "\n"))
+		fmt.Printf("  -%-30s %s\n",
+			fmt.Sprintf("%-1s, -%s %v", strings.Split(a.Usage, UsageDummy)[0], a.Name, a.Value),
+			strings.Trim(strings.Split(a.Usage, UsageDummy)[1], "\n"))
 	})
 	fmt.Printf("\n\n")
 
@@ -184,16 +186,20 @@ func handleError(err error, prefixErrMessage string) {
 
 // Helper function for flag
 func defineFlagValue(short, long, description string, defaultValue any) (f any) {
-	switch defaultValue.(type) {
+	flagUsage := short + UsageDummy + description
+	switch v := defaultValue.(type) {
 	case string:
 		f = flag.String(short, "", UsageDummy)
-		flag.StringVar(f.(*string), long, defaultValue.(string), description)
+		flag.StringVar(f.(*string), long, v, flagUsage)
 	case int:
 		f = flag.Int(short, 0, UsageDummy)
-		flag.IntVar(f.(*int), long, defaultValue.(int), description)
+		flag.IntVar(f.(*int), long, v, flagUsage)
 	case bool:
 		f = flag.Bool(short, false, UsageDummy)
-		flag.BoolVar(f.(*bool), long, defaultValue.(bool), description)
+		flag.BoolVar(f.(*bool), long, v, flagUsage)
+	case float64:
+		f = flag.Float64(short, 0.0, UsageDummy)
+		flag.Float64Var(f.(*float64), long, v, flagUsage)
 	default:
 		panic("unsupported flag type")
 	}
@@ -201,17 +207,17 @@ func defineFlagValue(short, long, description string, defaultValue any) (f any) 
 }
 
 func formatUsage(description string, maxLength *int, buffer *bytes.Buffer) {
-	// Get default flags usage
 	func() { flag.CommandLine.SetOutput(buffer); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
-	re := regexp.MustCompile("(-\\S+)( *\\S*)+\n*\\s+" + UsageDummy + ".*\n*\\s+(-\\S+)( *\\S*)+\n\\s+(.+)")
-	usageFirst := strings.Replace(strings.Replace(strings.Split(buffer.String(), "\n")[0], ":", " [OPTIONS] [-h, --help]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + description + "\n\nOptions:\n"
-	usageOptions := re.FindAllString(buffer.String(), -1)
+	usageOption := regexp.MustCompile("(-\\S+)( *\\S*)+\n*\\s+"+UsageDummy+"\n\\s*").ReplaceAllString(buffer.String(), "")
+	re := regexp.MustCompile("\\s(-\\S+)( *\\S*)( *\\S*)+\n\\s+(.+)")
+	usageFirst := strings.Replace(strings.Replace(strings.Split(usageOption, "\n")[0], ":", " [OPTIONS] [-h, --help]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + description + "\n\nOptions:\n"
+	usageOptions := re.FindAllString(usageOption, -1)
 	for _, v := range usageOptions {
-		*maxLength = max(*maxLength, len(re.ReplaceAllString(v, "$1, -$3$4")))
+		*maxLength = max(*maxLength, len(re.ReplaceAllString(v, " -$1")+re.ReplaceAllString(v, "$2"))+2)
 	}
 	usageOptionsRep := make([]string, 0)
 	for _, v := range usageOptions {
-		usageOptionsRep = append(usageOptionsRep, fmt.Sprintf("%-6s%-"+strconv.Itoa(*maxLength)+"s", re.ReplaceAllString(v, "  $1,"), re.ReplaceAllString(v, "-$3$4"))+re.ReplaceAllString(v, "$5\n"))
+		usageOptionsRep = append(usageOptionsRep, fmt.Sprintf("  -%-1s,%-"+strconv.Itoa(*maxLength)+"s%s", strings.Split(re.ReplaceAllString(v, "$4"), UsageDummy)[0], re.ReplaceAllString(v, " -$1")+re.ReplaceAllString(v, "$2"), strings.Split(re.ReplaceAllString(v, "$4"), UsageDummy)[1]+"\n"))
 	}
 	sort.SliceStable(usageOptionsRep, func(i, j int) bool {
 		return strings.Count(usageOptionsRep[i], UsageRequiredPrefix) > strings.Count(usageOptionsRep[j], UsageRequiredPrefix)
