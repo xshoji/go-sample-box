@@ -89,11 +89,8 @@ func main() {
 func searchTasksYahoo(word string, res *string) chromedp.Tasks {
 	return chromedp.Tasks{
 		chromedp.Navigate(`https://search.yahoo.co.jp/`),
-		chromedp.WaitVisible(`.SearchBox__searchInput`, chromedp.ByQuery),
-		chromedp.SendKeys(`.SearchBox__searchInput`, word, chromedp.ByQuery),
-		chromedp.WaitVisible(`.SearchBox__searchButton`, chromedp.ByQuery),
-		chromedp.Click(`.SearchBox__searchButton`, chromedp.ByQuery),
-		chromedp.WaitVisible(`#contents`, chromedp.ByQuery),
+		chromedp.SendKeys(`.SearchBox__searchInput`, word, chromedp.NodeVisible, chromedp.ByQuery),
+		chromedp.Click(`.SearchBox__searchButton`, chromedp.NodeVisible, chromedp.ByQuery),
 		chromedp.InnerHTML(`#contents`, res, chromedp.NodeVisible, chromedp.ByQuery),
 	}
 }
@@ -101,12 +98,9 @@ func searchTasksYahoo(word string, res *string) chromedp.Tasks {
 func searchTasksTabelog(word string, res *string) chromedp.Tasks {
 	return chromedp.Tasks{
 		chromedp.Navigate(`https://tabelog.com/`),
-		chromedp.WaitVisible(`#sk`, chromedp.ByQuery),
-		chromedp.SendKeys(`#sk`, word, chromedp.ByQuery),
-		chromedp.WaitVisible(`#js-global-search-btn`, chromedp.ByQuery),
-		chromedp.Click(`#js-global-search-btn`, chromedp.ByQuery),
+		chromedp.SendKeys(`#sk`, word, chromedp.NodeVisible, chromedp.ByQuery),
+		chromedp.Click(`#js-global-search-btn`, chromedp.NodeVisible, chromedp.ByQuery),
 		chromedp.Sleep(2 * time.Second),
-		chromedp.WaitVisible(`.flexible-rstlst`, chromedp.ByQuery),
 		chromedp.InnerHTML(`.flexible-rstlst`, res, chromedp.NodeVisible, chromedp.ByQuery),
 	}
 }
