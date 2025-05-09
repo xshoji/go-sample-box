@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"syscall"
 	"time"
 )
 
@@ -58,15 +59,19 @@ func main() {
 		// debug log mode
 		loggingContextOption = chromedp.WithDebugf(log.Printf)
 	}
-	ctxt, cancel = chromedp.NewContext(ctxt, loggingContextOption)
-	defer cancel()
-	// handle kill signal
-	signals := make(chan os.Signal, 1)
-	signal.Notify(signals, os.Kill, os.Interrupt)
+	ctxt, _ = chromedp.NewContext(ctxt, loggingContextOption)
+	// Signal handling
 	go func() {
-		<-signals
+		// 1. Create channel for os.Signal and Notify interrupt signal to channel.
+		signalChannel := make(chan os.Signal, 1)
+		signal.Notify(signalChannel, os.Interrupt, syscall.SIGTERM) // syscall.SIGINT, syscall.SIGTERM ( [!] Cannot handle os.Kill )
+
+		// 2. Wait signal
+		s := <-signalChannel
+		log.Printf("Signal is received: %v\n", s)
 		cancel()
-		os.Exit(0)
+		signalValue := int(s.(syscall.Signal))
+		os.Exit(signalValue)
 	}()
 
 	// run task list
