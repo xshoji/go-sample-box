@@ -476,16 +476,6 @@ func handleError(err error, prefixErrMessage string) {
 	}
 }
 
-// GetEnvOrDefault environment value ( with default value )
-func GetEnvOrDefault(key string, defaultValue string) string {
-	value := defaultValue
-	v := os.Getenv(key)
-	if v != "" {
-		value = v
-	}
-	return value
-}
-
 // formatUsage optionFieldWidth [ general: 12, bool only: 5 ]
 func formatUsage(description string, optionFieldWidth int) {
 	b := new(bytes.Buffer)

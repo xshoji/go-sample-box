@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"cmp"
 	_ "embed"
 	"encoding/json"
 	"flag"
@@ -29,7 +30,7 @@ var (
 	optionLineIndex         = flag.Int("l" /*     */, 10 /*                         */, "Index of line")
 
 	// Set environment variable
-	environmentValueLoopCount, _ = strconv.Atoi(GetEnvOrDefault("LOOP_COUNT", "10"))
+	environmentValueLoopCount, _ = strconv.Atoi(cmp.Or(os.Getenv("LOOP_COUNT"), "10"))
 )
 
 func init() {
@@ -115,15 +116,6 @@ func ReadAllFileContents(filePath *string) string {
 // =======================================
 // Common Utils
 // =======================================
-
-func GetEnvOrDefault(key string, defaultValue string) string {
-	value := defaultValue
-	v := os.Getenv(key)
-	if v != "" {
-		value = v
-	}
-	return value
-}
 
 func handleError(err error, prefixErrMessage string) {
 	if err != nil {
