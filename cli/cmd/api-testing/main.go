@@ -36,7 +36,7 @@ const (
 var (
 	// Command options ( the -h, --help option is defined by default in the flag package )
 	commandDescription               = "Web API testing tool."
-	commandOptionFieldWidth          = 7
+	commandOptionFieldWidth          = "12" // recommended width = general: 12, bool only: 5
 	optionByteSizePostData           = flag.Int("b" /*  */, 1024 /*  */, "Byte size for post data")
 	optionUseChunkedTransferEncoding = flag.Bool("c" /* */, false /* */, "Use \"Transfer-Encoding: chunked\" ( only for HTTP/1.1 ).")
 	optionTrimDownHttpMessages       = flag.Bool("t" /* */, false /* */, "Trim down HTTP messages in stdout.")
@@ -62,7 +62,15 @@ var (
 )
 
 func init() {
-	formatUsage(commandDescription, commandOptionFieldWidth)
+	b := new(bytes.Buffer)
+	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
+	usage := strings.Replace(strings.Replace(b.String(), ":", " [OPTIONS] [-h, --help]\n\nDescription:\n  "+commandDescription+"\n\nOptions:\n", 1), "Usage of", "Usage:", 1)
+	re := regexp.MustCompile(`[^,] +(-\S+)(?: (\S+))?\n*(\s+)(.*)\n`)
+	flag.Usage = func() {
+		_, _ = fmt.Fprint(flag.CommandLine.Output(), re.ReplaceAllStringFunc(usage, func(m string) string {
+			return fmt.Sprintf("  %-"+commandOptionFieldWidth+"s %s\n", re.FindStringSubmatch(m)[1]+" "+strings.TrimSpace(re.FindStringSubmatch(m)[2]), re.FindStringSubmatch(m)[4])
+		}))
+	}
 }
 
 // # Build: GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o /tmp/main main.go
@@ -80,7 +88,7 @@ func main() {
 	// Print all options
 	fmt.Printf("[ Command options ]\n")
 	flag.VisitAll(func(a *flag.Flag) {
-		fmt.Printf("  -%-10s %s\n", fmt.Sprintf("%s %v", a.Name, a.Value), strings.Trim(a.Usage, "\n"))
+		fmt.Printf("  -%-"+commandOptionFieldWidth+"s %s\n", fmt.Sprintf("%s %v", a.Name, a.Value), strings.Trim(a.Usage, "\n"))
 	})
 	fmt.Printf("\n\n")
 
@@ -380,7 +388,14 @@ func HttpRequest(client http.Client, method string, url string, headers map[stri
 	handleError(err, "client.Do(req)")
 	responseBody, err := io.ReadAll(res.Body)
 	handleError(err, "io.ReadAll(res.Body)")
-	responseBodyJsonObject := ToJsonObject(responseBody)
+
+	// if cannot parse json, just print response body string
+	responseBodyJsonObject, err := ToJsonObject(responseBody)
+	if err != nil {
+		responseBodyString := string(responseBody)
+		fmt.Println(responseBodyString)
+		return responseBody
+	}
 
 	var jsonString string
 	var jsonBytes []byte
@@ -407,11 +422,12 @@ func HttpRequest(client http.Client, method string, url string, headers map[stri
 // =======================================
 
 // ToJsonObject json bytes to any object
-func ToJsonObject(body []byte) any {
+func ToJsonObject(body []byte) (any, error) {
 	var jsonObject any
-	err := json.Unmarshal(body, &jsonObject)
-	handleError(err, "json.Unmarshal")
-	return jsonObject
+	if err := json.Unmarshal(body, &jsonObject); err != nil {
+		return nil, err
+	}
+	return jsonObject, nil
 }
 
 // Get get value in any object [ example : object["aaa"][0]["bbb"] -> keyChain: "aaa.0.bbb" ]
@@ -474,18 +490,4 @@ func handleError(err error, prefixErrMessage string) {
 	if err != nil {
 		fmt.Printf("%s [ERROR %s]: %v\n", time.Now().Format(TimeFormat), prefixErrMessage, err)
 	}
-}
-
-// formatUsage optionFieldWidth [ general: 12, bool only: 5 ]
-func formatUsage(description string, optionFieldWidth int) {
-	b := new(bytes.Buffer)
-	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
-	usageLines := strings.Split(b.String(), "\n")
-	usage := strings.Replace(strings.Replace(usageLines[0], ":", " [OPTIONS]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + description + "\n\nOptions:\n"
-	re := regexp.MustCompile(` +(-\S+)(?: (\S+))?\n*(\s+)(.*)\n`)
-	usage += re.ReplaceAllStringFunc(strings.Join(usageLines[1:], "\n"), func(m string) string {
-		parts := re.FindStringSubmatch(m)
-		return fmt.Sprintf("  %-"+strconv.Itoa(optionFieldWidth)+"s %s\n", parts[1]+" "+strings.TrimSpace(parts[2]), parts[4])
-	})
-	flag.Usage = func() { _, _ = fmt.Fprint(flag.CommandLine.Output(), usage) }
 }
