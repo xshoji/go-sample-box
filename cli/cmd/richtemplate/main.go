@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"os"
 	"regexp"
-	"runtime"
 	"sort"
 	"strconv"
 	"strings"
@@ -39,23 +38,16 @@ var (
 	// Set environment variable
 	environmentValueLoopCount, _ = strconv.Atoi(cmp.Or(os.Getenv("LOOP_COUNT"), "10"))
 
-	// ColorPrinter colorize string
-	ColorPrinter = struct {
-		Red      string
-		Green    string
-		Yellow   string
-		Colorize func(string, string) string
+	// Color colorize string
+	Color = struct {
+		Red    func(string) string
+		Green  func(string) string
+		Yellow func(string) string
 	}{
-		Red:    "\033[31m",
-		Green:  "\033[32m",
-		Yellow: "\033[33m",
-		Colorize: func(color string, text string) string {
-			if runtime.GOOS == "windows" {
-				return text
-			}
-			colorReset := "\033[0m"
-			return color + text + colorReset
-		},
+		// "\033[31m", "\033[32m", "\033[33m" = ANSI color codes, "\033[0m" = reset color code
+		Red:    func(text string) string { return "\033[31m" + text + "\033[0m" },
+		Green:  func(text string) string { return "\033[32m" + text + "\033[0m" },
+		Yellow: func(text string) string { return "\033[33m" + text + "\033[0m" },
 	}
 )
 
@@ -96,6 +88,10 @@ func main() {
 	res := HttpGetJson(*optionUrl + "?" + fmt.Sprintf("optionLineIndex=%d", *optionLineIndex))
 	fmt.Println(res)
 	fmt.Println(Get(res, "args.optionLineIndex"))
+
+	fmt.Println(Color.Red("Sample: Error"))
+	fmt.Println(Color.Yellow("Sample: Warning"))
+	fmt.Println(Color.Green("Sample: Success"))
 
 }
 
