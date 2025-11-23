@@ -27,7 +27,7 @@ var (
 
 	// Command options (the -h and --help flags are provided by default in the flag package)	commandDescription     = "Here is the command description."
 	commandDescription     = "A sample command demonstrating rich template usage in Go CLI applications."
-	commandOptionMaxLength = "18"
+	commandOptionMaxLength = "22"
 	optionFilePath         = defineFlagValue("f", "file-path" /*  */, UsageRequiredPrefix+"File path" /* */, "").(*string)
 	optionUrl              = defineFlagValue("u", "url" /*        */, "URL" /*                           */, "https://httpbin.org/get").(*string)
 	optionLineIndex        = defineFlagValue("l", "line-index" /* */, "Index of line" /*                 */, 10).(*int)
@@ -76,7 +76,7 @@ func main() {
 		if a.Usage == UsageDummy {
 			return
 		}
-		fmt.Printf("  -%-30s %s\n",
+		fmt.Printf("  -%-"+commandOptionMaxLength+"s %s\n",
 			fmt.Sprintf("%-1s, -%s %v", strings.Split(a.Usage, UsageDummy)[0], a.Name, a.Value),
 			strings.Trim(strings.Split(a.Usage, UsageDummy)[1], "\n"))
 	})
