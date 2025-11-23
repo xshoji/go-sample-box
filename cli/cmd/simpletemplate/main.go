@@ -48,7 +48,7 @@ func init() {
 
 // Build:
 // $ GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o /tmp/tool main.go
-// $ go build -ldflags="-s -w" -trimpath -o "/tmp/$(basename "PWD")" main.go
+// $ go build -ldflags="-s -w" -trimpath -o /tmp/$(basename "${PWD}") main.go
 func main() {
 
 	flag.Parse()
