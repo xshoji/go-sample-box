@@ -50,7 +50,7 @@ var (
 
 func main() {
 
-	// Format usage
+	// Set custom usage (flag.VisitsAll を使ったUsageの加工方法、型やデフォルト値の表示ができなくなるので採用していない)
 	b := new(bytes.Buffer)
 	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
 	usage := strings.Replace(strings.Replace(b.String(), ":", " [OPTIONS] [-h, --help]\n\nDescription:\n  "+commandDescription+"\n\nOptions:\n", 1), "Usage of", "Usage:", 1)
