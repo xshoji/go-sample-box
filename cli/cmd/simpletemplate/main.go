@@ -28,6 +28,7 @@ var (
 	optionFilePath          = flag.String("f" /*  */, "" /*                         */, UsageRequiredPrefix+"File path")
 	optionUrl               = flag.String("u" /*  */, "https://httpbin.org/get" /*  */, "URL")
 	optionLineIndex         = flag.Int("l" /*     */, 10 /*                         */, "Index of line")
+	optionDebug             = flag.Bool("d" /*     */, false /*                     */, "Debug mode")
 
 	// Set environment variable
 	environmentValueLoopCount, _ = strconv.Atoi(cmp.Or(os.Getenv("LOOP_COUNT"), "10"))
@@ -66,6 +67,10 @@ func main() {
 		fmt.Printf("  -%-30s %s\n", fmt.Sprintf("%s %v", a.Name, a.Value), strings.Trim(a.Usage, "\n"))
 	})
 	fmt.Printf("\n\n")
+
+	if *optionDebug {
+		fmt.Printf("[ Debug ] debug mode: true\n\n")
+	}
 
 	contents := ReadAllFileContents(optionFilePath)
 	fmt.Println(strings.Split(contents, "\n")[*optionLineIndex])
