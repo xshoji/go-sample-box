@@ -22,13 +22,13 @@ const (
 )
 
 var (
-	// Command options ( the -h, --help option is defined by default in the flag package )
-	commandDescription      = "Here is the command description."
+	commandDescription      = "A sample command demonstrating simple template usage in Go CLI applications."
 	commandOptionFieldWidth = "12" // recommended width = general: 12, bool only: 5
-	optionFilePath          = flag.String("f" /*  */, "" /*                         */, UsageRequiredPrefix+"File path")
-	optionUrl               = flag.String("u" /*  */, "https://httpbin.org/get" /*  */, "URL")
-	optionLineIndex         = flag.Int("l" /*     */, 10 /*                         */, "Index of line")
-	optionDebug             = flag.Bool("d" /*     */, false /*                     */, "Debug mode")
+	// Command options (the -h and --help flags are provided by default in the flag package)	commandDescription     = "Here is the command description."
+	optionFilePath  = flag.String("f" /*  */, "" /*                         */, UsageRequiredPrefix+"File path")
+	optionUrl       = flag.String("u" /*  */, "https://httpbin.org/get" /*  */, "URL")
+	optionLineIndex = flag.Int("l" /*     */, 10 /*                         */, "Index of line")
+	optionDebug     = flag.Bool("d" /*    */, false /*                     */, "Debug mode")
 
 	// Set environment variable
 	environmentValueLoopCount, _ = strconv.Atoi(cmp.Or(os.Getenv("LOOP_COUNT"), "10"))
