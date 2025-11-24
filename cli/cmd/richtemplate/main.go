@@ -25,13 +25,13 @@ var (
 	//go:embed main.go
 	srcBytes []byte
 
-	// Command options (the -h and --help flags are provided by default in the flag package)	commandDescription     = "Here is the command description."
 	commandDescription     = "A sample command demonstrating rich template usage in Go CLI applications."
 	commandOptionMaxLength = "22"
-	optionFilePath         = defineFlagValue("f", "file-path" /*  */, UsageRequiredPrefix+"File path" /* */, "").(*string)
-	optionUrl              = defineFlagValue("u", "url" /*        */, "URL" /*                           */, "https://httpbin.org/get").(*string)
-	optionLineIndex        = defineFlagValue("l", "line-index" /* */, "Index of line" /*                 */, 10).(*int)
-	optionPrintSrc         = defineFlagValue("p", "print-src" /*  */, "Print source code" /*             */, false).(*bool)
+	// Command options (the -h and --help flags are provided by default in the flag package)	commandDescription     = "Here is the command description."
+	optionFilePath  = defineFlagValue("f", "file-path" /*  */, UsageRequiredPrefix+"File path" /* */, "", flag.String, flag.StringVar)
+	optionUrl       = defineFlagValue("u", "url" /*        */, "URL" /*                           */, "https://httpbin.org/get", flag.String, flag.StringVar)
+	optionLineIndex = defineFlagValue("l", "line-index" /* */, "Index of line" /*                 */, 10, flag.Int, flag.IntVar)
+	optionPrintSrc  = defineFlagValue("p", "print-src" /*  */, "Print source code" /*             */, false, flag.Bool, flag.BoolVar)
 
 	// Set environment variable
 	environmentValueLoopCount, _ = strconv.Atoi(cmp.Or(os.Getenv("LOOP_COUNT"), "10"))
@@ -173,33 +173,16 @@ func handleError(err error, prefixErrMessage string) {
 }
 
 // Helper function for flag
-func defineFlagValue[T comparable](short, long, description string, defaultValue T) any {
+func defineFlagValue[T comparable](short, long, description string, defaultValue T, flagFunc func(name string, value T, usage string) *T, flagVarFunc func(p *T, name string, value T, usage string)) *T {
 	flagUsage := short + UsageDummy + description
 	var zero T
 	if defaultValue != zero {
 		flagUsage = flagUsage + fmt.Sprintf(" (default %v)", defaultValue)
 	}
 
-	switch v := any(defaultValue).(type) {
-	case string:
-		f := flag.String(short, v, UsageDummy)
-		flag.StringVar(f, long, v, flagUsage)
-		return f
-	case int:
-		f := flag.Int(short, v, UsageDummy)
-		flag.IntVar(f, long, v, flagUsage)
-		return f
-	case int64:
-		f := flag.Int64(short, v, UsageDummy)
-		flag.Int64Var(f, long, v, flagUsage)
-		return f
-	case bool:
-		f := flag.Bool(short, v, UsageDummy)
-		flag.BoolVar(f, long, v, flagUsage)
-		return f
-	default:
-		panic("unsupported flag type")
-	}
+	f := flagFunc(short, defaultValue, UsageDummy)
+	flagVarFunc(f, long, defaultValue, flagUsage)
+	return f
 }
 
 func customUsage(output io.Writer, cmdName, description, fieldWidth string) func() {
