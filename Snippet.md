@@ -1,10 +1,18 @@
 # Build snippet
 
+## Useful build command
+
 ```bash
-APP="/tmp/app"; MAIN="main.go"; GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w -X main.md5info=$(md5 ${MAIN} |sed 's/ //g')" -trimpath -o "${APP}" "${MAIN}"; chmod +x "${APP}"
-# APP=/tmp/app_linux;   MAIN="main.go"; GOOS=linux GOARCH=amd64   go build -ldflags="-s -w -X main.md5info=$(md5 ${MAIN} |sed 's/ //g')" -trimpath -o "${APP}" "${MAIN}"; chmod +x "${APP}" # linux
-# APP=/tmp/app_mac;     MAIN="main.go"; GOOS=darwin GOARCH=amd64  go build -ldflags="-s -w -X main.md5info=$(md5 ${MAIN} |sed 's/ //g')" -trimpath -o "${APP}" "${MAIN}"; chmod +x "${APP}" # macOS
-# APP=/tmp/app_win.exe; MAIN="main.go"; GOOS=windows GOARCH=amd64 go build -ldflags="-s -w -X main.md5info=$(md5 ${MAIN} |sed 's/ //g')" -trimpath -o "${APP}" "${MAIN}"; chmod +x "${APP}" # windows
+go build -ldflags="-s -w" -trimpath -o /tmp/$(basename "$PWD") main.go
+```
+
+## Cross compile
+
+```bash
+APP="/tmp/app"; MAIN="main.go"; GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o "${APP}" "${MAIN}"; chmod +x "${APP}"
+# APP=/tmp/app_linux;   MAIN="main.go"; GOOS=linux GOARCH=amd64   go build -ldflags="-s -w" -trimpath -o "${APP}" "${MAIN}"; chmod +x "${APP}" # linux
+# APP=/tmp/app_mac;     MAIN="main.go"; GOOS=darwin GOARCH=amd64  go build -ldflags="-s -w" -trimpath -o "${APP}" "${MAIN}"; chmod +x "${APP}" # macOS
+# APP=/tmp/app_win.exe; MAIN="main.go"; GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o "${APP}" "${MAIN}"; chmod +x "${APP}" # windows
 ```
 
 * [overridegobuild - Inject build-time variables with Golang](https://blog.alexellis.io/inject-build-time-vars-golang/#overridegobuild)
