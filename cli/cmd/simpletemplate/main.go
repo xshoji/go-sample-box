@@ -16,18 +16,18 @@ import (
 )
 
 const (
-	UsageRequiredPrefix = "\u001B[33m(REQ)\u001B[0m "
-	TimeFormat          = "2006-01-02 15:04:05.0000 [MST]"
+	Req        = "\u001B[33m(REQ)\u001B[0m "
+	TimeFormat = "2006-01-02 15:04:05.0000 [MST]"
 )
 
 var (
 	commandDescription      = "A sample command demonstrating simple template usage in Go CLI applications."
 	commandOptionFieldWidth = "12" // recommended width = general: 12, bool only: 5
 	// Command options (the -h and --help flags are provided by default in the flag package)	commandDescription     = "Here is the command description."
-	optionFilePath  = flag.String("f" /*  */, "" /*                         */, UsageRequiredPrefix+"File path")
+	optionFilePath  = flag.String("f" /*  */, "" /*                         */, Req+"File path")
 	optionUrl       = flag.String("u" /*  */, "https://httpbin.org/get" /*  */, "URL")
 	optionLineIndex = flag.Int("l" /*     */, 10 /*                         */, "Index of line")
-	optionDebug     = flag.Bool("d" /*    */, false /*                     */, "Debug mode")
+	optionDebug     = flag.Bool("d" /*    */, false /*                      */, "Debug mode")
 
 	// Set environment variable
 	environmentValueLoopCount, _ = strconv.Atoi(cmp.Or(os.Getenv("LOOP_COUNT"), "10"))
