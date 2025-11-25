@@ -17,9 +17,9 @@ import (
 )
 
 const (
-	UsageRequiredPrefix = "\033[33m" + "(REQ)" + "\033[0m "
-	UsageDummy          = "########"
-	TimeFormat          = "2006-01-02 15:04:05.0000 [MST]"
+	Req        = "(REQ)"
+	UsageDummy = "########"
+	TimeFormat = "2006-01-02 15:04:05.0000 [MST]"
 )
 
 var (
@@ -29,7 +29,7 @@ var (
 	commandDescription     = "A sample command demonstrating rich template usage in Go CLI applications."
 	commandOptionMaxLength = "22"
 	// Command options (the -h and --help flags are provided by default in the flag package)	commandDescription     = "Here is the command description."
-	optionFilePath  = defineFlagValue("f", "file-path" /*  */, UsageRequiredPrefix+"File path" /* */, "", flag.String, flag.StringVar)
+	optionFilePath  = defineFlagValue("f", "file-path" /*  */, Color.Yellow(Req)+" File path" /*  */, "", flag.String, flag.StringVar)
 	optionUrl       = defineFlagValue("u", "url" /*        */, "URL" /*                           */, "https://httpbin.org/get", flag.String, flag.StringVar)
 	optionLineIndex = defineFlagValue("l", "line-index" /* */, "Index of line" /*                 */, 10, flag.Int, flag.IntVar)
 	optionPrintSrc  = defineFlagValue("p", "print-src" /*  */, "Print source code" /*             */, false, flag.Bool, flag.BoolVar)
@@ -52,7 +52,7 @@ var (
 
 func init() {
 	// Customize the usage message
-	flag.Usage = customUsage(os.Stdout, os.Args[0], commandDescription, commandOptionMaxLength)
+	flag.Usage = customUsage(os.Stdout, commandDescription, commandOptionMaxLength)
 }
 
 // Build:
@@ -72,7 +72,7 @@ func main() {
 	}
 
 	fmt.Printf("[ Environment variable ]\nLOOP_COUNT: %d\n\n", environmentValueLoopCount)
-	fmt.Printf("[ Command options ]\n%s\n\n", getOptionsUsage(commandOptionMaxLength, true))
+	fmt.Printf("[ Command options ]\n%s\n", getOptionsUsage(commandOptionMaxLength, true))
 
 	contents := ReadAllFileContents(optionFilePath)
 	fmt.Println(strings.Split(contents, "\n")[*optionLineIndex])
@@ -164,6 +164,10 @@ func handleError(err error, prefixErrMessage string) {
 	}
 }
 
+// =======================================
+// flag Utils
+// =======================================
+
 // Helper function for flag
 func defineFlagValue[T comparable](short, long, description string, defaultValue T, flagFunc func(name string, value T, usage string) *T, flagVarFunc func(p *T, name string, value T, usage string)) *T {
 	flagUsage := short + UsageDummy + description
@@ -172,26 +176,28 @@ func defineFlagValue[T comparable](short, long, description string, defaultValue
 		flagUsage = flagUsage + fmt.Sprintf(" (default %v)", defaultValue)
 	}
 
-	f := flagFunc(short, defaultValue, UsageDummy)
-	flagVarFunc(f, long, defaultValue, flagUsage)
+	f := flagFunc(long, defaultValue, flagUsage)
+	flagVarFunc(f, short, defaultValue, UsageDummy)
 	return f
 }
 
-func customUsage(output io.Writer, cmdName, description, fieldWidth string) func() {
+// Custom usage message
+func customUsage(output io.Writer, description, fieldWidth string) func() {
 	return func() {
 		fmt.Fprintf(output, "Usage: %s [OPTIONS] [-h, --help]\n\n", func() string { e, _ := os.Executable(); return filepath.Base(e) }())
 		fmt.Fprintf(output, "Description:\n  %s\n\n", description)
-		fmt.Fprintf(output, "Options:\n%s\n", getOptionsUsage(fieldWidth, false))
+		fmt.Fprintf(output, "Options:\n%s", getOptionsUsage(fieldWidth, false))
 	}
 }
 
+// Get options usage message
 func getOptionsUsage(fieldWidth string, currentValue bool) string {
 	optionUsages := make([]string, 0)
 	flag.VisitAll(func(f *flag.Flag) {
 		if f.Usage == UsageDummy {
 			return
 		}
-		value := strings.ReplaceAll(strings.Replace(fmt.Sprintf("%T", f.Value), "*flag.", "", -1), "Value", "")
+		value := strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(fmt.Sprintf("%T", f.Value), "*flag.", ""), "Value", ""), "bool", "")
 		if currentValue {
 			value = f.Value.String()
 		}
@@ -201,7 +207,7 @@ func getOptionsUsage(fieldWidth string, currentValue bool) string {
 		optionUsages = append(optionUsages, fmt.Sprintf(format, short, f.Name+" "+value, mainUsage))
 	})
 	sort.SliceStable(optionUsages, func(i, j int) bool {
-		return strings.Count(optionUsages[i], UsageRequiredPrefix) > strings.Count(optionUsages[j], UsageRequiredPrefix)
+		return strings.Count(optionUsages[i], Req) > strings.Count(optionUsages[j], Req)
 	})
 	return strings.Join(optionUsages, "")
 }
