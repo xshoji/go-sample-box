@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -71,16 +72,7 @@ func main() {
 	}
 
 	fmt.Printf("[ Environment variable ]\nLOOP_COUNT: %d\n\n", environmentValueLoopCount)
-	fmt.Printf("[ Command options ]\n")
-	flag.VisitAll(func(a *flag.Flag) {
-		if a.Usage == UsageDummy {
-			return
-		}
-		fmt.Printf("  -%-"+commandOptionMaxLength+"s %s\n",
-			fmt.Sprintf("%-1s, -%s %v", strings.Split(a.Usage, UsageDummy)[0], a.Name, a.Value),
-			strings.Trim(strings.Split(a.Usage, UsageDummy)[1], "\n"))
-	})
-	fmt.Printf("\n\n")
+	fmt.Printf("[ Command options ]\n%s\n\n", getOptionsUsage(commandOptionMaxLength, true))
 
 	contents := ReadAllFileContents(optionFilePath)
 	fmt.Println(strings.Split(contents, "\n")[*optionLineIndex])
@@ -187,24 +179,29 @@ func defineFlagValue[T comparable](short, long, description string, defaultValue
 
 func customUsage(output io.Writer, cmdName, description, fieldWidth string) func() {
 	return func() {
-		fmt.Fprintf(output, "Usage: %s [OPTIONS] [-h, --help]\n\n", cmdName)
+		fmt.Fprintf(output, "Usage: %s [OPTIONS] [-h, --help]\n\n", func() string { e, _ := os.Executable(); return filepath.Base(e) }())
 		fmt.Fprintf(output, "Description:\n  %s\n\n", description)
-		fmt.Fprintln(output, "Options:")
-
-		optionUsages := make([]string, 0)
-		flag.VisitAll(func(f *flag.Flag) {
-			if f.Usage == UsageDummy {
-				return
-			}
-			valueType := strings.Replace(strings.Replace(fmt.Sprintf("%T", f.Value), "*flag.", "", -1), "Value", "", -1)
-			format := "  -%s, --%-" + fieldWidth + "s %s\n"
-			short := strings.Split(f.Usage, UsageDummy)[0]
-			mainUsage := strings.Split(f.Usage, UsageDummy)[1]
-			optionUsages = append(optionUsages, fmt.Sprintf(format, short, f.Name+" "+valueType, mainUsage))
-		})
-		sort.SliceStable(optionUsages, func(i, j int) bool {
-			return strings.Count(optionUsages[i], UsageRequiredPrefix) > strings.Count(optionUsages[j], UsageRequiredPrefix)
-		})
-		fmt.Fprint(output, strings.Join(optionUsages, ""))
+		fmt.Fprintf(output, "Options:\n%s\n", getOptionsUsage(fieldWidth, false))
 	}
+}
+
+func getOptionsUsage(fieldWidth string, currentValue bool) string {
+	optionUsages := make([]string, 0)
+	flag.VisitAll(func(f *flag.Flag) {
+		if f.Usage == UsageDummy {
+			return
+		}
+		value := strings.ReplaceAll(strings.Replace(fmt.Sprintf("%T", f.Value), "*flag.", "", -1), "Value", "")
+		if currentValue {
+			value = f.Value.String()
+		}
+		format := "  -%-1s, --%-" + fieldWidth + "s %s\n"
+		short := strings.Split(f.Usage, UsageDummy)[0]
+		mainUsage := strings.Split(f.Usage, UsageDummy)[1]
+		optionUsages = append(optionUsages, fmt.Sprintf(format, short, f.Name+" "+value, mainUsage))
+	})
+	sort.SliceStable(optionUsages, func(i, j int) bool {
+		return strings.Count(optionUsages[i], UsageRequiredPrefix) > strings.Count(optionUsages[j], UsageRequiredPrefix)
+	})
+	return strings.Join(optionUsages, "")
 }
