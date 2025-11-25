@@ -50,7 +50,7 @@ var (
 
 func init() {
 	// Customize the usage message
-	flag.Usage = customUsage(os.Stdout, os.Args[0], commandDescription, commandOptionMaxLength)
+	flag.Usage = customUsage(os.Stdout, commandDescription, commandOptionMaxLength)
 }
 
 // Build:
