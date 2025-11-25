@@ -17,7 +17,6 @@ import (
 
 const (
 	Req        = "(REQ)"
-	UsageDummy = "########"
 	TimeFormat = "2006-01-02 15:04:05.0000 [MST]"
 )
 
@@ -170,10 +169,9 @@ func handleError(err error, prefixErrMessage string) {
 
 // Helper function for flag
 func defineFlagValue[T comparable](flagName, description string, defaultValue T, flagFunc func(name string, value T, usage string) *T) *T {
-	flagUsage := flagName + UsageDummy + description
 	var zero T
 	if defaultValue != zero {
-		flagUsage = flagUsage + fmt.Sprintf(" (default %v)", defaultValue)
+		description = description + fmt.Sprintf(" (default %v)", defaultValue)
 	}
 	return flagFunc(flagName, defaultValue, description)
 }
