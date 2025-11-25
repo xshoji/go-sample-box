@@ -177,7 +177,7 @@ func defineFlagValue[T comparable](flagName, description string, defaultValue T,
 }
 
 // Custom usage message
-func customUsage(output io.Writer, cmdName, description, fieldWidth string) func() {
+func customUsage(output io.Writer, description, fieldWidth string) func() {
 	return func() {
 		fmt.Fprintf(output, "Usage: %s [OPTIONS] [-h, --help]\n\n", func() string { e, _ := os.Executable(); return filepath.Base(e) }())
 		fmt.Fprintf(output, "Description:\n  %s\n\n", description)
