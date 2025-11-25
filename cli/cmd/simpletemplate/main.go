@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"cmp"
-	_ "embed"
 	"encoding/json"
 	"flag"
 	"fmt"
