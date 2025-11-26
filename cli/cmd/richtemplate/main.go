@@ -27,12 +27,13 @@ var (
 	srcBytes []byte
 
 	commandDescription     = "A sample command demonstrating rich template usage in Go CLI applications."
-	commandOptionMaxLength = "22"
+	commandOptionMaxLength = 0
 	// Command options (the -h and --help flags are provided by default in the flag package)	commandDescription     = "Here is the command description."
-	optionFilePath  = defineFlagValue("f", "file-path" /*  */, Color.Yellow(Req)+" File path" /*  */, "", flag.String, flag.StringVar)
-	optionUrl       = defineFlagValue("u", "url" /*        */, "URL" /*                           */, "https://httpbin.org/get", flag.String, flag.StringVar)
-	optionLineIndex = defineFlagValue("l", "line-index" /* */, "Index of line" /*                 */, 10, flag.Int, flag.IntVar)
-	optionPrintSrc  = defineFlagValue("p", "print-src" /*  */, "Print source code" /*             */, false, flag.Bool, flag.BoolVar)
+	optionFilePath        = defineFlagValue("f", "file-path" /*    */, Color.Yellow(Req)+" File path" /*  */, "" /*                         */, flag.String, flag.StringVar)
+	optionUrl             = defineFlagValue("u", "url" /*          */, "URL" /*                           */, "https://httpbin.org/get" /*  */, flag.String, flag.StringVar)
+	optionLineIndex       = defineFlagValue("l", "line-index" /*   */, "Index of line" /*                 */, 10 /*                         */, flag.Int, flag.IntVar)
+	optionDurationWaitSec = defineFlagValue("w", "wait-seconds" /* */, "Duration of wait seconds" /*      */, 1*time.Second /*              */, flag.Duration, flag.DurationVar)
+	optionPrintSrc        = defineFlagValue("p", "print-src" /*    */, "Print source code" /*             */, false /*                      */, flag.Bool, flag.BoolVar)
 
 	// Set environment variable
 	environmentValueLoopCount, _ = strconv.Atoi(cmp.Or(os.Getenv("LOOP_COUNT"), "10"))
@@ -52,7 +53,7 @@ var (
 
 func init() {
 	// Customize the usage message
-	flag.Usage = customUsage(os.Stdout, commandDescription, commandOptionMaxLength)
+	flag.Usage = customUsage(os.Stdout, commandDescription, strconv.Itoa(commandOptionMaxLength))
 }
 
 // Build:
@@ -72,8 +73,9 @@ func main() {
 	}
 
 	fmt.Printf("[ Environment variable ]\nLOOP_COUNT: %d\n\n", environmentValueLoopCount)
-	fmt.Printf("[ Command options ]\n%s\n", getOptionsUsage(commandOptionMaxLength, true))
+	fmt.Printf("[ Command options ]\n%s\n", getOptionsUsage(strconv.Itoa(commandOptionMaxLength), true))
 
+	time.Sleep(*optionDurationWaitSec)
 	contents := ReadAllFileContents(optionFilePath)
 	fmt.Println(strings.Split(contents, "\n")[*optionLineIndex])
 
@@ -175,7 +177,7 @@ func defineFlagValue[T comparable](short, long, description string, defaultValue
 	if defaultValue != zero {
 		flagUsage = flagUsage + fmt.Sprintf(" (default %v)", defaultValue)
 	}
-
+	commandOptionMaxLength = max(commandOptionMaxLength, len(fmt.Sprintf("  -%s", short))+len(fmt.Sprintf(", --%s", long))+6)
 	f := flagFunc(long, defaultValue, flagUsage)
 	flagVarFunc(f, short, defaultValue, UsageDummy)
 	return f

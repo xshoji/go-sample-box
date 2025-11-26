@@ -25,12 +25,13 @@ var (
 	srcBytes []byte
 
 	commandDescription     = "A sample command demonstrating rich template (short only) usage in Go CLI applications."
-	commandOptionMaxLength = "12"
-	// Command options (the -h and --help flags are provided by default in the flag package)	commandDescription     = "Here is the command description."
-	optionFilePath  = defineFlagValue("f", Color.Yellow(Req)+" File path" /*  */, "", flag.String)
-	optionUrl       = defineFlagValue("u", "URL" /*                           */, "https://httpbin.org/get", flag.String)
-	optionLineIndex = defineFlagValue("l", "Index of line" /*                 */, 10, flag.Int)
-	optionPrintSrc  = defineFlagValue("p", "Print source code" /*             */, false, flag.Bool)
+	commandOptionMaxLength = "12" // Recommended width = general: 12, bool only: 5
+	// Command options (the -h and --help flags are provided by default in the flag package)
+	optionFilePath        = defineFlagValue("f", Color.Yellow(Req)+" File path" /*  */, "" /*                         */, flag.String)
+	optionUrl             = defineFlagValue("u", "URL" /*                           */, "https://httpbin.org/get" /*  */, flag.String)
+	optionLineIndex       = defineFlagValue("l", "Index of line" /*                 */, 10 /*                         */, flag.Int)
+	optionDurationWaitSec = defineFlagValue("w", "Duration of wait seconds" /*      */, 1*time.Second /*              */, flag.Duration)
+	optionPrintSrc        = defineFlagValue("p", "Print source code" /*             */, false /*                      */, flag.Bool)
 
 	// Set environment variable
 	environmentValueLoopCount, _ = strconv.Atoi(cmp.Or(os.Getenv("LOOP_COUNT"), "10"))
@@ -73,6 +74,7 @@ func main() {
 	fmt.Printf("[ Command options ]\n")
 	printOptionsUsage(commandOptionMaxLength, true)
 
+	time.Sleep(*optionDurationWaitSec)
 	contents := ReadAllFileContents(optionFilePath)
 	fmt.Println(strings.Split(contents, "\n")[*optionLineIndex])
 

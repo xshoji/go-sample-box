@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -22,28 +23,20 @@ const (
 
 var (
 	commandDescription      = "A sample command demonstrating simple template usage in Go CLI applications."
-	commandOptionFieldWidth = "12" // recommended width = general: 12, bool only: 5
+	commandOptionFieldWidth = "12" // Recommended width = general: 12, bool only: 5
 	// Command options (the -h and --help flags are provided by default in the flag package)	commandDescription     = "Here is the command description."
-	optionFilePath  = flag.String("f" /*  */, "" /*                         */, Req+"File path")
-	optionUrl       = flag.String("u" /*  */, "https://httpbin.org/get" /*  */, "URL")
-	optionLineIndex = flag.Int("l" /*     */, 10 /*                         */, "Index of line")
-	optionDebug     = flag.Bool("d" /*    */, false /*                      */, "Debug mode")
+	optionFilePath        = flag.String("f" /*   */, "" /*                         */, Req+"File path")
+	optionUrl             = flag.String("u" /*   */, "https://httpbin.org/get" /*  */, "URL")
+	optionLineIndex       = flag.Int("l" /*      */, 10 /*                         */, "Index of line")
+	optionDebug           = flag.Bool("d" /*     */, false /*                      */, "Debug mode")
+	optionDurationWaitSec = flag.Duration("w" /* */, 1*time.Second /*              */, "Duration of wait seconds")
 
 	// Set environment variable
 	environmentValueLoopCount, _ = strconv.Atoi(cmp.Or(os.Getenv("LOOP_COUNT"), "10"))
 )
 
 func init() {
-	// Format usage
-	b := new(bytes.Buffer)
-	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
-	usage := strings.Replace(strings.Replace(b.String(), ":", " [OPTIONS] [-h, --help]\n\nDescription:\n  "+commandDescription+"\n\nOptions:\n", 1), "Usage of", "Usage:", 1)
-	re := regexp.MustCompile(`[^,] +(-\S+)(?: (\S+))?\n*(\s+)(.*)\n`)
-	flag.Usage = func() {
-		_, _ = fmt.Fprint(flag.CommandLine.Output(), re.ReplaceAllStringFunc(usage, func(m string) string {
-			return fmt.Sprintf("  %-"+commandOptionFieldWidth+"s %s\n", re.FindStringSubmatch(m)[1]+" "+strings.TrimSpace(re.FindStringSubmatch(m)[2]), re.FindStringSubmatch(m)[4])
-		}))
-	}
+	flag.Usage = customUsage(new(bytes.Buffer), commandDescription, commandOptionFieldWidth)
 }
 
 // Build:
@@ -71,6 +64,7 @@ func main() {
 		fmt.Printf("[ Debug ] debug mode: true\n\n")
 	}
 
+	time.Sleep(*optionDurationWaitSec)
 	contents := ReadAllFileContents(optionFilePath)
 	fmt.Println(strings.Split(contents, "\n")[*optionLineIndex])
 
@@ -125,5 +119,19 @@ func ReadAllFileContents(filePath *string) string {
 func handleError(err error, prefixErrMessage string) {
 	if err != nil {
 		fmt.Printf("%s [ERROR %s]: %v\n", time.Now().Format(TimeFormat), prefixErrMessage, err)
+	}
+}
+
+func customUsage(b *bytes.Buffer, description string, optionFieldWidth string) func() {
+	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
+	return func() {
+		flagUsage := regexp.MustCompile(`(?m)^Usage.*$`).ReplaceAllString(b.String(), "")
+		re := regexp.MustCompile(`(?m)^ +(-\S+)(?: (\S+))?\n*(\s+)(.*)\n`)
+		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s [OPTIONS] [-h, --help]\n\n", func() string { e, _ := os.Executable(); return filepath.Base(e) }())
+		fmt.Fprintf(flag.CommandLine.Output(), "Description:\n  %s\n\n", description)
+		fmt.Fprintf(flag.CommandLine.Output(), "Options:")
+		fmt.Fprint(flag.CommandLine.Output(), re.ReplaceAllStringFunc(flagUsage, func(m string) string {
+			return fmt.Sprintf("  %-"+optionFieldWidth+"s %s\n", re.FindStringSubmatch(m)[1]+" "+strings.TrimSpace(re.FindStringSubmatch(m)[2]), re.FindStringSubmatch(m)[4])
+		}))
 	}
 }
