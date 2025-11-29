@@ -27,7 +27,7 @@ var (
 // << Execution sample >>
 //
 // $ go run flag/simpleformatusage/main.go -h
-// Usage: /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build2691711322/b001/exe/main [OPTIONS] [-h, --help]
+// Usage: /var/folders/_q/dpw924t12bj25568xfxcd2wm0000gn/T/go-build2691711322/b001/exe/main [OPTIONS]
 //
 // Description:
 //   Here is the command description.
@@ -53,7 +53,7 @@ func main() {
 	// Set custom usage (flag.VisitsAll を使ったUsageの加工方法、型やデフォルト値の表示ができなくなるので採用していない)
 	b := new(bytes.Buffer)
 	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(nil) }()
-	usage := strings.Replace(strings.Replace(b.String(), ":", " [OPTIONS] [-h, --help]\n\nDescription:\n  "+commandDescription+"\n\nOptions:\n", 1), "Usage of", "Usage:", 1)
+	usage := strings.Replace(strings.Replace(b.String(), ":", " [OPTIONS]\n\nDescription:\n  "+commandDescription+"\n\nOptions:\n", 1), "Usage of", "Usage:", 1)
 	re := regexp.MustCompile(`[^,] +(-\S+)(?: (\S+))?\n*(\s+)(.*)\n`)
 	flag.Usage = func() {
 		_, _ = fmt.Fprint(flag.CommandLine.Output(), re.ReplaceAllStringFunc(usage, func(m string) string {

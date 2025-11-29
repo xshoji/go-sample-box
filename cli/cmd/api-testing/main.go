@@ -34,7 +34,7 @@ const (
 )
 
 var (
-	// Command options ( the -h, --help option is defined by default in the flag package )
+	// Command options (the -h and --help flags are provided by default in the flag package)
 	commandDescription               = "Web API testing tool."
 	commandOptionFieldWidth          = "12" // recommended width = general: 12, bool only: 5
 	optionByteSizePostData           = flag.Int("b" /*  */, 1024 /*  */, "Byte size for post data")
@@ -64,7 +64,7 @@ var (
 func init() {
 	b := new(bytes.Buffer)
 	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
-	usage := strings.Replace(strings.Replace(b.String(), ":", " [OPTIONS] [-h, --help]\n\nDescription:\n  "+commandDescription+"\n\nOptions:\n", 1), "Usage of", "Usage:", 1)
+	usage := strings.Replace(strings.Replace(b.String(), ":", " [OPTIONS]\n\nDescription:\n  "+commandDescription+"\n\nOptions:\n", 1), "Usage of", "Usage:", 1)
 	re := regexp.MustCompile(`[^,] +(-\S+)(?: (\S+))?\n*(\s+)(.*)\n`)
 	flag.Usage = func() {
 		_, _ = fmt.Fprint(flag.CommandLine.Output(), re.ReplaceAllStringFunc(usage, func(m string) string {

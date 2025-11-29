@@ -22,14 +22,14 @@ const (
 )
 
 var (
+	// Command options (the -h and --help flags are provided by default in the flag package)
 	commandDescription      = "A sample command demonstrating simple template usage in Go CLI applications."
 	commandOptionFieldWidth = "12" // Recommended width = general: 12, bool only: 5
-	// Command options (the -h and --help flags are provided by default in the flag package)	commandDescription     = "Here is the command description."
-	optionFilePath        = flag.String("f" /*   */, "" /*                         */, Req+"File path")
-	optionUrl             = flag.String("u" /*   */, "https://httpbin.org/get" /*  */, "URL")
-	optionLineIndex       = flag.Int("l" /*      */, 10 /*                         */, "Index of line")
-	optionDebug           = flag.Bool("d" /*     */, false /*                      */, "Debug mode")
-	optionDurationWaitSec = flag.Duration("w" /* */, 1*time.Second /*              */, "Duration of wait seconds")
+	optionFilePath          = flag.String("f" /*   */, "" /*                         */, Req+"File path")
+	optionUrl               = flag.String("u" /*   */, "https://httpbin.org/get" /*  */, "URL")
+	optionLineIndex         = flag.Int("l" /*      */, 10 /*                         */, "Index of line")
+	optionDebug             = flag.Bool("d" /*     */, false /*                      */, "Debug mode")
+	optionDurationWaitSec   = flag.Duration("w" /* */, 1*time.Second /*              */, "Duration of wait seconds (e.g., 1s, 500ms, 2m)")
 
 	// Set environment variable
 	environmentValueLoopCount, _ = strconv.Atoi(cmp.Or(os.Getenv("LOOP_COUNT"), "10"))
@@ -125,7 +125,7 @@ func handleError(err error, prefixErrMessage string) {
 func customUsage(b *bytes.Buffer, description string, optionFieldWidth string) func() {
 	func() { flag.CommandLine.SetOutput(b); flag.PrintDefaults(); flag.CommandLine.SetOutput(nil) }()
 	return func() {
-		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s [OPTIONS] [-h, --help]\n\n", func() string { e, _ := os.Executable(); return filepath.Base(e) }())
+		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s [OPTIONS]\n\n", func() string { e, _ := os.Executable(); return filepath.Base(e) }())
 		fmt.Fprintf(flag.CommandLine.Output(), "Description:\n  %s\n\n", description)
 		fmt.Fprintf(flag.CommandLine.Output(), "Options:\n")
 		re := regexp.MustCompile(`(?m)^ +(-\S+)(?: (\S+))?\n*(\s+)(.*)\n`)
