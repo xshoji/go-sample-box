@@ -52,7 +52,7 @@ func main() {
 
 	// Set custom usage (flag.VisitsAll を使ったUsageの加工方法、型やデフォルト値の表示ができなくなるので採用していない)
 	b := new(bytes.Buffer)
-	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
+	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(nil) }()
 	usage := strings.Replace(strings.Replace(b.String(), ":", " [OPTIONS] [-h, --help]\n\nDescription:\n  "+commandDescription+"\n\nOptions:\n", 1), "Usage of", "Usage:", 1)
 	re := regexp.MustCompile(`[^,] +(-\S+)(?: (\S+))?\n*(\s+)(.*)\n`)
 	flag.Usage = func() {

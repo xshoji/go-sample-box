@@ -68,7 +68,7 @@ func main() {
 
 func formatUsage(description string, maxLength *int, buffer *bytes.Buffer) {
 	// Get default flags usage
-	func() { flag.CommandLine.SetOutput(buffer); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
+	func() { flag.CommandLine.SetOutput(buffer); flag.Usage(); flag.CommandLine.SetOutput(nil) }()
 	re := regexp.MustCompile("\\s+(-\\S+ *\\S*)+\n*\\s+(.+)")
 	usageFirst := strings.Replace(strings.Replace(strings.Split(buffer.String(), "\n")[0], ":", " [OPTIONS] [-h, --help]", -1), " of ", ": ", -1) + "\n\nDescription:\n  " + description + "\n\nOptions:\n"
 	usageOptions := re.FindAllString(buffer.String(), -1)

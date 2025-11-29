@@ -99,7 +99,7 @@ func main() {
 	flag.Usage()
 	re := regexp.MustCompile("(-\\S+)( *\\S*)+\n*\\s+" + DummyUsage + ".*\n*\\s+(-\\S+)( *\\S*)+\n")
 	usage := re.ReplaceAllString(b.String(), "  $1, -$3$4\n")
-	flag.CommandLine.SetOutput(os.Stderr)
+	flag.CommandLine.SetOutput(nil)
 	flag.Usage = func() {
 		_, _ = fmt.Fprintf(flag.CommandLine.Output(), usage)
 	}

@@ -123,14 +123,13 @@ func handleError(err error, prefixErrMessage string) {
 }
 
 func customUsage(b *bytes.Buffer, description string, optionFieldWidth string) func() {
-	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
+	func() { flag.CommandLine.SetOutput(b); flag.PrintDefaults(); flag.CommandLine.SetOutput(nil) }()
 	return func() {
-		flagUsage := regexp.MustCompile(`(?m)^Usage.*$`).ReplaceAllString(b.String(), "")
-		re := regexp.MustCompile(`(?m)^ +(-\S+)(?: (\S+))?\n*(\s+)(.*)\n`)
 		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s [OPTIONS] [-h, --help]\n\n", func() string { e, _ := os.Executable(); return filepath.Base(e) }())
 		fmt.Fprintf(flag.CommandLine.Output(), "Description:\n  %s\n\n", description)
-		fmt.Fprintf(flag.CommandLine.Output(), "Options:")
-		fmt.Fprint(flag.CommandLine.Output(), re.ReplaceAllStringFunc(flagUsage, func(m string) string {
+		fmt.Fprintf(flag.CommandLine.Output(), "Options:\n")
+		re := regexp.MustCompile(`(?m)^ +(-\S+)(?: (\S+))?\n*(\s+)(.*)\n`)
+		fmt.Fprint(flag.CommandLine.Output(), re.ReplaceAllStringFunc(b.String(), func(m string) string {
 			return fmt.Sprintf("  %-"+optionFieldWidth+"s %s\n", re.FindStringSubmatch(m)[1]+" "+strings.TrimSpace(re.FindStringSubmatch(m)[2]), re.FindStringSubmatch(m)[4])
 		}))
 	}
