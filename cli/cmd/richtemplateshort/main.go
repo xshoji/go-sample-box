@@ -24,14 +24,15 @@ var (
 	//go:embed main.go
 	srcBytes []byte
 
+	commandDescription           = "A sample command demonstrating rich template (short only) usage in Go CLI applications."
+	commandOptionMaxLength       = "12" // Recommended width = general: 12, bool only: 5
+	commandRequiredOptionExample = ""   // Auto-adjusted in defineFlagValue
 	// Command options (the -h and --help flags are provided by default in the flag package)
-	commandDescription     = "A sample command demonstrating rich template (short only) usage in Go CLI applications."
-	commandOptionMaxLength = "12" // Recommended width = general: 12, bool only: 5
-	optionFilePath         = defineFlagValue("f", Color.Yellow(Req)+" File path" /*                    */, "" /*                         */, flag.String)
-	optionUrl              = defineFlagValue("u", "URL" /*                                             */, "https://httpbin.org/get" /*  */, flag.String)
-	optionLineIndex        = defineFlagValue("l", "Index of line" /*                                   */, 10 /*                         */, flag.Int)
-	optionDurationWaitSec  = defineFlagValue("w", "Duration of wait seconds (e.g., 1s, 500ms, 2m)" /*  */, 1*time.Second /*              */, flag.Duration)
-	optionPrintSrc         = defineFlagValue("p", "Print source code" /*                               */, false /*                      */, flag.Bool)
+	optionFilePath        = defineFlagValue("f", Color.Yellow(Req)+" File path" /*                    */, "" /*                         */, flag.String)
+	optionUrl             = defineFlagValue("u", "URL" /*                                             */, "https://httpbin.org/get" /*  */, flag.String)
+	optionLineIndex       = defineFlagValue("l", Color.Yellow(Req)+" Index of line" /*                                   */, 10 /*                         */, flag.Int)
+	optionDurationWaitSec = defineFlagValue("w", "Duration of wait seconds (e.g., 1s, 500ms, 2m)" /*  */, 1*time.Second /*              */, flag.Duration)
+	optionPrintSrc        = defineFlagValue("p", "Print source code" /*                               */, false /*                      */, flag.Bool)
 
 	// Set environment variable
 	environmentValueLoopCount, _ = strconv.Atoi(cmp.Or(os.Getenv("LOOP_COUNT"), "10"))
@@ -175,13 +176,16 @@ func defineFlagValue[T comparable](flagName, description string, defaultValue T,
 	if defaultValue != zero {
 		description = description + fmt.Sprintf(" (default %v)", defaultValue)
 	}
+	if strings.Contains(description, Req) {
+		commandRequiredOptionExample = commandRequiredOptionExample + fmt.Sprintf("-%s %T ", flagName, defaultValue)
+	}
 	return flagFunc(flagName, defaultValue, description)
 }
 
 // Custom usage message
 func customUsage(output io.Writer, description, fieldWidth string) func() {
 	return func() {
-		fmt.Fprintf(output, "Usage: %s [OPTIONS]\n\n", func() string { e, _ := os.Executable(); return filepath.Base(e) }())
+		fmt.Fprintf(output, "Usage: %s %s[OPTIONS]\n\n", func() string { e, _ := os.Executable(); return filepath.Base(e) }(), commandRequiredOptionExample)
 		fmt.Fprintf(output, "Description:\n  %s\n\n", description)
 		fmt.Fprintf(output, "Options:\n")
 		printOptionsUsage(fieldWidth, false)
