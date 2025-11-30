@@ -33,15 +33,15 @@ func main() {
 	fmt.Println("GetAsObject parsed")
 	fmt.Printf(
 		"hash: %v\ntime: %.f\nblock_index: %.f\nheight: %.f\ntxIndexes_count: %d\n",
-		resultLatestBlock.(map[string]interface{})["hash"].(string),
-		resultLatestBlock.(map[string]interface{})["time"].(float64),
-		resultLatestBlock.(map[string]interface{})["block_index"].(float64),
-		resultLatestBlock.(map[string]interface{})["height"].(float64),
-		len(resultLatestBlock.(map[string]interface{})["txIndexes"].([]interface{})),
+		resultLatestBlock.(map[string]any)["hash"].(string),
+		resultLatestBlock.(map[string]any)["time"].(float64),
+		resultLatestBlock.(map[string]any)["block_index"].(float64),
+		resultLatestBlock.(map[string]any)["height"].(float64),
+		len(resultLatestBlock.(map[string]any)["txIndexes"].([]any)),
 	)
 
 	fmt.Println("Get block hash")
-	blockHash := resultLatestBlock.(map[string]interface{})["hash"].(string)
+	blockHash := resultLatestBlock.(map[string]any)["hash"].(string)
 	fmt.Println(blockHash)
 	fmt.Println("")
 
@@ -50,10 +50,10 @@ func main() {
 
 	fmt.Println("Get transaction hashs")
 	resultSingleBlock := clientRawblock.Get("/" + blockHash).GetBodyAsObject()
-	transactions := resultSingleBlock.(map[string]interface{})["tx"].([]interface{})
+	transactions := resultSingleBlock.(map[string]any)["tx"].([]any)
 	var transactionHashs []string
 	for _, transaction := range transactions {
-		transactionHashs = append(transactionHashs, transaction.(map[string]interface{})["hash"].(string))
+		transactionHashs = append(transactionHashs, transaction.(map[string]any)["hash"].(string))
 	}
 	fmt.Printf("%v", transactionHashs)
 	fmt.Println("")

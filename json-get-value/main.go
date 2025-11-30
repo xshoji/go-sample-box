@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/xshoji/go-sample-box/json-get-value/jsonutil"
 )
 
@@ -18,7 +19,7 @@ func main() {
   ]
 }
 `
-	var jsonObject interface{}
+	var jsonObject any
 	err := json.Unmarshal([]byte(jsonString), &jsonObject)
 	if err != nil {
 		println(err.Error())
@@ -29,7 +30,7 @@ func main() {
 	fmt.Println(jsonutil.Get(jsonObject, "name"))
 	fmt.Printf("{\"age\":%v}\n", jsonutil.ToJsonString(jsonutil.Get(jsonObject, "age")))
 	fmt.Printf("{\"list\":%v}\n", jsonutil.ToJsonString(jsonutil.Get(jsonObject, "list")))
-	list := jsonutil.Get(jsonObject, "list").([]interface{})
+	list := jsonutil.Get(jsonObject, "list").([]any)
 	for i, value := range list {
 		fmt.Printf("%v:%v\n", i, value)
 	}

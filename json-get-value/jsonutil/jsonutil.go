@@ -7,22 +7,22 @@ import (
 	"strings"
 )
 
-// Extract value by specified key from json object typed as interface{}
+// Extract value by specified key from json object typed as any
 // Example: object["aaa"][0]["bbb"] -> keyChain: "aaa.0.bbb"
-func Get(object interface{}, keyChain string) interface{} {
+func Get(object any, keyChain string) any {
 	keys := strings.Split(keyChain, ".")
-	var result interface{}
+	var result any
 	var exists bool
 	for _, key := range keys {
 		exists = false
-		value, ok := object.(map[string]interface{})
+		value, ok := object.(map[string]any)
 		if ok {
 			exists = true
 			object = value[key]
 			result = object
 			continue
 		}
-		values, ok := object.([]interface{})
+		values, ok := object.([]any)
 		if ok {
 			for i, v := range values {
 				if strconv.FormatInt(int64(i), 10) == key {
@@ -41,7 +41,7 @@ func Get(object interface{}, keyChain string) interface{} {
 }
 
 // Extract and cast value as string
-func AsString(object interface{}, keyChain string) *string {
+func AsString(object any, keyChain string) *string {
 	maybeString := Get(object, keyChain)
 	if stringValue, ok := maybeString.(string); ok {
 		return &stringValue
@@ -51,7 +51,7 @@ func AsString(object interface{}, keyChain string) *string {
 }
 
 // Extract and cast value as int
-func AsInt(object interface{}, keyChain string) *int {
+func AsInt(object any, keyChain string) *int {
 	maybeInt := Get(object, keyChain)
 	number, ok := maybeInt.(float64)
 	if !ok {
@@ -67,7 +67,7 @@ func AsInt(object interface{}, keyChain string) *int {
 }
 
 // Extract and cast value as float
-func AsFloat(object interface{}, keyChain string) *float64 {
+func AsFloat(object any, keyChain string) *float64 {
 	maybeFloat := Get(object, keyChain)
 	if floatValue, ok := maybeFloat.(float64); ok {
 		return &floatValue
@@ -77,9 +77,9 @@ func AsFloat(object interface{}, keyChain string) *float64 {
 }
 
 // Extract and cast value as slice
-func AsSlice(object interface{}, keyChain string) []interface{} {
+func AsSlice(object any, keyChain string) []any {
 	maybeSlice := Get(object, keyChain)
-	if slice, ok := maybeSlice.([]interface{}); ok {
+	if slice, ok := maybeSlice.([]any); ok {
 		return slice
 	} else {
 		return nil
@@ -87,13 +87,13 @@ func AsSlice(object interface{}, keyChain string) []interface{} {
 }
 
 // Convert to json format string
-func ToJsonString(v interface{}) string {
+func ToJsonString(v any) string {
 	result, _ := json.Marshal(v)
 	return string(result)
 }
 
 // Convert to json format string as pretty
-func ToJsonStringPretty(v interface{}) string {
+func ToJsonStringPretty(v any) string {
 	var buf bytes.Buffer
 	if err := json.Indent(&buf, []byte(ToJsonString(v)), "", "  "); err != nil {
 		panic(err)

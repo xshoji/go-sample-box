@@ -33,15 +33,15 @@ func (c Consumer) Consume() {
 		panic("Client is empty.")
 	}
 
-	var result interface{}
+	var result any
 	for v := range c.Channel {
 		fmt.Println("Consumer is recieved: ", v)
 		result = c.ClientTx.Get(v).GetBodyAsObject()
 		fmt.Printf(
 			"hash: %v, time: %.f, tx_index: %.f\n",
-			result.(map[string]interface{})["hash"].(string),
-			result.(map[string]interface{})["time"].(float64),
-			result.(map[string]interface{})["tx_index"].(float64),
+			result.(map[string]any)["hash"].(string),
+			result.(map[string]any)["time"].(float64),
+			result.(map[string]any)["tx_index"].(float64),
 		)
 	}
 }

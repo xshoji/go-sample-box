@@ -10,7 +10,7 @@ func TestGet(t *testing.T) {
 	t.Run("test Get (single value) ", func(t *testing.T) {
 
 		// setup
-		var jsonObject interface{}
+		var jsonObject any
 		json.Unmarshal([]byte(`
 {
   "string": "stringValue1",
@@ -46,7 +46,7 @@ func TestGet(t *testing.T) {
 		testCases := []struct {
 			TestCase string
 			Input    string
-			Expected interface{}
+			Expected any
 		}{
 			{
 				TestCase: "string",
@@ -114,7 +114,7 @@ func TestGet(t *testing.T) {
 	t.Run("test Get (array) ", func(t *testing.T) {
 
 		// setup
-		var jsonObject interface{}
+		var jsonObject any
 		json.Unmarshal([]byte(`
 {
   "stringArray": [
@@ -140,7 +140,7 @@ func TestGet(t *testing.T) {
 		testCases := []struct {
 			TestCase string
 			Input    string
-			Expected []interface{}
+			Expected []any
 		}{
 			{
 				TestCase: "stringArray",
@@ -167,7 +167,7 @@ func TestGet(t *testing.T) {
 		// run
 		for i := range testCases {
 			param := testCases[i]
-			actual := Get(jsonObject, param.Input).([]interface{})
+			actual := Get(jsonObject, param.Input).([]any)
 			t.Logf("Case:%v\n", param.TestCase)
 			if len(actual) != len(param.Expected) {
 				t.Errorf("  Failed: len(actual) -> %v, len(expected) -> %v\n", len(actual), len(param.Expected))
@@ -183,7 +183,7 @@ func TestGet(t *testing.T) {
 	t.Run("test Get (object array) ", func(t *testing.T) {
 
 		// setup
-		var jsonObject interface{}
+		var jsonObject any
 		json.Unmarshal([]byte(`
 {
   "objectArray": [
@@ -203,26 +203,26 @@ func TestGet(t *testing.T) {
 		testCases := []struct {
 			TestCase string
 			Input    string
-			Expected []interface{}
+			Expected []any
 		}{
 			{
 				TestCase: "objectArray",
 				Input:    "objectArray",
-				Expected: createInterfaceSliceIndexed(map[string]interface{}{"string": "stringValue5", "number": 5.0}, map[string]interface{}{"string": "stringValue6", "number": 6.0}),
+				Expected: createInterfaceSliceIndexed(map[string]any{"string": "stringValue5", "number": 5.0}, map[string]any{"string": "stringValue6", "number": 6.0}),
 			},
 		}
 
 		// run
 		for i := range testCases {
 			param := testCases[i]
-			actual := Get(jsonObject, param.Input).([]interface{})
+			actual := Get(jsonObject, param.Input).([]any)
 			t.Logf("Case:%v\n", param.TestCase)
 			if len(actual) != len(param.Expected) {
 				t.Errorf("  Failed: len(actual) -> %v, len(expected) -> %v\n", len(actual), len(param.Expected))
 			}
 			for i, _ := range actual {
-				actualMap := actual[i].(map[string]interface{})
-				expectedMap := param.Expected[i].(map[string]interface{})
+				actualMap := actual[i].(map[string]any)
+				expectedMap := param.Expected[i].(map[string]any)
 				if len(actualMap) != len(expectedMap) {
 					t.Errorf("  Failed: len(actualMap) -> %v, len(expectedMap) -> %v\n", len(actualMap), len(expectedMap))
 				}
@@ -254,7 +254,7 @@ func TestAsString(t *testing.T) {
 		}
 
 		// run
-		var jsonObject interface{}
+		var jsonObject any
 		for i := range testCases {
 			param := testCases[i]
 			t.Logf("Case:%v\n", param.TestCase)
@@ -314,7 +314,7 @@ func TestAsInt(t *testing.T) {
 		}
 
 		// run
-		var jsonObject interface{}
+		var jsonObject any
 		for i := range testCases {
 			param := testCases[i]
 			t.Logf("Case:%v\n", param.TestCase)
@@ -388,7 +388,7 @@ func TestAsFloat(t *testing.T) {
 		}
 
 		// run
-		var jsonObject interface{}
+		var jsonObject any
 		for i := range testCases {
 			param := testCases[i]
 			t.Logf("Case:%v\n", param.TestCase)
@@ -438,7 +438,7 @@ func TestAsSlice(t *testing.T) {
 		testCases := []struct {
 			TestCase string
 			Input    string
-			Expected []interface{}
+			Expected []any
 		}{
 			{
 				TestCase: "ok1",
@@ -453,7 +453,7 @@ func TestAsSlice(t *testing.T) {
 		}
 
 		// run
-		var jsonObject interface{}
+		var jsonObject any
 		for i := range testCases {
 			param := testCases[i]
 			t.Logf("Case:%v\n", param.TestCase)
@@ -530,7 +530,7 @@ func TestToJsonString(t *testing.T) {
 		}
 
 		// run
-		var jsonObject interface{}
+		var jsonObject any
 		for i := range testCases {
 			param := testCases[i]
 			t.Logf("Case:%v\n", param.TestCase)
@@ -562,7 +562,7 @@ func TestToJsonStringPretty(t *testing.T) {
 		}
 
 		// run
-		var jsonObject interface{}
+		var jsonObject any
 		for i := range testCases {
 			param := testCases[i]
 			t.Logf("Case:%v\n", param.TestCase)
@@ -575,18 +575,14 @@ func TestToJsonStringPretty(t *testing.T) {
 	})
 }
 
-func createInterfaceSliceIndexed(values ...interface{}) []interface{} {
-	result := make([]interface{}, len(values))
-	for i, s := range values {
-		result[i] = s
-	}
+func createInterfaceSliceIndexed(values ...any) []any {
+	result := make([]any, len(values))
+	copy(result, values)
 	return result
 }
 
-func createInterfaceSliceAppended(values ...interface{}) []interface{} {
-	result := make([]interface{}, len(values))
-	for _, s := range values {
-		result = append(result, s)
-	}
+func createInterfaceSliceAppended(values ...any) []any {
+	result := make([]any, 0)
+	result = append(result, values...)
 	return result
 }

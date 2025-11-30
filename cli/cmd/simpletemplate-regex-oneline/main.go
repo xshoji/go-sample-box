@@ -78,7 +78,7 @@ func main() {
 // HTTP Utils
 // =======================================
 
-func HttpGetJson(url string) interface{} {
+func HttpGetJson(url string) any {
 	res, err := http.Get(url)
 	handleError(err, "http.Get(url)")
 	responseBody, err := io.ReadAll(res.Body)
@@ -90,9 +90,9 @@ func HttpGetJson(url string) interface{} {
 // Json Utils
 // =======================================
 
-// ToJsonObject json bytes to interface{} object
-func ToJsonObject(body []byte) interface{} {
-	var jsonObject interface{}
+// ToJsonObject json bytes to any object
+func ToJsonObject(body []byte) any {
+	var jsonObject any
 	err := json.Unmarshal(body, &jsonObject)
 	handleError(err, "json.Unmarshal")
 	return jsonObject

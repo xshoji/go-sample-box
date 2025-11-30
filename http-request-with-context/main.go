@@ -132,11 +132,11 @@ func CreateCustomTransport(tlsConfig *tls.Config, disableHttp2 bool, networkType
 	return customTr
 }
 
-func DoHttpRequest(ctx context.Context, client http.Client, method string, url string, headers map[string]string, body string) interface{} {
+func DoHttpRequest(ctx context.Context, client http.Client, method string, url string, headers map[string]string, body string) any {
 	return internalDoHttpRequest(ctx, client, method, url, headers, strings.NewReader(body))
 }
 
-func internalDoHttpRequest(ctx context.Context, client http.Client, method string, url string, headers map[string]string, body io.Reader) interface{} {
+func internalDoHttpRequest(ctx context.Context, client http.Client, method string, url string, headers map[string]string, body io.Reader) any {
 	req, err := http.NewRequestWithContext(ctx, method, url, body)
 	handleError(err, "http.NewRequestWithContext")
 	for key, value := range headers {
@@ -171,27 +171,27 @@ func internalDoHttpRequest(ctx context.Context, client http.Client, method strin
 // Json Utils
 // =======================================
 
-// ToJsonObject json bytes to interface{} object
-func ToJsonObject(body []byte) interface{} {
-	var jsonObject interface{}
+// ToJsonObject json bytes to any object
+func ToJsonObject(body []byte) any {
+	var jsonObject any
 	err := json.Unmarshal(body, &jsonObject)
 	handleError(err, "json.Unmarshal")
 	return jsonObject
 }
 
-// Get get value in interface{} object [ example : object["aaa"][0]["bbb"] -> keyChain: "aaa.0.bbb" ]
-func Get(object interface{}, keyChain string) interface{} {
-	var result interface{}
+// Get get value in any object [ example : object["aaa"][0]["bbb"] -> keyChain: "aaa.0.bbb" ]
+func Get(object any, keyChain string) any {
+	var result any
 	var exists bool
 	for _, key := range strings.Split(keyChain, ".") {
 		exists = false
-		if _, ok := object.(map[string]interface{}); ok {
+		if _, ok := object.(map[string]any); ok {
 			exists = true
-			object = object.(map[string]interface{})[key]
+			object = object.(map[string]any)[key]
 			result = object
 			continue
 		}
-		if values, ok := object.([]interface{}); ok {
+		if values, ok := object.([]any); ok {
 			for i, v := range values {
 				if strconv.FormatInt(int64(i), 10) == key {
 					exists = true
