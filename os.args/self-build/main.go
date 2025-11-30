@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	UsageRequiredPrefix = "\u001B[33m(REQ)\u001B[0m "
+	UsageRequiredPrefix = "\x1b[33m(REQ)\x1b[0m "
 )
 
 var (

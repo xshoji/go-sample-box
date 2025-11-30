@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	UsageRequiredPrefix   = "\u001B[33m(REQ)\u001B[0m "
+	UsageRequiredPrefix   = "\x1b[33m(REQ)\x1b[0m "
 	TimeFormat            = "2006-01-02 15:04:05.0000 [MST]"
 	ContentsFileNameInZip = "dummy.tsv"
 )
