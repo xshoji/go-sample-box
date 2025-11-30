@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	Req        = "\u001B[33m(REQ)\u001B[0m "
+	Req        = "\x1b[33m(REQ)\x1b[0m "
 	TimeFormat = "2006-01-02 15:04:05.0000 [MST]"
 )
 
@@ -127,9 +127,8 @@ func customUsage(b *bytes.Buffer, description string, optionFieldWidth string) f
 	return func() {
 		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s [OPTIONS]\n\n", func() string { e, _ := os.Executable(); return filepath.Base(e) }())
 		fmt.Fprintf(flag.CommandLine.Output(), "Description:\n  %s\n\n", description)
-		fmt.Fprintf(flag.CommandLine.Output(), "Options:\n")
 		re := regexp.MustCompile(`(?m)^ +(-\S+)(?: (\S+))?\n*(\s+)(.*)\n`)
-		fmt.Fprint(flag.CommandLine.Output(), re.ReplaceAllStringFunc(b.String(), func(m string) string {
+		fmt.Fprintf(flag.CommandLine.Output(), "Options:\n%s", re.ReplaceAllStringFunc(b.String(), func(m string) string {
 			return fmt.Sprintf("  %-"+optionFieldWidth+"s %s\n", re.FindStringSubmatch(m)[1]+" "+strings.TrimSpace(re.FindStringSubmatch(m)[2]), re.FindStringSubmatch(m)[4])
 		}))
 	}

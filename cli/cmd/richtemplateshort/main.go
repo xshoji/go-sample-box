@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	Req        = "(REQ)"
+	Req        = "(required)"
 	TimeFormat = "2006-01-02 15:04:05.0000 [MST]"
 )
 
@@ -30,7 +30,7 @@ var (
 	// Command options (the -h and --help flags are provided by default in the flag package)
 	optionFilePath        = defineFlagValue("f", Color.Yellow(Req)+" File path" /*                    */, "" /*                         */, flag.String)
 	optionUrl             = defineFlagValue("u", "URL" /*                                             */, "https://httpbin.org/get" /*  */, flag.String)
-	optionLineIndex       = defineFlagValue("l", Color.Yellow(Req)+" Index of line" /*                                   */, 10 /*                         */, flag.Int)
+	optionLineIndex       = defineFlagValue("l", "Index of line" /*                                   */, 10 /*                         */, flag.Int)
 	optionDurationWaitSec = defineFlagValue("w", "Duration of wait seconds (e.g., 1s, 500ms, 2m)" /*  */, 1*time.Second /*              */, flag.Duration)
 	optionPrintSrc        = defineFlagValue("p", "Print source code" /*                               */, false /*                      */, flag.Bool)
 
@@ -43,10 +43,10 @@ var (
 		Green  func(string) string
 		Yellow func(string) string
 	}{
-		// "\033[31m", "\033[32m", "\033[33m" = ANSI color codes, "\033[0m" = reset color code
-		Red:    func(text string) string { return "\033[31m" + text + "\033[0m" },
-		Green:  func(text string) string { return "\033[32m" + text + "\033[0m" },
-		Yellow: func(text string) string { return "\033[33m" + text + "\033[0m" },
+		// "\x1b[31m", "\x1b[32m", "\x1b[33m" = ANSI color codes, "\x1b[0m" = reset color code
+		Red:    func(text string) string { return "\x1b[31m" + text + "\x1b[0m" },
+		Green:  func(text string) string { return "\x1b[32m" + text + "\x1b[0m" },
+		Yellow: func(text string) string { return "\x1b[33m" + text + "\x1b[0m" },
 	}
 )
 

@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	Req        = "(REQ)"
+	Req        = "(required)"
 	UsageDummy = "########"
 	TimeFormat = "2006-01-02 15:04:05.0000 [MST]"
 )
@@ -33,7 +33,7 @@ var (
 	optionFilePath        = defineFlagValue("f", "file-path" /*    */, Color.Yellow(Req)+" File path" /*                   */, "" /*                         */, flag.String, flag.StringVar)
 	optionUrl             = defineFlagValue("u", "url" /*          */, "URL" /*                                            */, "https://httpbin.org/get" /*  */, flag.String, flag.StringVar)
 	optionLineIndex       = defineFlagValue("l", "line-index" /*   */, "Index of line" /*                                  */, 10 /*                         */, flag.Int, flag.IntVar)
-	optionDurationWaitSec = defineFlagValue("w", "wait-seconds" /* */, "Duration of wait seconds (e.g., 1s, 500ms, 2m)" /* */, 1*time.Second /*              */, flag.Duration, flag.DurationVar)
+	optionDurationWaitSec = defineFlagValue("w", "wait-seconds" /* */, "Duration of wait seconds (e.g., 500ms, 3s, 2m)" /* */, 1*time.Second /*              */, flag.Duration, flag.DurationVar)
 	optionPrintSrc        = defineFlagValue("p", "print-src" /*    */, "Print source code" /*                              */, false /*                      */, flag.Bool, flag.BoolVar)
 
 	// Set environment variable
@@ -45,16 +45,16 @@ var (
 		Green  func(string) string
 		Yellow func(string) string
 	}{
-		// "\033[31m", "\033[32m", "\033[33m" = ANSI color codes, "\033[0m" = reset color code
-		Red:    func(text string) string { return "\033[31m" + text + "\033[0m" },
-		Green:  func(text string) string { return "\033[32m" + text + "\033[0m" },
-		Yellow: func(text string) string { return "\033[33m" + text + "\033[0m" },
+		// "\x1b[31m", "\x1b[32m", "\x1b[33m" = ANSI color codes, "\x1b[0m" = reset color code
+		Red:    func(text string) string { return "\x1b[31m" + text + "\x1b[0m" },
+		Green:  func(text string) string { return "\x1b[32m" + text + "\x1b[0m" },
+		Yellow: func(text string) string { return "\x1b[33m" + text + "\x1b[0m" },
 	}
 )
 
 func init() {
 	// Customize the usage message
-	flag.Usage = customUsage(os.Stdout, commandDescription, strconv.Itoa(commandOptionMaxLength))
+	flag.Usage = customUsage(os.Stdout, commandDescription, strconv.Itoa(commandOptionMaxLength), commandRequiredOptionExample)
 }
 
 // Build:
@@ -188,9 +188,9 @@ func defineFlagValue[T comparable](short, long, description string, defaultValue
 }
 
 // Custom usage message
-func customUsage(output io.Writer, description, fieldWidth string) func() {
+func customUsage(output io.Writer, description, fieldWidth string, requiredExample string) func() {
 	return func() {
-		fmt.Fprintf(output, "Usage: %s %s[OPTIONS]\n\n", func() string { e, _ := os.Executable(); return filepath.Base(e) }(), commandRequiredOptionExample)
+		fmt.Fprintf(output, "Usage: %s %s[OPTIONS]\n\n", func() string { e, _ := os.Executable(); return filepath.Base(e) }(), requiredExample)
 		fmt.Fprintf(output, "Description:\n  %s\n\n", description)
 		fmt.Fprintf(output, "Options:\n%s", getOptionsUsage(fieldWidth, false))
 	}
