@@ -36,10 +36,11 @@ var (
 )
 
 func init() {
-	flag.Usage = customUsage(new(bytes.Buffer), commandDescription, commandOptionFieldWidth)
+	flag.Usage = customUsage(commandDescription, commandOptionFieldWidth)
 }
 
-func customUsage(b *bytes.Buffer, description string, optionFieldWidth string) func() {
+func customUsage(description string, optionFieldWidth string) func() {
+	b := new(bytes.Buffer)
 	func() { flag.CommandLine.SetOutput(b); flag.PrintDefaults(); flag.CommandLine.SetOutput(nil) }()
 	return func() {
 		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s [OPTIONS]\n\n", func() string { e, _ := os.Executable(); return filepath.Base(e) }())
