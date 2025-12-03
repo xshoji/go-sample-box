@@ -54,7 +54,7 @@ var (
 
 func init() {
 	// Customize the usage message
-	flag.Usage = customUsage(os.Stdout, commandDescription, strconv.Itoa(commandOptionMaxLength), commandRequiredOptionExample)
+	flag.Usage = customUsage(commandDescription, strconv.Itoa(commandOptionMaxLength), commandRequiredOptionExample)
 }
 
 // Build:
@@ -188,32 +188,31 @@ func defineFlagValue[T comparable](short, long, description string, defaultValue
 }
 
 // Custom usage message
-func customUsage(output io.Writer, description, fieldWidth string, requiredExample string) func() {
+func customUsage(description, fieldWidth string, requiredExample string) func() {
 	return func() {
-		fmt.Fprintf(output, "Usage: %s %s[OPTIONS]\n\n", func() string { e, _ := os.Executable(); return filepath.Base(e) }(), requiredExample)
-		fmt.Fprintf(output, "Description:\n  %s\n\n", description)
-		fmt.Fprintf(output, "Options:\n%s", getOptionsUsage(fieldWidth, false))
+		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s %s[OPTIONS]\n\n", func() string { e, _ := os.Executable(); return filepath.Base(e) }(), requiredExample)
+		fmt.Fprintf(flag.CommandLine.Output(), "Description:\n  %s\n\n", description)
+		fmt.Fprintf(flag.CommandLine.Output(), "Options:\n%s", getOptionsUsage(fieldWidth, false))
 	}
 }
 
 // Get options usage message
 func getOptionsUsage(fieldWidth string, currentValue bool) string {
-	optionUsages := make([]string, 0)
+	usages := make([]string, 0)
 	flag.VisitAll(func(f *flag.Flag) {
 		if f.Usage == UsageDummy {
 			return
 		}
-		value := strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(fmt.Sprintf("%T", f.Value), "*flag.", ""), "Value", ""), "bool", "")
+		value := strings.NewReplacer("*flag.", "", "Value", "", "bool", "").Replace(fmt.Sprintf("%T", f.Value))
 		if currentValue {
 			value = f.Value.String()
 		}
-		format := "  -%-1s, --%-" + fieldWidth + "s %s\n"
 		short := strings.Split(f.Usage, UsageDummy)[0]
 		mainUsage := strings.Split(f.Usage, UsageDummy)[1]
-		optionUsages = append(optionUsages, fmt.Sprintf(format, short, f.Name+" "+value, mainUsage))
+		usages = append(usages, fmt.Sprintf("  -%-1s, --%-"+fieldWidth+"s %s\n", short, f.Name+" "+value, mainUsage))
 	})
-	sort.SliceStable(optionUsages, func(i, j int) bool {
-		return strings.Count(optionUsages[i], Req) > strings.Count(optionUsages[j], Req)
+	sort.SliceStable(usages, func(i, j int) bool {
+		return strings.Count(usages[i], Req) > strings.Count(usages[j], Req)
 	})
-	return strings.Join(optionUsages, "")
+	return strings.Join(usages, "")
 }

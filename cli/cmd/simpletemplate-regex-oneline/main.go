@@ -39,6 +39,18 @@ func init() {
 	flag.Usage = customUsage(new(bytes.Buffer), commandDescription, commandOptionFieldWidth)
 }
 
+func customUsage(b *bytes.Buffer, description string, optionFieldWidth string) func() {
+	func() { flag.CommandLine.SetOutput(b); flag.PrintDefaults(); flag.CommandLine.SetOutput(nil) }()
+	return func() {
+		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s [OPTIONS]\n\n", func() string { e, _ := os.Executable(); return filepath.Base(e) }())
+		fmt.Fprintf(flag.CommandLine.Output(), "Description:\n  %s\n\n", description)
+		re := regexp.MustCompile(`(?m)^ +(-\S+)(?: (\S+))?\n*(\s+)(.*)\n`)
+		fmt.Fprintf(flag.CommandLine.Output(), "Options:\n%s", re.ReplaceAllStringFunc(b.String(), func(m string) string {
+			return fmt.Sprintf("  %-"+optionFieldWidth+"s %s\n", re.FindStringSubmatch(m)[1]+" "+strings.TrimSpace(re.FindStringSubmatch(m)[2]), re.FindStringSubmatch(m)[4])
+		}))
+	}
+}
+
 // Build:
 // $ GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o /tmp/tool main.go
 // $ go build -ldflags="-s -w" -trimpath -o /tmp/$(basename "${PWD}") main.go
@@ -119,17 +131,5 @@ func ReadAllFileContents(filePath *string) string {
 func handleError(err error, prefixErrMessage string) {
 	if err != nil {
 		fmt.Printf("%s [ERROR %s]: %v\n", time.Now().Format(TimeFormat), prefixErrMessage, err)
-	}
-}
-
-func customUsage(b *bytes.Buffer, description string, optionFieldWidth string) func() {
-	func() { flag.CommandLine.SetOutput(b); flag.PrintDefaults(); flag.CommandLine.SetOutput(nil) }()
-	return func() {
-		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s [OPTIONS]\n\n", func() string { e, _ := os.Executable(); return filepath.Base(e) }())
-		fmt.Fprintf(flag.CommandLine.Output(), "Description:\n  %s\n\n", description)
-		re := regexp.MustCompile(`(?m)^ +(-\S+)(?: (\S+))?\n*(\s+)(.*)\n`)
-		fmt.Fprintf(flag.CommandLine.Output(), "Options:\n%s", re.ReplaceAllStringFunc(b.String(), func(m string) string {
-			return fmt.Sprintf("  %-"+optionFieldWidth+"s %s\n", re.FindStringSubmatch(m)[1]+" "+strings.TrimSpace(re.FindStringSubmatch(m)[2]), re.FindStringSubmatch(m)[4])
-		}))
 	}
 }

@@ -52,7 +52,7 @@ var (
 
 func init() {
 	// Customize the usage message
-	flag.Usage = customUsage(os.Stdout, commandDescription, commandOptionMaxLength)
+	flag.Usage = customUsage(commandDescription, commandOptionMaxLength)
 }
 
 // Build:
@@ -183,11 +183,11 @@ func defineFlagValue[T comparable](flagName, description string, defaultValue T,
 }
 
 // Custom usage message
-func customUsage(output io.Writer, description, fieldWidth string) func() {
+func customUsage(description, fieldWidth string) func() {
 	return func() {
-		fmt.Fprintf(output, "Usage: %s %s[OPTIONS]\n\n", func() string { e, _ := os.Executable(); return filepath.Base(e) }(), commandRequiredOptionExample)
-		fmt.Fprintf(output, "Description:\n  %s\n\n", description)
-		fmt.Fprintf(output, "Options:\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s %s[OPTIONS]\n\n", func() string { e, _ := os.Executable(); return filepath.Base(e) }(), commandRequiredOptionExample)
+		fmt.Fprintf(flag.CommandLine.Output(), "Description:\n  %s\n\n", description)
+		fmt.Fprintf(flag.CommandLine.Output(), "Options:\n")
 		printOptionsUsage(fieldWidth, false)
 	}
 }
@@ -195,11 +195,10 @@ func customUsage(output io.Writer, description, fieldWidth string) func() {
 // Print options usage message
 func printOptionsUsage(fieldWidth string, currentValue bool) {
 	flag.VisitAll(func(f *flag.Flag) {
-		value := strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(fmt.Sprintf("%T", f.Value), "*flag.", ""), "Value", ""), "bool", "")
+		value := strings.NewReplacer("*flag.", "", "Value", "", "bool", "").Replace(fmt.Sprintf("%T", f.Value))
 		if currentValue {
 			value = f.Value.String()
 		}
-		format := "  -%-" + fieldWidth + "s %s\n"
-		fmt.Printf(format, f.Name+" "+value, f.Usage)
+		fmt.Printf("  -%-"+fieldWidth+"s %s\n", f.Name+" "+value, f.Usage)
 	})
 }

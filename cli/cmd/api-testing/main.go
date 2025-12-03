@@ -36,12 +36,12 @@ const (
 var (
 	// Command options (the -h and --help flags are provided by default in the flag package)
 	commandDescription               = "Web API testing tool."
-	commandOptionFieldWidth          = "12" // recommended width = general: 12, bool only: 5
+	commandOptionFieldWidth          = "10" // recommended width = general: 12, bool only: 5
 	optionByteSizePostData           = flag.Int("b" /*  */, 1024 /*  */, "Byte size for post data")
-	optionUseChunkedTransferEncoding = flag.Bool("c" /* */, false /* */, "Use \"Transfer-Encoding: chunked\" ( only for HTTP/1.1 ).")
-	optionTrimDownHttpMessages       = flag.Bool("t" /* */, false /* */, "Trim down HTTP messages in stdout.")
-	optionSkipTlsVerification        = flag.Bool("s" /* */, false /* */, "Skip TLS verification.")
-	optionDisableHttp2               = flag.Bool("d" /* */, false /* */, "Disable HTTP/2.")
+	optionUseChunkedTransferEncoding = flag.Bool("c" /* */, false /* */, "Use \"Transfer-Encoding: chunked\" (only for HTTP/1.1)")
+	optionTrimDownHttpMessages       = flag.Bool("t" /* */, false /* */, "Trim down HTTP messages in stdout")
+	optionSkipTlsVerification        = flag.Bool("s" /* */, false /* */, "Skip TLS verification")
+	optionDisableHttp2               = flag.Bool("d" /* */, false /* */, "Disable HTTP/2")
 
 	// HTTP Header templates
 	createHttpHeaderEmpty = func() map[string]string {
@@ -62,15 +62,7 @@ var (
 )
 
 func init() {
-	b := new(bytes.Buffer)
-	func() { flag.CommandLine.SetOutput(b); flag.Usage(); flag.CommandLine.SetOutput(os.Stderr) }()
-	usage := strings.Replace(strings.Replace(b.String(), ":", " [OPTIONS]\n\nDescription:\n  "+commandDescription+"\n\nOptions:\n", 1), "Usage of", "Usage:", 1)
-	re := regexp.MustCompile(`[^,] +(-\S+)(?: (\S+))?\n*(\s+)(.*)\n`)
-	flag.Usage = func() {
-		_, _ = fmt.Fprint(flag.CommandLine.Output(), re.ReplaceAllStringFunc(usage, func(m string) string {
-			return fmt.Sprintf("  %-"+commandOptionFieldWidth+"s %s\n", re.FindStringSubmatch(m)[1]+" "+strings.TrimSpace(re.FindStringSubmatch(m)[2]), re.FindStringSubmatch(m)[4])
-		}))
-	}
+	flag.Usage = customUsage(new(bytes.Buffer), commandDescription, commandOptionFieldWidth)
 }
 
 // Build:
@@ -491,5 +483,17 @@ func createUuid() string {
 func handleError(err error, prefixErrMessage string) {
 	if err != nil {
 		fmt.Printf("%s [ERROR %s]: %v\n", time.Now().Format(TimeFormat), prefixErrMessage, err)
+	}
+}
+
+func customUsage(b *bytes.Buffer, description string, optionFieldWidth string) func() {
+	func() { flag.CommandLine.SetOutput(b); flag.PrintDefaults(); flag.CommandLine.SetOutput(nil) }()
+	return func() {
+		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s [OPTIONS]\n\n", func() string { e, _ := os.Executable(); return filepath.Base(e) }())
+		fmt.Fprintf(flag.CommandLine.Output(), "Description:\n  %s\n\n", description)
+		re := regexp.MustCompile(`(?m)^ +(-\S+)(?: (\S+))?\n*(\s+)(.*)\n`)
+		fmt.Fprintf(flag.CommandLine.Output(), "Options:\n%s", re.ReplaceAllStringFunc(b.String(), func(m string) string {
+			return fmt.Sprintf("  %-"+optionFieldWidth+"s %s\n", re.FindStringSubmatch(m)[1]+" "+strings.TrimSpace(re.FindStringSubmatch(m)[2]), re.FindStringSubmatch(m)[4])
+		}))
 	}
 }
