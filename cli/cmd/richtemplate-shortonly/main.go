@@ -177,6 +177,7 @@ func defineFlagValue[T comparable](flagName, description string, defaultValue T,
 		description = description + fmt.Sprintf(" (default %v)", defaultValue)
 	}
 	if strings.Contains(description, Req) {
+		// commandRequiredOptionExample = commandRequiredOptionExample + fmt.Sprintf("-%s <%T> ", flagName, defaultValue)
 		commandRequiredOptionExample = commandRequiredOptionExample + fmt.Sprintf("-%s %T ", flagName, defaultValue)
 	}
 	return flagFunc(flagName, defaultValue, description)
@@ -195,7 +196,8 @@ func customUsage(description, fieldWidth string) func() {
 // Print options usage message
 func printOptionsUsage(fieldWidth string, currentValue bool) {
 	flag.VisitAll(func(f *flag.Flag) {
-		value := strings.NewReplacer("*flag.", "", "Value", "", "bool", "").Replace(fmt.Sprintf("%T", f.Value))
+		//value := strings.NewReplacer("*flag.boolValue", "", "*flag.", "<", "Value", ">").Replace(fmt.Sprintf("%T", f.Value))
+		value := strings.NewReplacer("*flag.boolValue", "", "*flag.", "", "Value", "").Replace(fmt.Sprintf("%T", f.Value))
 		if currentValue {
 			value = f.Value.String()
 		}

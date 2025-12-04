@@ -179,9 +179,10 @@ func defineFlagValue[T comparable](short, long, description string, defaultValue
 		flagUsage = flagUsage + fmt.Sprintf(" (default %v)", defaultValue)
 	}
 	if strings.Contains(description, Req) {
+		//commandRequiredOptionExample = commandRequiredOptionExample + fmt.Sprintf("--%s <%T> ", long, defaultValue)
 		commandRequiredOptionExample = commandRequiredOptionExample + fmt.Sprintf("--%s %T ", long, defaultValue)
 	}
-	commandOptionMaxLength = max(commandOptionMaxLength, len(long)+12)
+	commandOptionMaxLength = max(commandOptionMaxLength, len(long)+14)
 	f := flagFunc(long, defaultValue, flagUsage)
 	flagVarFunc(f, short, defaultValue, UsageDummy)
 	return f
@@ -203,7 +204,8 @@ func getOptionsUsage(fieldWidth string, currentValue bool) string {
 		if f.Usage == UsageDummy {
 			return
 		}
-		value := strings.NewReplacer("*flag.", "", "Value", "", "bool", "").Replace(fmt.Sprintf("%T", f.Value))
+		// value := strings.NewReplacer("*flag.boolValue", "", "*flag.", "<", "Value", ">").Replace(fmt.Sprintf("%T", f.Value))
+		value := strings.NewReplacer("*flag.boolValue", "", "*flag.", "", "Value", "").Replace(fmt.Sprintf("%T", f.Value))
 		if currentValue {
 			value = f.Value.String()
 		}
