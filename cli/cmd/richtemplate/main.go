@@ -26,15 +26,14 @@ var (
 	//go:embed main.go
 	srcBytes []byte
 
-	commandDescription           = "A sample command demonstrating rich template usage in Go CLI applications."
-	commandOptionMaxLength       = 0  // Auto-adjusted in defineFlagValue
-	commandRequiredOptionExample = "" // Auto-adjusted in defineFlagValue
+	commandDescription = "A sample command demonstrating rich template usage in Go CLI applications."
 	// Command options (the -h and --help flags are provided by default in the flag package)
 	optionFilePath        = defineFlagValue("f", "file-path" /*    */, Color.Yellow(Req)+" File path" /*                   */, "" /*                         */, flag.String, flag.StringVar)
 	optionUrl             = defineFlagValue("u", "url" /*          */, "URL" /*                                            */, "https://httpbin.org/get" /*  */, flag.String, flag.StringVar)
 	optionLineIndex       = defineFlagValue("l", "line-index" /*   */, "Index of line" /*                                  */, 10 /*                         */, flag.Int, flag.IntVar)
 	optionDurationWaitSec = defineFlagValue("w", "wait-seconds" /* */, "Duration of wait seconds (e.g., 500ms, 3s, 2m)" /* */, 1*time.Second /*              */, flag.Duration, flag.DurationVar)
 	optionPrintSrc        = defineFlagValue("p", "print-src" /*    */, "Print source code" /*                              */, false /*                      */, flag.Bool, flag.BoolVar)
+	optionDebug           = defineFlagValue("d", "debug" /*        */, "Debug mode" /*                                     */, false /*                      */, flag.Bool, flag.BoolVar)
 
 	// Set environment variable
 	environmentValueLoopCount, _ = strconv.Atoi(cmp.Or(os.Getenv("LOOP_COUNT"), "10"))
@@ -54,7 +53,7 @@ var (
 
 func init() {
 	// Customize the usage message
-	flag.Usage = customUsage(commandDescription, strconv.Itoa(commandOptionMaxLength), commandRequiredOptionExample)
+	flag.Usage = customUsage(commandDescription)
 }
 
 // Build:
@@ -74,7 +73,8 @@ func main() {
 	}
 
 	fmt.Printf("[ Environment variable ]\nLOOP_COUNT: %d\n\n", environmentValueLoopCount)
-	fmt.Printf("[ Command options ]\n%s\n", getOptionsUsage(strconv.Itoa(commandOptionMaxLength), true))
+	optionsUsage, _ := getOptionsUsage(true)
+	fmt.Printf("[ Command options ]\n%s\n", optionsUsage)
 
 	time.Sleep(*optionDurationWaitSec)
 	contents := ReadAllFileContents(optionFilePath)
@@ -178,43 +178,50 @@ func defineFlagValue[T comparable](short, long, description string, defaultValue
 	if defaultValue != zero {
 		flagUsage = flagUsage + fmt.Sprintf(" (default %v)", defaultValue)
 	}
-	if strings.Contains(description, Req) {
-		//commandRequiredOptionExample = commandRequiredOptionExample + fmt.Sprintf("--%s <%T> ", long, defaultValue)
-		commandRequiredOptionExample = commandRequiredOptionExample + fmt.Sprintf("--%s %T ", long, defaultValue)
-	}
-	commandOptionMaxLength = max(commandOptionMaxLength, len(long)+14)
 	f := flagFunc(long, defaultValue, flagUsage)
 	flagVarFunc(f, short, defaultValue, UsageDummy)
 	return f
 }
 
 // Custom usage message
-func customUsage(description, fieldWidth string, requiredExample string) func() {
+func customUsage(description string) func() {
 	return func() {
-		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s %s[OPTIONS]\n\n", func() string { e, _ := os.Executable(); return filepath.Base(e) }(), requiredExample)
+		optionsUsage, requiredOptionExample := getOptionsUsage(false)
+		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s %s[OPTIONS]\n\n", func() string { e, _ := os.Executable(); return filepath.Base(e) }(), requiredOptionExample)
 		fmt.Fprintf(flag.CommandLine.Output(), "Description:\n  %s\n\n", description)
-		fmt.Fprintf(flag.CommandLine.Output(), "Options:\n%s", getOptionsUsage(fieldWidth, false))
+		fmt.Fprintf(flag.CommandLine.Output(), "Options:\n%s", optionsUsage)
 	}
 }
 
 // Get options usage message
-func getOptionsUsage(fieldWidth string, currentValue bool) string {
+func getOptionsUsage(currentValue bool) (string, string) {
+	requiredOptionExample := ""
+	optionNameWidth := 0
 	usages := make([]string, 0)
+	getType := func(v string) string {
+		return strings.NewReplacer("*flag.boolValue", "", "*flag.", "<", "Value", ">").Replace(v)
+		//return strings.NewReplacer("*flag.boolValue", "", "*flag.", "", "Value", "").Replace(v)
+	}
+	flag.VisitAll(func(f *flag.Flag) {
+		optionNameWidth = max(optionNameWidth, len(fmt.Sprintf("%s %s", f.Name, getType(fmt.Sprintf("%T", f.Value))))+4)
+	})
 	flag.VisitAll(func(f *flag.Flag) {
 		if f.Usage == UsageDummy {
 			return
 		}
-		// value := strings.NewReplacer("*flag.boolValue", "", "*flag.", "<", "Value", ">").Replace(fmt.Sprintf("%T", f.Value))
-		value := strings.NewReplacer("*flag.boolValue", "", "*flag.", "", "Value", "").Replace(fmt.Sprintf("%T", f.Value))
+		value := getType(fmt.Sprintf("%T", f.Value))
 		if currentValue {
 			value = f.Value.String()
 		}
 		short := strings.Split(f.Usage, UsageDummy)[0]
 		mainUsage := strings.Split(f.Usage, UsageDummy)[1]
-		usages = append(usages, fmt.Sprintf("  -%-1s, --%-"+fieldWidth+"s %s\n", short, f.Name+" "+value, mainUsage))
+		if strings.Contains(mainUsage, Req) {
+			requiredOptionExample += fmt.Sprintf("--%s %s ", f.Name, value)
+		}
+		usages = append(usages, fmt.Sprintf("  -%-1s, --%-"+strconv.Itoa(optionNameWidth)+"s %s\n", short, f.Name+" "+value, mainUsage))
 	})
 	sort.SliceStable(usages, func(i, j int) bool {
 		return strings.Count(usages[i], Req) > strings.Count(usages[j], Req)
 	})
-	return strings.Join(usages, "")
+	return strings.Join(usages, ""), requiredOptionExample
 }
