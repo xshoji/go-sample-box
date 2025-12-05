@@ -23,23 +23,23 @@ const (
 
 var (
 	// Command options (the -h and --help flags are provided by default in the flag package)
-	commandDescription      = "A sample command demonstrating simple template usage in Go CLI applications."
-	commandOptionFieldWidth = "12" // Recommended width = general: 12, bool only: 5
-	optionFilePath          = flag.String("f" /*   */, "" /*                         */, Req+"File path")
-	optionUrl               = flag.String("u" /*   */, "https://httpbin.org/get" /*  */, "URL")
-	optionLineIndex         = flag.Int("l" /*      */, 10 /*                         */, "Index of line")
-	optionDebug             = flag.Bool("d" /*     */, false /*                      */, "Debug mode")
-	optionDurationWaitSec   = flag.Duration("w" /* */, 1*time.Second /*              */, "Duration of wait seconds (e.g., 1s, 500ms, 2m)")
+	commandDescription    = "A sample command demonstrating simple template usage in Go CLI applications."
+	optionFilePath        = flag.String("f" /*   */, "" /*                         */, Req+"File path")
+	optionUrl             = flag.String("u" /*   */, "https://httpbin.org/get" /*  */, "URL")
+	optionLineIndex       = flag.Int("l" /*      */, 10 /*                         */, "Index of line")
+	optionDebug           = flag.Bool("d" /*     */, false /*                      */, "Debug mode")
+	optionDurationWaitSec = flag.Duration("w" /* */, 1*time.Second /*              */, "Duration of wait seconds (e.g., 1s, 500ms, 2m)")
 
 	// Set environment variable
 	environmentValueLoopCount, _ = strconv.Atoi(cmp.Or(os.Getenv("LOOP_COUNT"), "10"))
 )
 
 func init() {
-	flag.Usage = customUsage(commandDescription, commandOptionFieldWidth)
+	flag.Usage = customUsage(commandDescription)
 }
 
-func customUsage(description string, optionFieldWidth string) func() {
+func customUsage(description string) func() {
+	optionFieldWidth := "12" // Recommended width = general: 12, bool only: 5
 	b := new(bytes.Buffer)
 	func() { flag.CommandLine.SetOutput(b); flag.PrintDefaults(); flag.CommandLine.SetOutput(nil) }()
 	return func() {
