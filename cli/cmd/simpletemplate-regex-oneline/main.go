@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -39,16 +40,18 @@ func init() {
 }
 
 func customUsage(description string) func() {
-	optionFieldWidth := "12" // Recommended width = general: 12, bool only: 5
+	optionFieldWidth := "14" // Recommended width = general: 14, bool only: 5
 	b := new(bytes.Buffer)
 	func() { flag.CommandLine.SetOutput(b); flag.PrintDefaults(); flag.CommandLine.SetOutput(nil) }()
 	return func() {
+		re := regexp.MustCompile(`(?m)^ +(-\S+)(?: (\S+))?\n*(\s+)(.*)\n`)
+		usages := strings.Split(re.ReplaceAllStringFunc(b.String(), func(m string) string {
+			return fmt.Sprintf("  %-"+optionFieldWidth+"s %s\n", re.FindStringSubmatch(m)[1]+" "+strings.TrimSpace(re.FindStringSubmatch(m)[2]), re.FindStringSubmatch(m)[4])
+		}), "\n")
+		sort.SliceStable(usages, func(i, j int) bool { return strings.Contains(usages[i], Req) && !strings.Contains(usages[j], Req) })
 		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s [OPTIONS]\n\n", func() string { e, _ := os.Executable(); return filepath.Base(e) }())
 		fmt.Fprintf(flag.CommandLine.Output(), "Description:\n  %s\n\n", description)
-		re := regexp.MustCompile(`(?m)^ +(-\S+)(?: (\S+))?\n*(\s+)(.*)\n`)
-		fmt.Fprintf(flag.CommandLine.Output(), "Options:\n%s", re.ReplaceAllStringFunc(b.String(), func(m string) string {
-			return fmt.Sprintf("  %-"+optionFieldWidth+"s %s\n", re.FindStringSubmatch(m)[1]+" "+strings.TrimSpace(re.FindStringSubmatch(m)[2]), re.FindStringSubmatch(m)[4])
-		}))
+		fmt.Fprintf(flag.CommandLine.Output(), "Options:\n%s", strings.Join(usages, "\n"))
 	}
 }
 

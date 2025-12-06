@@ -26,7 +26,7 @@ var (
 	//go:embed main.go
 	srcBytes []byte
 
-	commandDescription = "A sample command demonstrating rich template usage in Go CLI applications."
+	commandDescription = "A sample command demonstrating full template usage in Go CLI applications."
 	// Command options (the -h and --help flags are provided by default in the flag package)
 	optionFilePath        = defineFlagValue("f", "file-path" /*    */, Color.Yellow(Req)+" File path" /*                   */, "" /*                         */, flag.String, flag.StringVar)
 	optionUrl             = defineFlagValue("u", "url" /*          */, "URL" /*                                            */, "https://httpbin.org/get" /*  */, flag.String, flag.StringVar)
@@ -200,7 +200,6 @@ func getOptionsUsage(currentValue bool) (string, string) {
 	usages := make([]string, 0)
 	getType := func(v string) string {
 		return strings.NewReplacer("*flag.boolValue", "", "*flag.", "<", "Value", ">").Replace(v)
-		//return strings.NewReplacer("*flag.boolValue", "", "*flag.", "", "Value", "").Replace(v)
 	}
 	flag.VisitAll(func(f *flag.Flag) {
 		optionNameWidth = max(optionNameWidth, len(fmt.Sprintf("%s %s", f.Name, getType(fmt.Sprintf("%T", f.Value))))+4)
