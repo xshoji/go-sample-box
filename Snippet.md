@@ -18,6 +18,34 @@ APP="/tmp/app"; MAIN="main.go"; GOOS=darwin GOARCH=amd64 go build -ldflags="-s -
 * [overridegobuild - Inject build-time variables with Golang](https://blog.alexellis.io/inject-build-time-vars-golang/#overridegobuild)
 * [trimpath-オプションを付けてビルド - Goメモ-111 （ビルド時にデバッグ情報とかを消してサイズを小さくする, ldflags, trimpath, upx） - いろいろ備忘録日記](https://devlights.hatenablog.com/entry/2020/10/21/192615#trimpath-%E3%82%AA%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3%E3%82%92%E4%BB%98%E3%81%91%E3%81%A6%E3%83%93%E3%83%AB%E3%83%89)
 
+## Update dependency
+
+```
+# 1) 更新可能なモジュールを確認
+go list -m -u all
+
+# 2) 特定モジュールを特定バージョンへ上げる
+go get github.com/example/pkg@v1.2.3
+
+# 3) すべての依存を最新（マイナー/パッチ）に上げる（カレントモジュール配下）
+go get -u ./...
+
+# 4) パッチのみに限定して上げる（必要なら）
+go get -u=patch ./...
+
+# 5) 変更後にモジュールを整える
+go mod tidy
+
+# 6) Vendoring を使っている場合は更新
+go mod vendor
+
+# 7) バイナリツールは go install でバージョン指定（go.mod を変更しない）
+go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.52.2
+
+# 8) 最後にビルド・テスト
+go build ./...
+go test ./...
+```
 
 # Snippet
 
