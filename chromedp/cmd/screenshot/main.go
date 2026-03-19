@@ -3,14 +3,15 @@ package main
 import (
 	"context"
 	"flag"
-	"github.com/chromedp/cdproto/emulation"
-	"github.com/chromedp/chromedp"
 	"io/ioutil"
 	"log"
 	"os"
 	"os/signal"
 	"runtime"
 	"time"
+
+	"github.com/chromedp/cdproto/emulation"
+	"github.com/chromedp/chromedp"
 )
 
 var (
@@ -32,23 +33,25 @@ var (
 		},
 	}
 	arguments = struct {
-		url           *string
-		querySelector *string
-		outputPath    *string
-		windowWidth   *int64
-		windowHeight  *int64
-		debug         *bool
-		noHeadless    *bool
-		help          *bool
+		url               *string
+		querySelector     *string
+		outputPath        *string
+		windowWidth       *int64
+		windowHeight      *int64
+		deviceScaleFactor *float64
+		fullscreenshot    *bool
+		debug             *bool
+		noHeadless        *bool
 	}{
 		flag.String("u", "" /*              */, ColorPrinter.Colorize(ColorPrinter.Yellow, "[Required]")+" URL"),
 		flag.String("q", "" /*              */, ColorPrinter.Colorize(ColorPrinter.Yellow, "[Required]")+" Query selector. A screenshot target is the first element node matching the selector. ( e.g. -q=\".className#id\" )"),
 		flag.String("o", `/tmp/img.png` /*  */, "Output path of screenshot"),
-		flag.Int64("wi", 1440 /*            */, "Set width of window"),
-		flag.Int64("he", 1000 /*            */, "Set height of window"),
+		flag.Int64("wi", 1280 /*            */, "Set width of window"),
+		flag.Int64("he", 860 /*             */, "Set height of window (usually, the height is overridden because the height of the element specified by -q often exceeds the height of the window)"),
+		flag.Float64("ds", 2.0 /*          */, "Set deviceScaleFactor (2.0 = Retina)"),
+		flag.Bool("f", false /*             */, "\nEnable full screenshot mode (if true, the -wi, -he flags are ignored)"),
 		flag.Bool("d", false /*             */, "\nEnable debug mode"),
 		flag.Bool("n", false /*             */, "\nDisable Headless mode"),
-		flag.Bool("h", false /*             */, "\nShow help"),
 	}
 )
 
@@ -64,16 +67,17 @@ var (
 func main() {
 
 	flag.Parse()
-	if *arguments.help || *arguments.url == "" || *arguments.querySelector == "" {
+	if *arguments.url == "" || *arguments.querySelector == "" {
 		flag.Usage()
 		os.Exit(0)
 	}
 
-	log.Printf("url: %v\n", *arguments.url)
-	log.Printf("query: %v\n", *arguments.querySelector)
-	log.Printf("output: %v\n", *arguments.outputPath)
-	log.Printf("width: %v\n", *arguments.windowWidth)
-	log.Printf("height: %v\n", *arguments.windowHeight)
+	log.Printf("            url: %v\n", *arguments.url)
+	log.Printf("          query: %v\n", *arguments.querySelector)
+	log.Printf("         output: %v\n", *arguments.outputPath)
+	log.Printf("          width: %v\n", *arguments.windowWidth)
+	log.Printf("         height: %v\n", *arguments.windowHeight)
+	log.Printf("full screenshot: %v\n", *arguments.fullscreenshot)
 
 	var err error
 
@@ -110,14 +114,20 @@ func main() {
 	// > screenshot from a wrong page · Issue #205 · chromedp/chromedp
 	// > https://github.com/chromedp/chromedp/issues/205
 	// set param
-	err = chromedp.Run(ctxt, emulation.SetDeviceMetricsOverride(*arguments.windowWidth, *arguments.windowHeight, 1, false))
+	err = chromedp.Run(ctxt, emulation.SetDeviceMetricsOverride(*arguments.windowWidth, *arguments.windowHeight, *arguments.deviceScaleFactor, false))
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// run task list
 	var buf []byte
-	err = chromedp.Run(ctxt, screenshot(*arguments.url, *arguments.querySelector, &buf))
+	var screenshotFunc chromedp.Action
+	if *arguments.fullscreenshot {
+		screenshotFunc = chromedp.Screenshot(*arguments.querySelector, &buf, chromedp.ByQuery)
+	} else {
+		screenshotFunc = chromedp.FullScreenshot(&buf, 100)
+	}
+	err = chromedp.Run(ctxt, screenshot(*arguments.url, *arguments.querySelector, screenshotFunc))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -128,11 +138,11 @@ func main() {
 	}
 }
 
-func screenshot(url, sel string, buf *[]byte) chromedp.Tasks {
+func screenshot(url, sel string, screenShotAction chromedp.Action) chromedp.Tasks {
 	return chromedp.Tasks{
 		chromedp.Navigate(url),
 		chromedp.Sleep(1 * time.Second),
 		chromedp.WaitVisible(sel, chromedp.ByQuery),
-		chromedp.Screenshot(sel, buf, chromedp.ByQuery),
+		screenShotAction,
 	}
 }
