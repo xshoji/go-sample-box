@@ -3,11 +3,13 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"sync"
 	"time"
 
@@ -15,6 +17,15 @@ import (
 	"github.com/chromedp/cdproto/page"
 	"github.com/chromedp/chromedp"
 )
+
+// stringSlice implements flag.Value to accept multiple -u flags.
+type stringSlice []string
+
+func (s *stringSlice) String() string { return strings.Join(*s, ", ") }
+func (s *stringSlice) Set(v string) error {
+	*s = append(*s, v)
+	return nil
+}
 
 var (
 	ColorPrinter = struct {
@@ -34,11 +45,12 @@ var (
 			return color + text + colorReset
 		},
 	}
+	urls      stringSlice
 	arguments = struct {
-		url               *string
 		querySelector     *string
 		outputPath        *string
 		profileDir        *string
+		waitSeconds       *int
 		windowWidth       *int64
 		windowHeight      *int64
 		deviceScaleFactor *float64
@@ -47,13 +59,13 @@ var (
 		noHeadless        *bool
 		saveProfile       *bool
 	}{
-		flag.String("u", "" /*              */, ColorPrinter.Colorize(ColorPrinter.Yellow, "[Required]")+" URL"),
 		flag.String("q", "" /*              */, "Query selector. Screenshot the first matching element. ( e.g. -q=\".className#id\" )"),
-		flag.String("o", `/tmp/img.png` /*  */, "Output path of screenshot"),
+		flag.String("o", `/tmp/img.png` /*  */, "Output path of screenshot (with multiple URLs, auto-numbered: <base>_001.png, _002.png, ...)"),
 		flag.String("pd", `` /*             */, "Chrome profile directory to copy and cache. (e.g. -pd=\"/Users/you/Library/Application Support/Google/Chrome/Default\"). Use -s to keep cache after execution."),
+		flag.Int("w", 3 /*                  */, "Wait seconds after page navigation before taking screenshot"),
 		flag.Int64("wi", 1280 /*            */, "Viewport width (affects page layout, e.g. responsive design). Without -q, this is the output image width"),
 		flag.Int64("he", 860 /*             */, "Viewport height (affects page layout, e.g. responsive design). Without -q, this is the output image height"),
-		flag.Float64("ds", 2.0 /*          */, "Device scale factor (2.0 = Retina)"),
+		flag.Float64("ds", 2.0 /*           */, "Device scale factor (2.0 = Retina)"),
 		flag.Bool("f", false /*             */, "\nEnable full screenshot mode"),
 		flag.Bool("d", false /*             */, "\nEnable debug mode"),
 		flag.Bool("n", false /*             */, "\nDisable headless mode"),
@@ -62,19 +74,22 @@ var (
 )
 
 // [ Usage ]
-// go run cmd/screenshot/main.go -u="https://news.yahoo.co.jp/" -q="#liveStream" -o="/tmp/yahoo_news_livestream.png"
-// go run cmd/screenshot/main.go -u="https://news.yahoo.co.jp/" -q="section.toptopics" -o="/tmp/yahoo_news_toptopics.png"
+// go run cmd/screenshot-rich/main.go -u="https://news.yahoo.co.jp/" -q="#liveStream" -o="/tmp/yahoo_news_livestream.png"
+// go run cmd/screenshot-rich/main.go -u="https://news.yahoo.co.jp/" -q="section.toptopics" -o="/tmp/yahoo_news_toptopics.png"
 // # full screenshot
-// go run cmd/screenshot/main.go -u="https://www.yahoo.co.jp/" -q="html" -wi=1280 -he=800 -o=/tmp/s.png
+// go run cmd/screenshot-rich/main.go -u="https://www.yahoo.co.jp/" -q="html" -wi=1280 -he=800 -o=/tmp/s.png
 // # viewport screenshot (no selector)
-// go run cmd/screenshot/main.go -u="https://www.yahoo.co.jp/" -wi=1280 -he=800 -o=/tmp/s.png
+// go run cmd/screenshot-rich/main.go -u="https://www.yahoo.co.jp/" -wi=1280 -he=800 -o=/tmp/s.png
+// # multiple URLs (single Chrome process)
+// go run cmd/screenshot-rich/main.go -u="https://www.yahoo.co.jp/" -u="https://www.google.com/" -o=/tmp/s.png
 //
 // [ References ]
 // querySelector()を使うとjQueryみたいにセレクターで要素を取得できるよ。（DOMおれおれAdvent Calendar 2015 – 02日目） ｜ Ginpen.com
 // https://ginpen.com/2015/12/02/queryselector-api-like-jquery/
 func main() {
+	flag.Var(&urls, "u", ColorPrinter.Colorize(ColorPrinter.Yellow, "[Required]")+" URL (can be specified multiple times)")
 	flag.Parse()
-	if *arguments.url == "" {
+	if len(urls) == 0 {
 		flag.Usage()
 		os.Exit(0)
 	}
@@ -86,25 +101,63 @@ func main() {
 	browserCtx, shutdownBrowser := newBrowserContext()
 	defer shutdownBrowser()
 
-	// --- 3. Log settings ---
+	// --- 3. Start browser (must be done before parallel tabs) ---
+	if err := chromedp.Run(browserCtx); err != nil {
+		log.Fatal(err)
+	}
+
+	// --- 4. Log settings ---
 	logSettings(profileCacheDir)
 
-	// --- 4. Take screenshot ---
-	buf, err := takeScreenshot(browserCtx)
-	if err != nil {
-		log.Fatal(err)
+	// --- 5. Take screenshots (parallel with separate tabs) ---
+	type result struct {
+		index int
+		err   error
 	}
+	results := make(chan result, len(urls))
+	for i, u := range urls {
+		go func(i int, u string) {
+			// Create a new tab context from the browser context
+			tabCtx, tabCancel := chromedp.NewContext(browserCtx)
+			defer tabCancel()
 
-	// --- 5. Write output ---
-	if err := os.WriteFile(*arguments.outputPath, buf, 0644); err != nil {
-		log.Fatal(err)
+			log.Printf("[%d/%d] capturing: %s", i+1, len(urls), u)
+			buf, err := takeScreenshot(tabCtx, u)
+			if err != nil {
+				results <- result{i, fmt.Errorf("capture %s: %w", u, err)}
+				return
+			}
+
+			outPath := outputPath(i)
+			if err := os.WriteFile(outPath, buf, 0644); err != nil {
+				results <- result{i, fmt.Errorf("write %s: %w", outPath, err)}
+				return
+			}
+			log.Printf("saved screenshot: %s", outPath)
+			results <- result{i, nil}
+		}(i, u)
 	}
-	log.Printf("saved screenshot: %s", *arguments.outputPath)
+	for range urls {
+		if r := <-results; r.err != nil {
+			log.Fatal(r.err)
+		}
+	}
 
 	// --- 6. Cleanup ---
 	// Shut down Chrome before deleting profile to release file locks
 	shutdownBrowser()
 	cleanupProfileCache(profileCacheDir)
+}
+
+// outputPath returns the output file path for the i-th URL.
+// Single URL: uses -o as-is. Multiple URLs: <base>_001.png, _002.png, ...
+func outputPath(index int) string {
+	if len(urls) == 1 {
+		return *arguments.outputPath
+	}
+	ext := filepath.Ext(*arguments.outputPath)
+	base := strings.TrimSuffix(*arguments.outputPath, ext)
+	return fmt.Sprintf("%s_%03d%s", base, index+1, ext)
 }
 
 // setupProfileCache copies the specified Chrome profile to a cache directory.
@@ -151,6 +204,7 @@ func newBrowserContext() (context.Context, func()) {
 	if *arguments.profileDir != "" {
 		profileName := filepath.Base(*arguments.profileDir)
 		userDataDir := filepath.Join(chromeProfileCacheRoot(), "userdata-"+profileName)
+		removeStaleChromeLocks(userDataDir)
 		opts = append(opts,
 			chromedp.Flag("user-data-dir", userDataDir),
 			chromedp.Flag("profile-directory", profileName),
@@ -192,7 +246,7 @@ func newBrowserContext() (context.Context, func()) {
 }
 
 // takeScreenshot navigates to the URL and captures a screenshot.
-func takeScreenshot(ctx context.Context) ([]byte, error) {
+func takeScreenshot(ctx context.Context, url string) ([]byte, error) {
 	var buf []byte
 
 	// Set viewport
@@ -210,10 +264,10 @@ func takeScreenshot(ctx context.Context) ([]byte, error) {
 		// Use page.Navigate directly to avoid hanging on pages
 		// that never fire the load event within a constrained viewport.
 		chromedp.ActionFunc(func(ctx context.Context) error {
-			_, _, _, _, err := page.Navigate(*arguments.url).Do(ctx)
+			_, _, _, _, err := page.Navigate(url).Do(ctx)
 			return err
 		}),
-		chromedp.Sleep(3 * time.Second),
+		chromedp.Sleep(time.Duration(*arguments.waitSeconds) * time.Second),
 	}
 
 	// Wait & capture
@@ -243,6 +297,16 @@ func takeScreenshot(ctx context.Context) ([]byte, error) {
 	return buf, nil
 }
 
+// removeStaleChromeLocks removes lock files left by previous crashed runs.
+func removeStaleChromeLocks(userDataDir string) {
+	for _, name := range []string{"SingletonLock", "SingletonCookie", "SingletonSocket"} {
+		p := filepath.Join(userDataDir, name)
+		if err := os.Remove(p); err == nil {
+			log.Printf("removed stale lock: %s", p)
+		}
+	}
+}
+
 // cleanupProfileCache deletes the cached profile directory unless -s is specified.
 func cleanupProfileCache(cacheDir string) {
 	if cacheDir == "" || *arguments.saveProfile {
@@ -268,7 +332,9 @@ func chromeProfileCacheRoot() string {
 }
 
 func logSettings(profileCacheDir string) {
-	log.Printf("            url: %s", *arguments.url)
+	for i, u := range urls {
+		log.Printf("         url[%d]: %s", i, u)
+	}
 	log.Printf("          query: %s", *arguments.querySelector)
 	log.Printf("         output: %s", *arguments.outputPath)
 	log.Printf("    profile dir: %s", *arguments.profileDir)
