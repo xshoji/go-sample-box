@@ -45,8 +45,9 @@ var (
 			return color + text + colorReset
 		},
 	}
-	urls      stringSlice
-	arguments = struct {
+	urls        stringSlice
+	chromeFlags stringSlice
+	arguments   = struct {
 		querySelector     *string
 		outputPath        *string
 		profileDir        *string
@@ -88,6 +89,7 @@ var (
 // https://ginpen.com/2015/12/02/queryselector-api-like-jquery/
 func main() {
 	flag.Var(&urls, "u", ColorPrinter.Colorize(ColorPrinter.Yellow, "[Required]")+" URL (can be specified multiple times)")
+	flag.Var(&chromeFlags, "c", "Extra Chrome flag as key=value (can be specified multiple times, e.g. -c \"lang=ja\" -c \"disable-extensions\"). Key only (no '=') is treated as a boolean flag (--key).")
 	flag.Parse()
 	if len(urls) == 0 {
 		flag.Usage()
@@ -200,6 +202,16 @@ func newBrowserContext() (context.Context, func()) {
 		chromedp.Flag("no-first-run", true),
 		chromedp.Flag("no-default-browser-check", true),
 	)
+
+	// Apply extra Chrome flags from -c options
+	for _, cf := range chromeFlags {
+		k, v, _ := strings.Cut(cf, "=")
+		if v == "" {
+			opts = append(opts, chromedp.Flag(k, true))
+		} else {
+			opts = append(opts, chromedp.Flag(k, v))
+		}
+	}
 
 	if *arguments.profileDir != "" {
 		profileName := filepath.Base(*arguments.profileDir)
@@ -342,6 +354,9 @@ func logSettings(profileCacheDir string) {
 	log.Printf("   scale factor: %.1f", *arguments.deviceScaleFactor)
 	log.Printf("full screenshot: %v", *arguments.fullScreenshot)
 	log.Printf("       headless: %v", !*arguments.noHeadless)
+	for i, cf := range chromeFlags {
+		log.Printf("  chrome flag[%d]: %s", i, cf)
+	}
 	if profileCacheDir != "" {
 		log.Printf("  profile cache: %s", profileCacheDir)
 		log.Printf("   save profile: %v", *arguments.saveProfile)
