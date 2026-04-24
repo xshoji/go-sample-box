@@ -38,7 +38,7 @@ func init() {
 	formatUsage(commandDescription, commandOptionFieldWidth)
 }
 
-// # Build: APP="/tmp/tool"; MAIN="main.go"; GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o "${APP}" "${MAIN}"; chmod +x "${APP}"
+// # Build: APP="/tmp/tool"; MAIN="main.go"; GOOS=darwin GOARCH=amd64 go build -ldflags="-s" -trimpath -o "${APP}" "${MAIN}"; chmod +x "${APP}"
 func main() {
 
 	flag.Parse()

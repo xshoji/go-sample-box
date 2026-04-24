@@ -72,7 +72,7 @@ func parseArgsAndBuild() {
 		fmt.Printf("Error: Build mode cannot be specified for an executable binary.\n")
 		os.Exit(1)
 	}
-	cmd := exec.Command("go", "build", `-ldflags=-s -w`, "-trimpath", "-o", outputPath, sourcePath)
+	cmd := exec.Command("go", "build", `-ldflags=-s`, "-trimpath", "-o", outputPath, sourcePath)
 	env := os.Environ()
 	env = append(env, "GOOS="+targetOs, "GOARCH=amd64")
 	cmd.Env = env

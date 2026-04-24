@@ -22,7 +22,7 @@ var (
 
 // Build
 // ------
-// $ APP="/tmp/app"; MAIN="main.go"; GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w -X 'main.md5info=$(md5 ${MAIN})'" -trimpath -o "${APP}" "${MAIN}"; chmod +x "${APP}"
+// $ APP="/tmp/app"; MAIN="main.go"; GOOS=darwin GOARCH=amd64 go build -ldflags="-s -X 'main.md5info=$(md5 ${MAIN})'" -trimpath -o "${APP}" "${MAIN}"; chmod +x "${APP}"
 func main() {
 
 	flag.Parse()

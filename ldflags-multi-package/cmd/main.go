@@ -5,8 +5,9 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/xshoji/go-sample-box/ldflags-multi-package/sub"
 	"os"
+
+	"github.com/xshoji/go-sample-box/ldflags-multi-package/sub"
 )
 
 var (
@@ -20,7 +21,7 @@ var (
 
 // Build
 // ------
-// $ APP="/tmp/app"; MAIN="cmd/main.go"; GOOS=darwin GOARCH=amd64; toKV() { echo "\"${1}\":\"$(cat ${1} |base64)\""; }; export -f toKV; toBase64() { find . -type f -not -path '*/.*' |xargs -I{} bash -c "toKV {}" |awk 'NR==1{printf "{"}{printf "%s%s",sep,$0; sep=","}END{print "}"}' |base64; }; export -f toBase64; go build -ldflags="-s -w -X 'main.base64src=$(toBase64)'" -trimpath -o "${APP}" "${MAIN}"; chmod +x "${APP}"
+// $ APP="/tmp/app"; MAIN="cmd/main.go"; GOOS=darwin GOARCH=amd64; toKV() { echo "\"${1}\":\"$(cat ${1} |base64)\""; }; export -f toKV; toBase64() { find . -type f -not -path '*/.*' |xargs -I{} bash -c "toKV {}" |awk 'NR==1{printf "{"}{printf "%s%s",sep,$0; sep=","}END{print "}"}' |base64; }; export -f toBase64; go build -ldflags="-s -X 'main.base64src=$(toBase64)'" -trimpath -o "${APP}" "${MAIN}"; chmod +x "${APP}"
 func main() {
 
 	flag.Parse()
